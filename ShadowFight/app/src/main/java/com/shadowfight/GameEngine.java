@@ -83,6 +83,9 @@ public class GameEngine {
     // AI学习模式
     private boolean useQLearning;
 
+    // 玩家移动方向：0=静止, -1=左, 1=右
+    private float playerMoveDir = 0;
+
     public GameEngine(Context context) {
         this.phase = GamePhase.MENU;
         this.hitStopManager = new HitStopManager();
@@ -225,7 +228,11 @@ public class GameEngine {
         updatePlayer(deltaTime);
 
         // 更新AI
+        float aiXBefore = ai.x;
         aiController.update(deltaTime, ai, player);
+        float aiXAfter = ai.x;
+        // 根据AI位置变化设置移动状态
+        ai.setMoving(Math.abs(aiXAfter - aiXBefore) > 0.01f && ai.canAct());
 
         // 更新角色
         player.update(deltaTime);
@@ -258,22 +265,19 @@ public class GameEngine {
         if (player.state == FighterState.ATTACKING || player.state == FighterState.SKILL_CAST) return;
 
         // 移动
+        playerMoveDir = 0;
         if (inputLeft && player.canAct()) {
-            player.x -= player.speed * deltaTime;
-            if (player.state != FighterState.WALKING && !inputBlock) {
-                player.state = FighterState.WALKING;
-                player.animPlayer.play("walk");
-            }
+            playerMoveDir = -1;
         } else if (inputRight && player.canAct()) {
-            player.x += player.speed * deltaTime;
-            if (player.state != FighterState.WALKING && !inputBlock) {
-                player.state = FighterState.WALKING;
-                player.animPlayer.play("walk");
-            }
-        } else if (player.state == FighterState.WALKING) {
-            player.state = FighterState.IDLE;
-            player.animPlayer.play("idle");
+            playerMoveDir = 1;
         }
+
+        if (playerMoveDir != 0 && player.canAct()) {
+            player.x += playerMoveDir * player.speed * deltaTime;
+        }
+
+        // 通过 setMoving 让 Fighter 自行管理 IDLE↔WALKING 状态切换
+        player.setMoving(playerMoveDir != 0 && player.canAct());
 
         // 格挡
         if (inputBlock && player.canAct()) {

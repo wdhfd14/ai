@@ -202,15 +202,11 @@ public class AIController {
             case MOVE_LEFT:
                 if (ai.isBlocking) ai.stopBlock();
                 ai.x -= ai.speed * 0.016f;
-                if (ai.state == FighterState.IDLE) ai.state = FighterState.WALKING;
-                ai.facingRight = false;
                 break;
 
             case MOVE_RIGHT:
                 if (ai.isBlocking) ai.stopBlock();
                 ai.x += ai.speed * 0.016f;
-                if (ai.state == FighterState.IDLE) ai.state = FighterState.WALKING;
-                ai.facingRight = true;
                 break;
 
             case LIGHT_ATTACK:
@@ -314,10 +310,8 @@ public class AIController {
 
     private AIAction moveTowardPlayer(Fighter ai, Fighter player) {
         if (ai.x < player.x) {
-            ai.facingRight = true;
             return AIAction.MOVE_RIGHT;
         } else {
-            ai.facingRight = false;
             return AIAction.MOVE_LEFT;
         }
     }

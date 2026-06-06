@@ -78,6 +78,19 @@ public class Fighter {
     // 起身状态标记
     private boolean isGettingUp;
 
+    // 动画去重：记录上次播放的动画名，避免每帧重复调用 play()
+    private String lastAnimName = "";
+
+    /**
+     * 仅在动画名变化时调用 animPlayer.play()，防止每帧重置动画时间。
+     */
+    private void playAnim(String name) {
+        if (!name.equals(lastAnimName)) {
+            animPlayer.play(name);
+            lastAnimName = name;
+        }
+    }
+
     public Fighter(CharacterType charType, WeaponType weaponType, float x, float y, boolean facingRight) {
         this.characterType = charType;
         this.weaponType = weaponType;
@@ -1580,15 +1593,15 @@ public class Fighter {
         switch (state) {
             case IDLE:
                 if (!isGettingUp) {
-                    animPlayer.play("idle");
+                    playAnim("idle");
                 } else if (animPlayer.isFinished()) {
                     isGettingUp = false;
-                    animPlayer.play("idle");
+                    playAnim("idle");
                 }
                 break;
 
             case WALKING:
-                animPlayer.play("walk");
+                playAnim("walk");
                 break;
 
             case ATTACKING:
@@ -1597,7 +1610,7 @@ public class Fighter {
                 break;
 
             case BLOCKING:
-                animPlayer.play("block");
+                playAnim("block");
                 if (blockStunTimer > 0) {
                     blockStunTimer -= deltaTime;
                 }
@@ -1614,7 +1627,7 @@ public class Fighter {
 
             case KNOCKDOWN:
                 if (animPlayer.isFinished()) {
-                    animPlayer.play("getup");
+                    playAnim("getup");
                     state = FighterState.IDLE;
                     isGettingUp = true;
                     stateTimer = 0;
@@ -1736,7 +1749,7 @@ public class Fighter {
         currentFrameData = getFrameData(type);
 
         String animName = getAttackAnimationName(type);
-        animPlayer.play(animName);
+        playAnim(animName);
 
         isBlocking = false;
         stateTimer = 0;
@@ -1749,7 +1762,7 @@ public class Fighter {
         state = FighterState.BLOCKING;
         isBlocking = true;
         blockStunTimer = 0;
-        animPlayer.play("block");
+        playAnim("block");
         stateTimer = 0;
     }
 
@@ -1758,7 +1771,7 @@ public class Fighter {
         state = FighterState.IDLE;
         isBlocking = false;
         blockStunTimer = 0;
-        animPlayer.play("idle");
+        playAnim("idle");
         stateTimer = 0;
     }
 
@@ -1770,7 +1783,7 @@ public class Fighter {
         dodgeDirection = direction;
         dodgeTimer = 0.3f;
         invincible = true;
-        animPlayer.play("dodge");
+        playAnim("dodge");
         stateTimer = 0;
     }
 
@@ -1794,10 +1807,10 @@ public class Fighter {
             // 判断是否被击倒（大击退力）
             if (Math.abs(kbx) > 6f || Math.abs(kby) > 4f) {
                 state = FighterState.KNOCKDOWN;
-                animPlayer.play("knockdown");
+                playAnim("knockdown");
             } else {
                 state = FighterState.HIT;
-                animPlayer.play("hit");
+                playAnim("hit");
             }
         }
 
@@ -1922,6 +1935,20 @@ public class Fighter {
         return state == FighterState.IDLE || state == FighterState.WALKING;
     }
 
+    /**
+     * 由外部（GameEngine/AI）调用，通知角色是否正在移动。
+     * 仅在 IDLE↔WALKING 之间切换，避免直接修改 state 导致状态机不一致。
+     */
+    public void setMoving(boolean moving) {
+        if (moving && state == FighterState.IDLE) {
+            state = FighterState.WALKING;
+            playAnim("walk");
+        } else if (!moving && state == FighterState.WALKING) {
+            state = FighterState.IDLE;
+            playAnim("idle");
+        }
+    }
+
     public void reset() {
         hp = maxHp;
         state = FighterState.IDLE;
@@ -1948,7 +1975,8 @@ public class Fighter {
         velocityY = 0;
         stateTimer = 0;
         isGettingUp = false;
+        lastAnimName = "";
         skeleton.resetPose();
-        animPlayer.play("idle");
+        playAnim("idle");
     }
 }

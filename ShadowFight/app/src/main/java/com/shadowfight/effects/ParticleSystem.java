@@ -1,6 +1,7 @@
 package com.shadowfight.effects;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 
 import java.util.ArrayList;
@@ -16,9 +17,21 @@ public class ParticleSystem {
     private final List<Particle> particles;
     private final Paint paint;
 
+    // 屏幕尺寸（用于屏幕闪光）
+    private float canvasW;
+    private float canvasH;
+
     public ParticleSystem() {
         this.particles = new ArrayList<>();
         this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    }
+
+    /**
+     * 设置画布尺寸，用于屏幕闪光效果。
+     */
+    public void setCanvasSize(int w, int h) {
+        this.canvasW = w;
+        this.canvasH = h;
     }
 
     /**
@@ -34,8 +47,8 @@ public class ParticleSystem {
             float speed = 100f + (float) Math.random() * 300f;
             float vx = (float) Math.cos(angle) * speed;
             float vy = (float) Math.sin(angle) * speed;
-            float life = 0.3f + (float) Math.random() * 0.5f;
-            float size = 2f + (float) Math.random() * 4f;
+            float life = 0.4f + (float) Math.random() * 0.7f;
+            float size = 3f + (float) Math.random() * 6f;
             particles.add(new Particle(x, y, vx, vy, life, color, size));
         }
     }
@@ -51,8 +64,8 @@ public class ParticleSystem {
             float speed = 200f + (float) Math.random() * 400f;
             float vx = (float) Math.cos(angle) * speed;
             float vy = (float) Math.sin(angle) * speed;
-            float life = 0.2f + (float) Math.random() * 0.3f;
-            float size = 1f + (float) Math.random() * 3f;
+            float life = 0.25f + (float) Math.random() * 0.4f;
+            float size = 1.5f + (float) Math.random() * 4.5f;
             // 黄色到橙色随机
             int r = 255;
             int g = 180 + (int) (Math.random() * 75);
@@ -71,8 +84,8 @@ public class ParticleSystem {
             float speed = 150f + (float) Math.random() * 200f;
             float vx = (float) Math.cos(angle) * speed;
             float vy = (float) Math.sin(angle) * speed - 50f;
-            float life = 0.3f + (float) Math.random() * 0.3f;
-            float size = 3f + (float) Math.random() * 4f;
+            float life = 0.4f + (float) Math.random() * 0.5f;
+            float size = 4.5f + (float) Math.random() * 6f;
             // 暗红色变体
             int r = 140 + (int) (Math.random() * 60);
             int g = (int) (Math.random() * 30);
@@ -95,8 +108,8 @@ public class ParticleSystem {
             float speed = 300f + (float) Math.random() * 400f;
             float vx = (float) Math.cos(angle) * speed;
             float vy = (float) Math.sin(angle) * speed;
-            float life = 0.1f + (float) Math.random() * 0.2f;
-            float size = 4f + (float) Math.random() * 4f;
+            float life = 0.15f + (float) Math.random() * 0.3f;
+            float size = 6f + (float) Math.random() * 6f;
             // 白色到亮黄色
             int r = 255;
             int g = 230 + (int) (Math.random() * 25);
@@ -106,6 +119,30 @@ public class ParticleSystem {
             p.gravity = 200f;
             particles.add(p);
         }
+    }
+
+    /**
+     * 冲击波发射：在指定位置生成一个扩展圆环，模拟命中冲击波。
+     */
+    public void emitShockwave(float x, float y) {
+        Particle p = new Particle(x, y, 0, 0, 0.4f,
+                Color.argb(200, 255, 240, 200), 0, Particle.TYPE_SHOCKWAVE);
+        p.shockwaveMaxRadius = 120f;
+        p.shockwaveStrokeWidth = 6f;
+        p.gravity = 0f;
+        particles.add(p);
+    }
+
+    /**
+     * 屏幕闪光发射：全屏白色闪光快速淡出。
+     */
+    public void emitScreenFlash() {
+        Particle p = new Particle(0, 0, 0, 0, 0.08f,
+                Color.WHITE, 0, Particle.TYPE_SCREEN_FLASH);
+        p.gravity = 0f;
+        p.screenW = canvasW;
+        p.screenH = canvasH;
+        particles.add(p);
     }
 
     /**
