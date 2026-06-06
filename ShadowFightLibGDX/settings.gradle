@@ -1,0 +1,5 @@
+rootProject.name = "ShadowFightLibGDX"
+
+include "core"
+include "android"
+include "desktop"
