@@ -28,6 +28,7 @@ public class AIController {
     private float reactionDelay;
     private float reactionTimer;
     private AIAction pendingAction;
+    private float lastDeltaTime;
 
     private boolean lastHitLanded;
     private boolean lastTookDamage;
@@ -37,7 +38,7 @@ public class AIController {
         this.qLearner = new QLearner();
         this.useQLearning = false;
         this.thinkTimer = 0f;
-        this.thinkInterval = 0.15f;
+        this.thinkInterval = 0.08f; // AI每80ms决策一次，更敏捷
         this.currentAction = AIAction.IDLE;
         this.lastState = null;
         this.lastAction = null;
@@ -60,6 +61,7 @@ public class AIController {
             return;
         }
 
+        lastDeltaTime = deltaTime;
         thinkTimer += deltaTime;
 
         if (thinkTimer >= thinkInterval) {
@@ -98,30 +100,30 @@ public class AIController {
         boolean playerStunned = player.state == FighterState.HIT
                 || player.state == FighterState.KNOCKDOWN;
         boolean playerBlocking = player.state == FighterState.BLOCKING;
-        boolean close = dist <= 150f;
-        boolean far = dist > 300f;
+        boolean close = dist <= 200f;
+        boolean far = dist > 250f;
 
-        // 1. 玩家正在攻击且距离近：防御优先
+        // 1. 玩家正在攻击且距离近：防御优先（但不要只会防御）
         if (playerAttacking && close) {
             float roll = (float) Math.random();
-            if (roll < 0.4f) return AIAction.BLOCK;
-            if (roll < 0.7f) return ai.facingRight ? AIAction.DODGE_LEFT : AIAction.DODGE_RIGHT;
-            if (roll < 0.9f) return AIAction.LIGHT_ATTACK;
+            if (roll < 0.3f) return AIAction.BLOCK;
+            if (roll < 0.5f) return ai.facingRight ? AIAction.DODGE_LEFT : AIAction.DODGE_RIGHT;
+            if (roll < 0.8f) return AIAction.LIGHT_ATTACK; // 对攻！
             return chooseAvailableSkill(ai);
         }
 
         // 2. 玩家处于硬直：抓住机会进攻
         if (playerStunned && close) {
             float roll = (float) Math.random();
-            if (roll < 0.4f) return AIAction.HEAVY_ATTACK;
-            if (roll < 0.7f) return chooseAvailableSkill(ai);
+            if (roll < 0.5f) return AIAction.HEAVY_ATTACK; // 硬直时重击收益最大
+            if (roll < 0.8f) return chooseAvailableSkill(ai);
             return AIAction.LIGHT_ATTACK;
         }
 
-        // 3. 远距离：接近为主
+        // 3. 远距离：快速接近
         if (far) {
             float roll = (float) Math.random();
-            if (roll < 0.7f) {
+            if (roll < 0.85f) {
                 return moveTowardPlayer(ai, player);
             } else {
                 AIAction skill = chooseAvailableSkill(ai);
@@ -130,35 +132,35 @@ public class AIController {
             }
         }
 
-        // 4. 中近距离且有行动能力：利用模式识别
+        // 4. 中近距离且有行动能力：积极进攻
         if (ai.canAct()) {
+            // 利用模式识别
             List<AttackType> recent = patternRecognizer.getRecentActions();
             AttackType prediction = patternRecognizer.predictNext(recent);
             float confidence = patternRecognizer.getPredictionConfidence();
 
             if (prediction != null && confidence > 0.3f) {
-                // 预测玩家会攻击 → 防御/闪避
+                // 预测玩家会攻击 → 反击而非纯防御
                 if (isAttackType(prediction)) {
                     float roll = (float) Math.random();
-                    if (roll < 0.5f) return AIAction.BLOCK;
-                    return ai.facingRight ? AIAction.DODGE_LEFT : AIAction.DODGE_RIGHT;
+                    if (roll < 0.3f) return AIAction.BLOCK;
+                    if (roll < 0.5f) return ai.facingRight ? AIAction.DODGE_LEFT : AIAction.DODGE_RIGHT;
+                    return AIAction.LIGHT_ATTACK; // 拼招
                 }
-                // 预测玩家会防御 → 使用不可格挡的技能
+                // 预测玩家会防御 → 用技能破防
                 if (playerBlocking || confidence > 0.5f) {
                     AIAction skill = chooseAvailableSkill(ai);
                     if (skill != AIAction.LIGHT_ATTACK) return skill;
                 }
-                // 预测玩家会闪避 → 延迟攻击（先走位再攻）
-                if (rollDelayedAttack()) {
-                    return moveTowardPlayer(ai, player);
-                }
             }
 
-            // 默认：多样化攻击
+            // 默认：积极多样化的攻击组合
             float roll = (float) Math.random();
-            if (roll < 0.6f) return AIAction.LIGHT_ATTACK;
-            if (roll < 0.85f) return AIAction.HEAVY_ATTACK;
-            return chooseAvailableSkill(ai);
+            if (roll < 0.35f) return AIAction.LIGHT_ATTACK;
+            if (roll < 0.55f) return AIAction.HEAVY_ATTACK;
+            if (roll < 0.75f) return chooseAvailableSkill(ai);
+            if (roll < 0.85f) return moveTowardPlayer(ai, player);
+            return AIAction.LIGHT_ATTACK; // 持续施压
         }
 
         // 5. 无法行动时保持当前状态
@@ -201,12 +203,12 @@ public class AIController {
 
             case MOVE_LEFT:
                 if (ai.isBlocking) ai.stopBlock();
-                ai.x -= ai.speed * 0.016f;
+                ai.x -= ai.speed * lastDeltaTime;
                 break;
 
             case MOVE_RIGHT:
                 if (ai.isBlocking) ai.stopBlock();
-                ai.x += ai.speed * 0.016f;
+                ai.x += ai.speed * lastDeltaTime;
                 break;
 
             case LIGHT_ATTACK:
@@ -260,8 +262,8 @@ public class AIController {
      */
     public void setDifficulty(float diff) {
         this.difficulty = Math.max(0.5f, Math.min(3.0f, diff));
-        this.thinkInterval = 0.2f / this.difficulty;
-        this.reactionDelay = 0.2f / this.difficulty;
+        this.thinkInterval = 0.08f / this.difficulty;
+        this.reactionDelay = 0.08f / this.difficulty;
     }
 
     /**

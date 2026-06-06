@@ -98,8 +98,12 @@ public class AnimationPlayer {
             Bone bone = skeleton.findBone(boneName);
             if (bone == null) continue;
 
-            // 应用旋转
-            bone.localRotation = currentAnimation.getRotationAtTime(boneName, currentTime);
+            // 应用旋转（左朝向时反转旋转值，使镜像后动作方向正确）
+            float rotation = currentAnimation.getRotationAtTime(boneName, currentTime);
+            if (!skeleton.facingRight) {
+                rotation = -rotation;
+            }
+            bone.localRotation = bone.origLocalRotation + rotation;
 
             // 应用偏移（叠加到骨骼原始局部位置上）
             float[] offset = currentAnimation.getOffsetAtTime(boneName, currentTime);

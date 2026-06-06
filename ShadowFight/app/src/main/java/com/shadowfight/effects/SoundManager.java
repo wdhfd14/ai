@@ -213,14 +213,17 @@ public class SoundManager {
 
                 // 延迟清理已完成的AudioTrack
                 final AudioTrack trackRef = track;
-                new Thread(() -> {
-                    try {
-                        Thread.sleep((long) (buffer.length / (float) SAMPLE_RATE * 1000) + 100);
-                        trackRef.stop();
-                        trackRef.release();
-                        activeTracks.remove(trackRef);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep((long) (buffer.length / (float) SAMPLE_RATE * 1000) + 100);
+                            trackRef.stop();
+                            trackRef.release();
+                            activeTracks.remove(trackRef);
                     } catch (Exception ignored) {
                     }
+                }
                 }).start();
             } else {
                 track.release();

@@ -242,6 +242,9 @@ public class GameEngine {
         constrainPosition(player);
         constrainPosition(ai);
 
+        // 防止穿模
+        preventOverlap();
+
         // 面向对手
         updateFacing();
 
@@ -327,6 +330,25 @@ public class GameEngine {
         fighter.x = Math.max(ARENA_MARGIN, Math.min(arenaWidth - ARENA_MARGIN, fighter.x));
         fighter.skeleton.x = fighter.x;
         fighter.skeleton.y = groundY;
+    }
+
+    /**
+     * 防止两个角色穿模重叠：如果距离太近则互相推开。
+     */
+    private void preventOverlap() {
+        if (player == null || ai == null) return;
+        float minDist = 60f; // 最小间距
+        float dist = Math.abs(player.x - ai.x);
+        if (dist < minDist) {
+            float overlap = minDist - dist;
+            float pushDir = player.x < ai.x ? -1f : 1f;
+            // 各推一半
+            player.x += pushDir * overlap * 0.5f;
+            ai.x -= pushDir * overlap * 0.5f;
+            // 确保不推出场地
+            constrainPosition(player);
+            constrainPosition(ai);
+        }
     }
 
     private void updateFacing() {
