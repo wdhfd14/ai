@@ -60,9 +60,8 @@ static int insert_brk(swbreak_bp_t *bp)
     uint32_t brk = bp->brk_insn;
     memcpy((void *)bp->addr, &brk, HOOK_INSN_SIZE);
 #else
-    /* x86_64: 保存原始字节, 插入 INT3 */
+    /* x86_64: 插入 INT3 (不覆盖 orig_insn, 已在 hook_set 中保存) */
     uint8_t int3 = X86_INT3;
-    memcpy(&bp->orig_insn, (const void *)bp->addr, HOOK_INSN_SIZE);
     memcpy((void *)bp->addr, &int3, HOOK_INSN_SIZE);
 #endif
 
@@ -118,10 +117,25 @@ static void hook_handle_sigtrap(int sig, siginfo_t *si, void *ctx)
     if (g_hook_state.active_bp && g_hook_state.active_tid == tid) {
         /* 单步完成, 重新插入 BRK */
         swbreak_bp_t *step_bp = g_hook_state.active_bp;
-        insert_brk(step_bp);
         g_hook_state.active_bp = NULL;
         g_hook_state.active_tid = 0;
         swbreak_engine_clear_stepping();
+
+        /* 清除单步标志 */
+        ucontext_t *uc = (ucontext_t *)ctx;
+#ifdef __aarch64__
+        uint64_t *raw = (uint64_t *)&uc->uc_mcontext;
+        raw[34] &= ~(1UL << 21);
+#elif defined(__x86_64__)
+        uc->uc_mcontext.gregs[REG_EFL] &= ~0x100;
+#endif
+
+        if (step_bp->pending_delete) {
+            /* 安全删除: 不重新插入, 直接移除 */
+            swbreak_engine_remove(step_bp->id);
+        } else {
+            insert_brk(step_bp);
+        }
         return;
     }
 
@@ -180,17 +194,9 @@ static void hook_handle_sigtrap(int sig, siginfo_t *si, void *ctx)
 
     switch (action) {
     case SWBREAK_ACTION_DELETE:
-        swbreak_engine_remove(bp->id);
-        regs.pc = brk_addr;
-        swbreak_regs_to_ucontext(ctx, &regs);
-        break;
-
-    case SWBREAK_ACTION_STOP:
-        g_hook_state.active_bp = bp;
-        g_hook_state.active_tid = tid;
-        regs.pc = brk_addr;
-        swbreak_regs_to_ucontext(ctx, &regs);
-        break;
+        /* 标记待删除, 单步完成后安全删除 */
+        bp->pending_delete = 1;
+        /* fall through to continue */
 
     case SWBREAK_ACTION_SINGLE_STEP:
     case SWBREAK_ACTION_CONTINUE:
@@ -210,6 +216,13 @@ static void hook_handle_sigtrap(int sig, siginfo_t *si, void *ctx)
             uc->uc_mcontext.gregs[REG_EFL] |= 0x100; /* EFLAGS TF */
 #endif
         }
+        break;
+
+    case SWBREAK_ACTION_STOP:
+        g_hook_state.active_bp = bp;
+        g_hook_state.active_tid = tid;
+        regs.pc = brk_addr;
+        swbreak_regs_to_ucontext(ctx, &regs);
         break;
     }
 
