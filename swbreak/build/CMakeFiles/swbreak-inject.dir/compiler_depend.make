@@ -118,6 +118,8 @@ CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o: /workspace/swbreak/to
   /usr/include/x86_64-linux-gnu/bits/types/timer_t.h \
   /usr/include/x86_64-linux-gnu/bits/typesizes.h \
   /usr/include/x86_64-linux-gnu/bits/uintn-identity.h \
+  /usr/include/x86_64-linux-gnu/bits/uio-ext.h \
+  /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
   /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
   /usr/include/x86_64-linux-gnu/bits/waitflags.h \
   /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
@@ -131,12 +133,15 @@ CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o: /workspace/swbreak/to
   /usr/include/x86_64-linux-gnu/sys/socket.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/include/x86_64-linux-gnu/sys/ucontext.h \
+  /usr/include/x86_64-linux-gnu/sys/uio.h \
   /usr/include/x86_64-linux-gnu/sys/un.h \
   /usr/include/x86_64-linux-gnu/sys/user.h \
   /usr/include/x86_64-linux-gnu/sys/wait.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
-  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h
+  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h \
+  /workspace/swbreak/include/bp_types.h \
+  /workspace/swbreak/include/reg_ops.h
 
 
 /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h:
@@ -145,11 +150,15 @@ CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o: /workspace/swbreak/to
 
 /usr/include/x86_64-linux-gnu/sys/user.h:
 
+/usr/include/x86_64-linux-gnu/sys/uio.h:
+
 /usr/include/x86_64-linux-gnu/sys/ucontext.h:
 
 /usr/include/x86_64-linux-gnu/sys/types.h:
 
 /usr/include/x86_64-linux-gnu/sys/socket.h:
+
+/usr/include/x86_64-linux-gnu/sys/ptrace.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/time_t.h:
 
@@ -174,6 +183,8 @@ CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o: /workspace/swbreak/to
 /usr/include/x86_64-linux-gnu/bits/environments.h:
 
 /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h:
+
+/workspace/swbreak/include/reg_ops.h:
 
 /usr/include/x86_64-linux-gnu/bits/getopt_core.h:
 
@@ -208,6 +219,8 @@ CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o: /workspace/swbreak/to
 /usr/include/x86_64-linux-gnu/bits/endianness.h:
 
 /usr/include/endian.h:
+
+/usr/include/x86_64-linux-gnu/bits/uio_lim.h:
 
 /usr/include/x86_64-linux-gnu/bits/floatn.h:
 
@@ -313,6 +326,8 @@ CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o: /workspace/swbreak/to
 
 /usr/include/x86_64-linux-gnu/bits/signum-arch.h:
 
+/workspace/swbreak/include/bp_types.h:
+
 /usr/include/x86_64-linux-gnu/bits/sigstack.h:
 
 /usr/include/x86_64-linux-gnu/bits/socket.h:
@@ -336,6 +351,8 @@ CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o: /workspace/swbreak/to
 /usr/include/strings.h:
 
 /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h:
+
+/usr/include/x86_64-linux-gnu/bits/uio-ext.h:
 
 /usr/include/x86_64-linux-gnu/bits/sigcontext.h:
 
@@ -382,8 +399,6 @@ CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o: /workspace/swbreak/to
 /usr/include/x86_64-linux-gnu/bits/sigevent-consts.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
-
-/usr/include/x86_64-linux-gnu/sys/ptrace.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h:
 

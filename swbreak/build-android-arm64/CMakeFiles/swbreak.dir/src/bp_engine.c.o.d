@@ -52,18 +52,21 @@ CMakeFiles/swbreak.dir/src/bp_engine.c.o: \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/strings.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/fortify/strings.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/fortify/string.h \
-  /workspace/swbreak/lua5.2/src/lua.h \
-  /workspace/swbreak/lua5.2/src/luaconf.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/pthread.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/limits.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/limits.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/float.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/limits.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/posix_limits.h \
-  /workspace/swbreak/lua5.2/src/lauxlib.h \
-  /workspace/swbreak/include/bp_engine.h \
-  /workspace/swbreak/include/bp_types.h \
-  /workspace/swbreak/include/swbreak.h \
-  /workspace/swbreak/include/bp_signal.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/page_size.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sched.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/timespec.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/sched.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/time.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/time.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/time.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/time_types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/select.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/signal.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/sigcontext.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/sve_context.h \
@@ -74,10 +77,16 @@ CMakeFiles/swbreak.dir/src/bp_engine.c.o: \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/signal-defs.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/siginfo.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/siginfo.h \
-  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/timespec.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/ucontext.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/user.h \
-  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/page_size.h \
+  /workspace/swbreak/lua5.2/src/lua.h \
+  /workspace/swbreak/lua5.2/src/luaconf.h \
+  /workspace/swbreak/lua5.2/src/lauxlib.h \
+  /workspace/swbreak/include/bp_engine.h \
+  /workspace/swbreak/include/bp_types.h \
+  /workspace/swbreak/include/swbreak.h \
+  /workspace/swbreak/include/bp_signal.h \
   /workspace/swbreak/include/bp_hook.h \
   /workspace/swbreak/include/bp_hybrid.h \
+  /workspace/swbreak/include/signal_dispatch.h \
   /workspace/swbreak/include/lua_api.h

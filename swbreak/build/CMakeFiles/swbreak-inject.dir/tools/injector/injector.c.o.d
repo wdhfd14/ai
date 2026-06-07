@@ -91,8 +91,11 @@ CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o: \
  /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
  /usr/include/x86_64-linux-gnu/bits/types/idtype_t.h \
  /usr/include/x86_64-linux-gnu/sys/user.h \
- /usr/include/x86_64-linux-gnu/sys/socket.h \
+ /usr/include/x86_64-linux-gnu/sys/uio.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
+ /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/uio-ext.h \
+ /usr/include/x86_64-linux-gnu/sys/socket.h \
  /usr/include/x86_64-linux-gnu/bits/socket.h \
  /usr/include/x86_64-linux-gnu/bits/socket_type.h \
  /usr/include/x86_64-linux-gnu/bits/sockaddr.h \
@@ -112,8 +115,10 @@ CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o: \
  /usr/include/x86_64-linux-gnu/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
- /usr/include/linux/ptrace.h /usr/include/linux/types.h \
- /usr/include/x86_64-linux-gnu/asm/types.h \
+ /workspace/swbreak/include/bp_types.h \
+ /workspace/swbreak/include/reg_ops.h \
+ /workspace/swbreak/include/bp_types.h /usr/include/linux/ptrace.h \
+ /usr/include/linux/types.h /usr/include/x86_64-linux-gnu/asm/types.h \
  /usr/include/asm-generic/types.h /usr/include/asm-generic/int-ll64.h \
  /usr/include/x86_64-linux-gnu/asm/ptrace.h \
  /usr/include/x86_64-linux-gnu/asm/ptrace-abi.h \

@@ -100,5 +100,6 @@ CMakeFiles/swbreak.dir/src/bp_hook.c.o: /workspace/swbreak/src/bp_hook.c \
   /workspace/swbreak/include/bp_types.h \
   /workspace/swbreak/include/bp_engine.h \
   /workspace/swbreak/include/swbreak.h \
+  /workspace/swbreak/include/signal_dispatch.h \
   /workspace/swbreak/include/mem_ops.h \
   /workspace/swbreak/include/reg_ops.h

@@ -79,6 +79,7 @@ CMakeFiles/swbreak.dir/src/swbreak.c.o: /workspace/swbreak/src/swbreak.c \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/page_size.h \
   /workspace/swbreak/include/bp_hook.h \
   /workspace/swbreak/include/bp_hybrid.h \
+  /workspace/swbreak/include/signal_dispatch.h \
   /workspace/swbreak/include/mem_ops.h \
   /workspace/swbreak/include/reg_ops.h \
   /workspace/swbreak/include/lua_api.h

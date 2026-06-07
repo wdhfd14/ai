@@ -57,11 +57,16 @@ CMakeFiles/swbreak.dir/src/bp_engine.c.o: /workspace/swbreak/src/bp_engine.c \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/compiler_types.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/limits.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/posix_types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/sched.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/signal.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/stddef.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/time.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/time_types.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/types.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/wait.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/malloc.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/pthread.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sched.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/signal.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdint.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdio.h \
@@ -69,9 +74,12 @@ CMakeFiles/swbreak.dir/src/bp_engine.c.o: /workspace/swbreak/src/bp_engine.c \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/string.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/strings.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/cdefs.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/select.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/time.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/types.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/ucontext.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/user.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/time.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/xlocale.h \
   /workspace/swbreak/include/bp_engine.h \
   /workspace/swbreak/include/bp_hook.h \
@@ -79,6 +87,7 @@ CMakeFiles/swbreak.dir/src/bp_engine.c.o: /workspace/swbreak/src/bp_engine.c \
   /workspace/swbreak/include/bp_signal.h \
   /workspace/swbreak/include/bp_types.h \
   /workspace/swbreak/include/lua_api.h \
+  /workspace/swbreak/include/signal_dispatch.h \
   /workspace/swbreak/include/swbreak.h \
   /workspace/swbreak/lua5.2/src/lauxlib.h \
   /workspace/swbreak/lua5.2/src/lua.h \
@@ -187,6 +196,7 @@ CMakeFiles/swbreak.dir/src/bp_hook.c.o: /workspace/swbreak/src/bp_hook.c \
   /workspace/swbreak/include/bp_types.h \
   /workspace/swbreak/include/mem_ops.h \
   /workspace/swbreak/include/reg_ops.h \
+  /workspace/swbreak/include/signal_dispatch.h \
   /workspace/swbreak/include/swbreak.h
 
 CMakeFiles/swbreak.dir/src/bp_hybrid.c.o: /workspace/swbreak/src/bp_hybrid.c \
@@ -344,6 +354,7 @@ CMakeFiles/swbreak.dir/src/bp_signal.c.o: /workspace/swbreak/src/bp_signal.c \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/memfd.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/mman.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/posix_types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/sched.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/signal.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/stddef.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/time.h \
@@ -352,6 +363,8 @@ CMakeFiles/swbreak.dir/src/bp_signal.c.o: /workspace/swbreak/src/bp_signal.c \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/uio.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/wait.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/malloc.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/pthread.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sched.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/signal.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdint.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdio.h \
@@ -361,9 +374,11 @@ CMakeFiles/swbreak.dir/src/bp_signal.c.o: /workspace/swbreak/src/bp_signal.c \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/cdefs.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/mman.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/select.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/time.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/types.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/ucontext.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/user.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/time.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/unistd.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/xlocale.h \
   /workspace/swbreak/include/bp_engine.h \
@@ -371,6 +386,7 @@ CMakeFiles/swbreak.dir/src/bp_signal.c.o: /workspace/swbreak/src/bp_signal.c \
   /workspace/swbreak/include/bp_types.h \
   /workspace/swbreak/include/mem_ops.h \
   /workspace/swbreak/include/reg_ops.h \
+  /workspace/swbreak/include/signal_dispatch.h \
   /workspace/swbreak/include/swbreak.h
 
 CMakeFiles/swbreak.dir/src/lua_api.c.o: /workspace/swbreak/src/lua_api.c \
@@ -453,6 +469,7 @@ CMakeFiles/swbreak.dir/src/lua_api.c.o: /workspace/swbreak/src/lua_api.c \
   /workspace/swbreak/include/lua_api.h \
   /workspace/swbreak/include/mem_ops.h \
   /workspace/swbreak/include/reg_ops.h \
+  /workspace/swbreak/include/signal_dispatch.h \
   /workspace/swbreak/include/swbreak.h \
   /workspace/swbreak/lua5.2/src/lauxlib.h \
   /workspace/swbreak/lua5.2/src/lua.h \
@@ -745,6 +762,98 @@ CMakeFiles/swbreak.dir/src/reg_ops.c.o: /workspace/swbreak/src/reg_ops.c \
   /workspace/swbreak/include/mem_ops.h \
   /workspace/swbreak/include/reg_ops.h
 
+CMakeFiles/swbreak.dir/src/signal_dispatch.c.o: /workspace/swbreak/src/signal_dispatch.c \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stdarg___gnuc_va_list.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stdarg___va_copy.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stdarg_va_arg.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stdarg_va_copy.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stdarg_va_list.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stddef_max_align_t.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stddef_null.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stddef_offsetof.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stddef_ptrdiff_t.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stddef_size_t.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stddef_wchar_t.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/float.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/limits.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/stdarg.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/stddef.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/stdint.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/bitsperlong.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/posix_types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/sigcontext.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/siginfo.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/signal.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/sve_context.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/alloca.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/api-level.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/legacy_stdlib_inlines.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/legacy_unistd_inlines.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/ndk-version.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/versioning.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/bitsperlong.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/int-ll64.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/posix_types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/siginfo.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/signal-defs.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/signal.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/fcntl.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/fortify/stdio.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/fortify/stdlib.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/fortify/string.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/fortify/strings.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/fortify/unistd.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/get_device_api_level_inlines.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/getentropy.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/getopt.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/ioctl.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/lockf.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/page_size.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/posix_limits.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/pthread_types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/seek_constants.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/signal_types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/strcasecmp.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/struct_file.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/swab.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/sysconf.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/timespec.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/wait.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/wchar_limits.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/limits.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/compiler.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/compiler_types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/limits.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/posix_types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/signal.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/stddef.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/time.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/time_types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/wait.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/malloc.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/signal.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdint.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdio.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdlib.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/string.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/strings.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/cdefs.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/select.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/types.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/ucontext.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/user.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/unistd.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/xlocale.h \
+  /workspace/swbreak/include/bp_engine.h \
+  /workspace/swbreak/include/bp_hook.h \
+  /workspace/swbreak/include/bp_types.h \
+  /workspace/swbreak/include/reg_ops.h \
+  /workspace/swbreak/include/signal_dispatch.h \
+  /workspace/swbreak/include/swbreak.h
+
 CMakeFiles/swbreak.dir/src/swbreak.c.o: /workspace/swbreak/src/swbreak.c \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stdarg___gnuc_va_list.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stdarg___va_copy.h \
@@ -825,6 +934,7 @@ CMakeFiles/swbreak.dir/src/swbreak.c.o: /workspace/swbreak/src/swbreak.c \
   /workspace/swbreak/include/lua_api.h \
   /workspace/swbreak/include/mem_ops.h \
   /workspace/swbreak/include/reg_ops.h \
+  /workspace/swbreak/include/signal_dispatch.h \
   /workspace/swbreak/include/swbreak.h \
   /workspace/swbreak/lua5.2/src/lauxlib.h \
   /workspace/swbreak/lua5.2/src/lua.h \
@@ -877,6 +987,10 @@ CMakeFiles/swbreak.dir/src/swbreak.c.o: /workspace/swbreak/src/swbreak.c \
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/page_size.h:
 
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/sched.h:
+
+/workspace/swbreak/include/reg_ops.h:
+
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/fortify/strings.h:
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/posix_types.h:
@@ -909,6 +1023,10 @@ CMakeFiles/swbreak.dir/src/swbreak.c.o: /workspace/swbreak/src/swbreak.c \
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/sigcontext.h:
 
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/ptrace.h:
+
+/workspace/swbreak/lua5.2/src/lauxlib.h:
+
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stddef_ptrdiff_t.h:
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/stdint.h:
@@ -919,19 +1037,11 @@ CMakeFiles/swbreak.dir/src/swbreak.c.o: /workspace/swbreak/src/swbreak.c \
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/sysconf.h:
 
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/types.h:
-
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stddef_offsetof.h:
-
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/get_device_api_level_inlines.h:
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/limits.h:
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/android/legacy_stdlib_inlines.h:
-
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/limits.h:
-
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stdarg___gnuc_va_list.h:
 
 /workspace/swbreak/include/lua_api.h:
 
@@ -979,9 +1089,23 @@ CMakeFiles/swbreak.dir/src/swbreak.c.o: /workspace/swbreak/src/swbreak.c \
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/fortify/stdlib.h:
 
+/workspace/swbreak/src/signal_dispatch.c:
+
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/types.h:
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/ptrace.h:
+
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/limits.h:
+
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/time.h:
+
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/time_types.h:
+
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/strings.h:
+
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stddef_offsetof.h:
+
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/types.h:
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/wait.h:
 
@@ -1007,9 +1131,9 @@ CMakeFiles/swbreak.dir/src/swbreak.c.o: /workspace/swbreak/src/swbreak.c \
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/xlocale.h:
 
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/strings.h:
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/select.h:
 
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/time_types.h:
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/resource.h:
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/types.h:
 
@@ -1019,7 +1143,19 @@ CMakeFiles/swbreak.dir/src/swbreak.c.o: /workspace/swbreak/src/swbreak.c \
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/user.h:
 
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/signal.h:
+
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/time.h:
+
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/mman.h:
+
 /workspace/swbreak/include/bp_hook.h:
+
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/limits.h:
+
+/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/__stdarg___gnuc_va_list.h:
+
+/workspace/swbreak/include/signal_dispatch.h:
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/lockf.h:
 
@@ -1049,12 +1185,6 @@ CMakeFiles/swbreak.dir/src/swbreak.c.o: /workspace/swbreak/src/swbreak.c \
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/swab.h:
 
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/mman.h:
-
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/signal.h:
-
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/time.h:
-
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/fcntl.h:
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/errno.h:
@@ -1073,21 +1203,9 @@ CMakeFiles/swbreak.dir/src/swbreak.c.o: /workspace/swbreak/src/swbreak.c \
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/mman.h:
 
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/lib/clang/18/include/limits.h:
-
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/time.h:
-
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/uio.h:
 
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/select.h:
-
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/aarch64-linux-android/asm/resource.h:
-
 /workspace/swbreak/include/mem_ops.h:
-
-/workspace/swbreak/include/reg_ops.h:
-
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/sched.h:
 
 /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/bits/signal_types.h:
 
@@ -1096,7 +1214,3 @@ CMakeFiles/swbreak.dir/src/swbreak.c.o: /workspace/swbreak/src/swbreak.c \
 /workspace/swbreak/src/mem_ops.c:
 
 /workspace/swbreak/src/lua_engine.c:
-
-/workspace/swbreak/lua5.2/src/lauxlib.h:
-
-/opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/ptrace.h:

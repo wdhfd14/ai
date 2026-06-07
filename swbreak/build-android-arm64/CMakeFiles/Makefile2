@@ -67,6 +67,7 @@ all: CMakeFiles/lua52.dir/all
 all: CMakeFiles/swbreak.dir/all
 all: CMakeFiles/swbreak-debugger.dir/all
 all: CMakeFiles/swbreak-inject.dir/all
+all: CMakeFiles/test_core.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -78,6 +79,7 @@ clean: CMakeFiles/lua52.dir/clean
 clean: CMakeFiles/swbreak.dir/clean
 clean: CMakeFiles/swbreak-debugger.dir/clean
 clean: CMakeFiles/swbreak-inject.dir/clean
+clean: CMakeFiles/test_core.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -113,12 +115,12 @@ CMakeFiles/lua52.dir/clean:
 CMakeFiles/swbreak.dir/all: CMakeFiles/lua52.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspace/swbreak/build-android-arm64/CMakeFiles --progress-num=34,35,36,37,38,39,40,41,42,43 "Built target swbreak"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspace/swbreak/build-android-arm64/CMakeFiles --progress-num=34,35,36,37,38,39,40,41,42,43,44 "Built target swbreak"
 .PHONY : CMakeFiles/swbreak.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/swbreak.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/swbreak/build-android-arm64/CMakeFiles 43
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/swbreak/build-android-arm64/CMakeFiles 44
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/swbreak.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/swbreak/build-android-arm64/CMakeFiles 0
 .PHONY : CMakeFiles/swbreak.dir/rule
@@ -140,12 +142,12 @@ CMakeFiles/swbreak-debugger.dir/all: CMakeFiles/lua52.dir/all
 CMakeFiles/swbreak-debugger.dir/all: CMakeFiles/swbreak.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspace/swbreak/build-android-arm64/CMakeFiles --progress-num=44,45 "Built target swbreak-debugger"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspace/swbreak/build-android-arm64/CMakeFiles --progress-num=45,46 "Built target swbreak-debugger"
 .PHONY : CMakeFiles/swbreak-debugger.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/swbreak-debugger.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/swbreak/build-android-arm64/CMakeFiles 45
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/swbreak/build-android-arm64/CMakeFiles 46
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/swbreak-debugger.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/swbreak/build-android-arm64/CMakeFiles 0
 .PHONY : CMakeFiles/swbreak-debugger.dir/rule
@@ -167,12 +169,12 @@ CMakeFiles/swbreak-inject.dir/all: CMakeFiles/lua52.dir/all
 CMakeFiles/swbreak-inject.dir/all: CMakeFiles/swbreak.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspace/swbreak/build-android-arm64/CMakeFiles --progress-num=46,47 "Built target swbreak-inject"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspace/swbreak/build-android-arm64/CMakeFiles --progress-num=47,48 "Built target swbreak-inject"
 .PHONY : CMakeFiles/swbreak-inject.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/swbreak-inject.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/swbreak/build-android-arm64/CMakeFiles 45
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/swbreak/build-android-arm64/CMakeFiles 46
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/swbreak-inject.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/swbreak/build-android-arm64/CMakeFiles 0
 .PHONY : CMakeFiles/swbreak-inject.dir/rule
@@ -185,6 +187,33 @@ swbreak-inject: CMakeFiles/swbreak-inject.dir/rule
 CMakeFiles/swbreak-inject.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/clean
 .PHONY : CMakeFiles/swbreak-inject.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_core.dir
+
+# All Build rule for target.
+CMakeFiles/test_core.dir/all: CMakeFiles/lua52.dir/all
+CMakeFiles/test_core.dir/all: CMakeFiles/swbreak.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/workspace/swbreak/build-android-arm64/CMakeFiles --progress-num=49,50 "Built target test_core"
+.PHONY : CMakeFiles/test_core.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_core.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/swbreak/build-android-arm64/CMakeFiles 46
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_core.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /workspace/swbreak/build-android-arm64/CMakeFiles 0
+.PHONY : CMakeFiles/test_core.dir/rule
+
+# Convenience name for target.
+test_core: CMakeFiles/test_core.dir/rule
+.PHONY : test_core
+
+# clean rule for target.
+CMakeFiles/test_core.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/clean
+.PHONY : CMakeFiles/test_core.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

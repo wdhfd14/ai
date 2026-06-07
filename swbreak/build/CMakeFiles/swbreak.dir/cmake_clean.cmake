@@ -15,6 +15,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/swbreak.dir/src/mem_ops.c.o.d"
   "CMakeFiles/swbreak.dir/src/reg_ops.c.o"
   "CMakeFiles/swbreak.dir/src/reg_ops.c.o.d"
+  "CMakeFiles/swbreak.dir/src/signal_dispatch.c.o"
+  "CMakeFiles/swbreak.dir/src/signal_dispatch.c.o.d"
   "CMakeFiles/swbreak.dir/src/swbreak.c.o"
   "CMakeFiles/swbreak.dir/src/swbreak.c.o.d"
   "libswbreak.pdb"

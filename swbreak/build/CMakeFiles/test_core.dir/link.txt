@@ -1,0 +1,1 @@
+/usr/bin/gcc CMakeFiles/test_core.dir/tests/test_core.c.o -o test_core  -Wl,-rpath,/workspace/swbreak/build libswbreak.so liblua52.a -ldl -lm 

@@ -16,6 +16,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/workspace/swbreak/src/lua_engine.c" "CMakeFiles/swbreak.dir/src/lua_engine.c.o" "gcc" "CMakeFiles/swbreak.dir/src/lua_engine.c.o.d"
   "/workspace/swbreak/src/mem_ops.c" "CMakeFiles/swbreak.dir/src/mem_ops.c.o" "gcc" "CMakeFiles/swbreak.dir/src/mem_ops.c.o.d"
   "/workspace/swbreak/src/reg_ops.c" "CMakeFiles/swbreak.dir/src/reg_ops.c.o" "gcc" "CMakeFiles/swbreak.dir/src/reg_ops.c.o.d"
+  "/workspace/swbreak/src/signal_dispatch.c" "CMakeFiles/swbreak.dir/src/signal_dispatch.c.o" "gcc" "CMakeFiles/swbreak.dir/src/signal_dispatch.c.o.d"
   "/workspace/swbreak/src/swbreak.c" "CMakeFiles/swbreak.dir/src/swbreak.c.o" "gcc" "CMakeFiles/swbreak.dir/src/swbreak.c.o.d"
   )
 

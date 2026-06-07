@@ -58,6 +58,7 @@ set_target_properties(lua52 PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set(SWBREAK_SOURCES
     src/mem_ops.c
     src/reg_ops.c
+    src/signal_dispatch.c
     src/bp_signal.c
     src/bp_hook.c
     src/bp_hybrid.c
@@ -100,6 +101,21 @@ target_include_directories(swbreak-inject
 )
 target_compile_definitions(swbreak-inject PRIVATE _GNU_SOURCE)
 target_link_libraries(swbreak-inject PRIVATE swbreak lua52 dl)
+
+# ── 测试 ──
+enable_testing()
+
+add_executable(test_core
+    tests/test_core.c
+)
+target_include_directories(test_core
+    PRIVATE ${CMAKE_SOURCE_DIR}/include
+            ${CMAKE_SOURCE_DIR}/src
+            ${LUA_SRC_DIR}
+)
+target_compile_definitions(test_core PRIVATE _GNU_SOURCE)
+target_link_libraries(test_core PRIVATE swbreak lua52 dl m)
+add_test(NAME test_core COMMAND test_core)
 
 # ── 安装 ──
 include(GNUInstallDirs)

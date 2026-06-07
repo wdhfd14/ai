@@ -1,21 +1,10 @@
 /*
- * lua_api.c - Lua 5.2 API 绑定实现
+ * lua_api.c - Lua 5.2 API 绑定实现 (v2)
  *
- * 将 SWBreak 的所有能力暴露给 Lua 脚本:
- *   - 断点管理: set, remove, enable, disable
- *   - 内存操作: read8/16/32/64, write8/16/32/64, scan
- *   - 寄存器操作: reg_read, reg_write
- *   - 执行控制: continue, single_step
- *   - 调用栈: backtrace
- *   - 输出: log, printf
- *
- * Lua 回调签名:
- *   function on_breakpoint(info) return action end
- *   info: { addr, fault_addr, tid, hit_count, pc, sp, lr, x0~x30, callstack }
- *   action: "continue" | "stop" | "step" | "delete"
+ * v2: 使用 signal_dispatch 提供的线程局部上下文,
+ *     补全 reg_read/reg_write/backtrace 等桩函数。
  */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,12 +16,13 @@
 #include "bp_signal.h"
 #include "bp_hook.h"
 #include "bp_hybrid.h"
+#include "signal_dispatch.h"
 #include "mem_ops.h"
 #include "reg_ops.h"
 
 /* ── 内部 Lua State ── */
 static lua_State *g_lua = NULL;
-static int g_lua_owned = 0; /* 是否由我们创建 (需要销毁) */
+static int g_lua_owned = 0;
 
 /* ── 辅助: 将字符串动作转为枚举 ── */
 static swbreak_bp_action_t parse_action(const char *s)
@@ -48,19 +38,13 @@ static swbreak_bp_action_t parse_action(const char *s)
  *  Lua API 函数实现
  * ══════════════════════════════════════ */
 
-/* swbreak.set_breakpoint(addr, type, mode [, lua_callback])
- *   type: "exec" | "read" | "write" | "rw"
- *   mode: "signal" | "hook" | "hybrid"
- *   lua_callback: function(info) -> action_string end
- *   返回: breakpoint_id (整数)
- */
+/* swbreak.set(addr, type, mode [, lua_callback]) -> bp_id */
 static int l_set_breakpoint(lua_State *L)
 {
     uint64_t addr = (uint64_t)luaL_checkinteger(L, 1);
     const char *type_str = luaL_checkstring(L, 2);
     const char *mode_str = luaL_checkstring(L, 3);
 
-    /* 解析类型 */
     swbreak_bp_type_t type;
     if (strcmp(type_str, "exec") == 0)       type = SWBREAK_BP_EXECUTE;
     else if (strcmp(type_str, "read") == 0)   type = SWBREAK_BP_READ;
@@ -68,29 +52,18 @@ static int l_set_breakpoint(lua_State *L)
     else if (strcmp(type_str, "rw") == 0)     type = SWBREAK_BP_READWRITE;
     else return luaL_error(L, "invalid breakpoint type: %s", type_str);
 
-    /* 解析模式 */
     swbreak_bp_mode_t mode;
     if (strcmp(mode_str, "signal") == 0)      mode = SWBREAK_MODE_SIGNAL;
     else if (strcmp(mode_str, "hook") == 0)    mode = SWBREAK_MODE_HOOK;
     else if (strcmp(mode_str, "hybrid") == 0)  mode = SWBREAK_MODE_HYBRID;
     else return luaL_error(L, "invalid breakpoint mode: %s", mode_str);
 
-    /* 构建参数 */
-    swbreak_bp_params_t params;
-    memset(&params, 0, sizeof(params));
-    params.addr = addr;
-    params.type = type;
-    params.mode = mode;
-
-    /* Lua 回调 */
     int lua_ref = LUA_NOREF;
     if (lua_isfunction(L, 4)) {
-        lua_pushvalue(L, 4); /* 复制回调到栈顶 */
-        lua_ref = luaL_ref(L, LUA_REGISTRYINDEX); /* 注册到注册表 */
+        lua_pushvalue(L, 4);
+        lua_ref = luaL_ref(L, LUA_REGISTRYINDEX);
     }
-    params.lua_script = NULL;
 
-    /* 分配断点结构 */
     swbreak_bp_t *bp = calloc(1, sizeof(swbreak_bp_t));
     if (!bp) {
         if (lua_ref != LUA_NOREF) luaL_unref(L, LUA_REGISTRYINDEX, lua_ref);
@@ -104,10 +77,8 @@ static int l_set_breakpoint(lua_State *L)
     bp->enabled = 0;
     bp->lua_ref = lua_ref;
 
-    /* 添加到引擎 */
     swbreak_engine_add(bp);
 
-    /* 根据模式设置底层断点 */
     int ret;
     switch (mode) {
     case SWBREAK_MODE_SIGNAL: ret = swbreak_signal_set(bp); break;
@@ -117,6 +88,9 @@ static int l_set_breakpoint(lua_State *L)
     }
 
     if (ret != 0) {
+        /* 设置失败, 清理 */
+        if (lua_ref != LUA_NOREF) luaL_unref(L, LUA_REGISTRYINDEX, lua_ref);
+        bp->lua_ref = LUA_NOREF;
         swbreak_engine_remove(bp->id);
         return luaL_error(L, "failed to set breakpoint at 0x%lx", addr);
     }
@@ -125,7 +99,7 @@ static int l_set_breakpoint(lua_State *L)
     return 1;
 }
 
-/* swbreak.remove(bp_id) */
+/* swbreak.remove(bp_id) -> bool */
 static int l_remove_breakpoint(lua_State *L)
 {
     int bp_id = (int)luaL_checkinteger(L, 1);
@@ -134,13 +108,12 @@ static int l_remove_breakpoint(lua_State *L)
     return 1;
 }
 
-/* swbreak.enable(bp_id) */
+/* swbreak.enable(bp_id) -> bool */
 static int l_enable_breakpoint(lua_State *L)
 {
     int bp_id = (int)luaL_checkinteger(L, 1);
     swbreak_bp_t *bp = swbreak_engine_find_by_id(bp_id);
     if (!bp) return luaL_error(L, "breakpoint %d not found", bp_id);
-
     int ret;
     switch (bp->mode) {
     case SWBREAK_MODE_SIGNAL: ret = swbreak_signal_enable(bp); break;
@@ -152,13 +125,12 @@ static int l_enable_breakpoint(lua_State *L)
     return 1;
 }
 
-/* swbreak.disable(bp_id) */
+/* swbreak.disable(bp_id) -> bool */
 static int l_disable_breakpoint(lua_State *L)
 {
     int bp_id = (int)luaL_checkinteger(L, 1);
     swbreak_bp_t *bp = swbreak_engine_find_by_id(bp_id);
     if (!bp) return luaL_error(L, "breakpoint %d not found", bp_id);
-
     int ret;
     switch (bp->mode) {
     case SWBREAK_MODE_SIGNAL: ret = swbreak_signal_disable(bp); break;
@@ -172,7 +144,6 @@ static int l_disable_breakpoint(lua_State *L)
 
 /* ── 内存操作 ── */
 
-/* swbreak.read8(addr) -> integer */
 static int l_read8(lua_State *L)
 {
     uint64_t addr = (uint64_t)luaL_checkinteger(L, 1);
@@ -213,7 +184,6 @@ static int l_read64(lua_State *L)
     return 1;
 }
 
-/* swbreak.write8(addr, value) */
 static int l_write8(lua_State *L)
 {
     uint64_t addr = (uint64_t)luaL_checkinteger(L, 1);
@@ -250,7 +220,6 @@ static int l_write64(lua_State *L)
     return 0;
 }
 
-/* swbreak.read_bytes(addr, len) -> string */
 static int l_read_bytes(lua_State *L)
 {
     uint64_t addr = (uint64_t)luaL_checkinteger(L, 1);
@@ -270,7 +239,6 @@ static int l_read_bytes(lua_State *L)
     return 1;
 }
 
-/* swbreak.write_bytes(addr, data_string) */
 static int l_write_bytes(lua_State *L)
 {
     uint64_t addr = (uint64_t)luaL_checkinteger(L, 1);
@@ -281,21 +249,19 @@ static int l_write_bytes(lua_State *L)
     return 0;
 }
 
-/* ── 寄存器操作 ── */
+/* ── 寄存器操作 (使用线程局部上下文) ── */
 
 /* swbreak.reg_read(name) -> integer */
 static int l_reg_read(lua_State *L)
 {
     const char *name = luaL_checkstring(L, 1);
-    /* 需要从当前命中上下文获取寄存器, 这里使用线程局部存储的方案 */
-    /* 简化实现: 从引擎的单步/命中状态获取 */
-    swbreak_bp_t *bp = swbreak_engine_get_step_bp();
-    if (!bp) {
+    swbreak_regs_t *regs = swbreak_dispatch_get_regs();
+    if (!regs) {
         lua_pushnil(L);
         return 1;
     }
-    /* TODO: 需要保存当前命中上下文的寄存器 */
-    lua_pushinteger(L, 0);
+    uint64_t val = swbreak_reg_get(regs, name);
+    lua_pushinteger(L, (lua_Integer)val);
     return 1;
 }
 
@@ -304,22 +270,31 @@ static int l_reg_write(lua_State *L)
 {
     const char *name = luaL_checkstring(L, 1);
     uint64_t val = (uint64_t)luaL_checkinteger(L, 2);
-    /* TODO: 同上, 需要命中上下文 */
-    (void)name; (void)val;
-    return 0;
+    swbreak_regs_t *regs = swbreak_dispatch_get_regs();
+    if (!regs) {
+        lua_pushboolean(L, 0);
+        return 1;
+    }
+    int ret = swbreak_reg_set(regs, name, val);
+    /* 如果有 ucontext, 同步写回 */
+    if (ret == 0) {
+        void *uctx = swbreak_dispatch_get_ucontext();
+        if (uctx) {
+            swbreak_regs_to_ucontext(uctx, regs);
+        }
+    }
+    lua_pushboolean(L, ret == 0);
+    return 1;
 }
 
 /* ── 执行控制 ── */
 
-/* swbreak.continue() */
 static int l_continue(lua_State *L)
 {
     (void)L;
-    /* 在回调中返回 "continue" 即可 */
     return 0;
 }
 
-/* swbreak.single_step() */
 static int l_single_step(lua_State *L)
 {
     (void)L;
@@ -331,14 +306,26 @@ static int l_single_step(lua_State *L)
 /* swbreak.backtrace() -> table */
 static int l_backtrace(lua_State *L)
 {
-    /* TODO: 从命中上下文获取 */
+    swbreak_regs_t *regs = swbreak_dispatch_get_regs();
+    if (!regs) {
+        lua_newtable(L);
+        return 1;
+    }
+
+    void *frames[SWBREAK_MAX_CALLSTACK];
+    int depth = swbreak_regs_backtrace(regs, frames, SWBREAK_MAX_CALLSTACK);
+
     lua_newtable(L);
+    int i;
+    for (i = 0; i < depth; i++) {
+        lua_pushinteger(L, (lua_Integer)(uintptr_t)frames[i]);
+        lua_rawseti(L, -2, i + 1);
+    }
     return 1;
 }
 
 /* ── 日志 ── */
 
-/* swbreak.log(msg) */
 static int l_log(lua_State *L)
 {
     const char *msg = luaL_checkstring(L, 1);
@@ -346,20 +333,32 @@ static int l_log(lua_State *L)
     return 0;
 }
 
-/* swbreak.printf(fmt, ...) */
 static int l_printf(lua_State *L)
 {
     const char *fmt = luaL_checkstring(L, 1);
-    /* 简化: 仅支持 %d, %x, %s */
-    fprintf(stderr, "[swbreak] ");
-    fprintf(stderr, "%s", fmt);
-    fprintf(stderr, "\n");
+    int n = lua_gettop(L);
+    if (n > 1) {
+        /* 简化: 只支持 %d, %x, %s */
+        /* 使用 Lua 的 string.format */
+        lua_getglobal(L, "string");
+        lua_getfield(L, -1, "format");
+        lua_pushvalue(L, 1); /* fmt */
+        int i;
+        for (i = 2; i <= n; i++) {
+            lua_pushvalue(L, i);
+        }
+        lua_call(L, n, 1);
+        const char *result = lua_tostring(L, -1);
+        fprintf(stderr, "[swbreak] %s\n", result ? result : "(nil)");
+        lua_pop(L, 2); /* result + string table */
+    } else {
+        fprintf(stderr, "[swbreak] %s\n", fmt);
+    }
     return 0;
 }
 
 /* ── 信息查询 ── */
 
-/* swbreak.list_breakpoints() -> table */
 static int l_list_breakpoints(lua_State *L)
 {
     lua_newtable(L);
@@ -398,14 +397,11 @@ static int l_list_breakpoints(lua_State *L)
  * ══════════════════════════════════════ */
 
 static const luaL_Reg swbreak_lib[] = {
-    /* 断点管理 */
     {"set",          l_set_breakpoint},
     {"remove",       l_remove_breakpoint},
     {"enable",       l_enable_breakpoint},
     {"disable",      l_disable_breakpoint},
     {"list",         l_list_breakpoints},
-
-    /* 内存操作 */
     {"read8",        l_read8},
     {"read16",       l_read16},
     {"read32",       l_read32},
@@ -416,26 +412,15 @@ static const luaL_Reg swbreak_lib[] = {
     {"write64",      l_write64},
     {"read_bytes",   l_read_bytes},
     {"write_bytes",  l_write_bytes},
-
-    /* 寄存器操作 */
     {"reg_read",     l_reg_read},
     {"reg_write",    l_reg_write},
-
-    /* 执行控制 */
     {"continue",     l_continue},
     {"step",         l_single_step},
-
-    /* 调用栈 */
     {"backtrace",    l_backtrace},
-
-    /* 日志 */
     {"log",          l_log},
     {"printf",       l_printf},
-
     {NULL, NULL}
 };
-
-/* ── 注册 API ── */
 
 void swbreak_lua_register_api(lua_State *L)
 {
@@ -530,7 +515,6 @@ swbreak_bp_action_t swbreak_lua_call_callback(int lua_ref,
     if (!g_lua || lua_ref == LUA_NOREF || lua_ref == LUA_REFNIL)
         return SWBREAK_ACTION_CONTINUE;
 
-    /* 从注册表获取回调函数 */
     lua_rawgeti(g_lua, LUA_REGISTRYINDEX, lua_ref);
     if (!lua_isfunction(g_lua, -1)) {
         lua_pop(g_lua, 1);
@@ -560,14 +544,16 @@ swbreak_bp_action_t swbreak_lua_call_callback(int lua_ref,
         lua_setfield(g_lua, -2, "sp");
         lua_pushinteger(g_lua, (lua_Integer)info->regs->x[30]);
         lua_setfield(g_lua, -2, "lr");
+        lua_pushinteger(g_lua, (lua_Integer)info->regs->x[29]);
+        lua_setfield(g_lua, -2, "fp");
 
-        /* x0 ~ x30 */
+        /* x0 ~ x28 */
+        char reg_name[4];
         int i;
-        for (i = 0; i <= 30; i++) {
+        for (i = 0; i <= 28; i++) {
+            snprintf(reg_name, sizeof(reg_name), "x%d", i);
             lua_pushinteger(g_lua, (lua_Integer)info->regs->x[i]);
-            lua_setfield(g_lua, -2, i == 29 ? "fp" :
-                                   i == 30 ? "lr" :
-                                   (char[]){'x', '0' + (i / 10), '0' + (i % 10), '\0'});
+            lua_setfield(g_lua, -2, reg_name);
         }
     }
 

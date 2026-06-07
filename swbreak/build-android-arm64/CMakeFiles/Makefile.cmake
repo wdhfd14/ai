@@ -56,4 +56,5 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/swbreak.dir/DependInfo.cmake"
   "CMakeFiles/swbreak-debugger.dir/DependInfo.cmake"
   "CMakeFiles/swbreak-inject.dir/DependInfo.cmake"
+  "CMakeFiles/test_core.dir/DependInfo.cmake"
   )

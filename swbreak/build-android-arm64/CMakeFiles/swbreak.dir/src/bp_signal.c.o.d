@@ -97,9 +97,15 @@ CMakeFiles/swbreak.dir/src/bp_signal.c.o: \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/mman.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/asm-generic/mman-common.h \
   /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/uio.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/pthread.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sched.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/linux/sched.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/time.h \
+  /opt/android-ndk-r27c/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/sys/time.h \
   /workspace/swbreak/include/bp_signal.h \
   /workspace/swbreak/include/bp_types.h \
   /workspace/swbreak/include/bp_engine.h \
   /workspace/swbreak/include/swbreak.h \
+  /workspace/swbreak/include/signal_dispatch.h \
   /workspace/swbreak/include/mem_ops.h \
   /workspace/swbreak/include/reg_ops.h

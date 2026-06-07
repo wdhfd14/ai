@@ -92,6 +92,8 @@ swbreak__inject_EXTERNAL_OBJECTS =
 
 swbreak-inject: CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o
 swbreak-inject: CMakeFiles/swbreak-inject.dir/build.make
+swbreak-inject: libswbreak.so
+swbreak-inject: liblua52.a
 swbreak-inject: CMakeFiles/swbreak-inject.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable swbreak-inject"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/swbreak-inject.dir/link.txt --verbose=$(VERBOSE)

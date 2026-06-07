@@ -65,6 +65,16 @@ CMAKE_BINARY_DIR = /workspace/swbreak/build
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+.PHONY : test/fast
+
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "No interactive CMake dialog available..."
@@ -212,6 +222,19 @@ swbreak-inject: cmake_check_build_system
 swbreak-inject/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/build
 .PHONY : swbreak-inject/fast
+
+#=============================================================================
+# Target rules for targets named test_core
+
+# Build rule for target.
+test_core: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_core
+.PHONY : test_core
+
+# fast build rule for target.
+test_core/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/build
+.PHONY : test_core/fast
 
 lua5.2/src/lapi.o: lua5.2/src/lapi.c.o
 .PHONY : lua5.2/src/lapi.o
@@ -1173,6 +1196,30 @@ src/reg_ops.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/reg_ops.c.s
 .PHONY : src/reg_ops.c.s
 
+src/signal_dispatch.o: src/signal_dispatch.c.o
+.PHONY : src/signal_dispatch.o
+
+# target to build an object file
+src/signal_dispatch.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/signal_dispatch.c.o
+.PHONY : src/signal_dispatch.c.o
+
+src/signal_dispatch.i: src/signal_dispatch.c.i
+.PHONY : src/signal_dispatch.i
+
+# target to preprocess a source file
+src/signal_dispatch.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/signal_dispatch.c.i
+.PHONY : src/signal_dispatch.c.i
+
+src/signal_dispatch.s: src/signal_dispatch.c.s
+.PHONY : src/signal_dispatch.s
+
+# target to generate assembly for a file
+src/signal_dispatch.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/signal_dispatch.c.s
+.PHONY : src/signal_dispatch.c.s
+
 src/swbreak.o: src/swbreak.c.o
 .PHONY : src/swbreak.o
 
@@ -1196,6 +1243,30 @@ src/swbreak.s: src/swbreak.c.s
 src/swbreak.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/swbreak.c.s
 .PHONY : src/swbreak.c.s
+
+tests/test_core.o: tests/test_core.c.o
+.PHONY : tests/test_core.o
+
+# target to build an object file
+tests/test_core.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/tests/test_core.c.o
+.PHONY : tests/test_core.c.o
+
+tests/test_core.i: tests/test_core.c.i
+.PHONY : tests/test_core.i
+
+# target to preprocess a source file
+tests/test_core.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/tests/test_core.c.i
+.PHONY : tests/test_core.c.i
+
+tests/test_core.s: tests/test_core.c.s
+.PHONY : tests/test_core.s
+
+# target to generate assembly for a file
+tests/test_core.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/tests/test_core.c.s
+.PHONY : tests/test_core.c.s
 
 tools/debugger/debugger.o: tools/debugger/debugger.c.o
 .PHONY : tools/debugger/debugger.o
@@ -1257,10 +1328,12 @@ help:
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
+	@echo "... test"
 	@echo "... lua52"
 	@echo "... swbreak"
 	@echo "... swbreak-debugger"
 	@echo "... swbreak-inject"
+	@echo "... test_core"
 	@echo "... lua5.2/src/lapi.o"
 	@echo "... lua5.2/src/lapi.i"
 	@echo "... lua5.2/src/lapi.s"
@@ -1381,9 +1454,15 @@ help:
 	@echo "... src/reg_ops.o"
 	@echo "... src/reg_ops.i"
 	@echo "... src/reg_ops.s"
+	@echo "... src/signal_dispatch.o"
+	@echo "... src/signal_dispatch.i"
+	@echo "... src/signal_dispatch.s"
 	@echo "... src/swbreak.o"
 	@echo "... src/swbreak.i"
 	@echo "... src/swbreak.s"
+	@echo "... tests/test_core.o"
+	@echo "... tests/test_core.i"
+	@echo "... tests/test_core.s"
 	@echo "... tools/debugger/debugger.o"
 	@echo "... tools/debugger/debugger.i"
 	@echo "... tools/debugger/debugger.s"
