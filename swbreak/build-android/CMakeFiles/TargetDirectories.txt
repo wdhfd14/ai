@@ -1,0 +1,12 @@
+/workspace/swbreak/build-android/CMakeFiles/lua52.dir
+/workspace/swbreak/build-android/CMakeFiles/swbreak.dir
+/workspace/swbreak/build-android/CMakeFiles/swbreak-debugger.dir
+/workspace/swbreak/build-android/CMakeFiles/swbreak-inject.dir
+/workspace/swbreak/build-android/CMakeFiles/test_core.dir
+/workspace/swbreak/build-android/CMakeFiles/test.dir
+/workspace/swbreak/build-android/CMakeFiles/edit_cache.dir
+/workspace/swbreak/build-android/CMakeFiles/rebuild_cache.dir
+/workspace/swbreak/build-android/CMakeFiles/list_install_components.dir
+/workspace/swbreak/build-android/CMakeFiles/install.dir
+/workspace/swbreak/build-android/CMakeFiles/install/local.dir
+/workspace/swbreak/build-android/CMakeFiles/install/strip.dir

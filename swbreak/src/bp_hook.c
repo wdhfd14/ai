@@ -35,6 +35,15 @@ static struct {
 
 /* ── 指令替换辅助 ── */
 
+#ifdef __aarch64__
+/* ARM64: 使用 BRK #imm 指令, 固定 4 字节 */
+#define HOOK_INSN_SIZE 4
+#else
+/* x86_64: 使用 INT3 指令, 1 字节 */
+#define HOOK_INSN_SIZE 1
+#define X86_INT3 0xCC
+#endif
+
 static int insert_brk(swbreak_bp_t *bp)
 {
     if (!bp) return -1;
@@ -47,8 +56,15 @@ static int insert_brk(swbreak_bp_t *bp)
                  PROT_READ | PROT_WRITE | PROT_EXEC) != 0)
         return -1;
 
+#ifdef __aarch64__
     uint32_t brk = bp->brk_insn;
-    memcpy((void *)bp->addr, &brk, sizeof(brk));
+    memcpy((void *)bp->addr, &brk, HOOK_INSN_SIZE);
+#else
+    /* x86_64: 保存原始字节, 插入 INT3 */
+    uint8_t int3 = X86_INT3;
+    memcpy(&bp->orig_insn, (const void *)bp->addr, HOOK_INSN_SIZE);
+    memcpy((void *)bp->addr, &int3, HOOK_INSN_SIZE);
+#endif
 
     __builtin___clear_cache((char *)page_base,
                             (char *)(page_base + page_sz));
@@ -71,8 +87,13 @@ static int remove_brk(swbreak_bp_t *bp)
                  PROT_READ | PROT_WRITE | PROT_EXEC) != 0)
         return -1;
 
+#ifdef __aarch64__
     uint32_t orig = bp->orig_insn;
-    memcpy((void *)bp->addr, &orig, sizeof(orig));
+    memcpy((void *)bp->addr, &orig, HOOK_INSN_SIZE);
+#else
+    /* x86_64: 恢复原始字节 */
+    memcpy((void *)bp->addr, &bp->orig_insn, HOOK_INSN_SIZE);
+#endif
 
     __builtin___clear_cache((char *)page_base,
                             (char *)(page_base + page_sz));
@@ -104,7 +125,7 @@ static void hook_handle_sigtrap(int sig, siginfo_t *si, void *ctx)
         return;
     }
 
-    /* 检查是否为 BRK 触发 */
+    /* 检查是否为 BRK/INT3 触发 */
 #ifdef __aarch64__
     /* ARM64: BRK 触发后 PC 指向 BRK 之后 4 字节 */
     uint64_t brk_addr = regs.pc - 4;
@@ -114,6 +135,7 @@ static void hook_handle_sigtrap(int sig, siginfo_t *si, void *ctx)
 #endif
 
     /* 读取触发位置的指令 */
+#ifdef __aarch64__
     uint32_t insn = 0;
     memcpy(&insn, (const void *)brk_addr, sizeof(insn));
 
@@ -121,6 +143,14 @@ static void hook_handle_sigtrap(int sig, siginfo_t *si, void *ctx)
     if (imm < 0) return; /* 不是 BRK, 不是我们的 */
 
     swbreak_bp_t *bp = swbreak_engine_find_by_id(imm);
+#else
+    /* x86_64: 检查是否为 INT3, 通过地址查找断点 */
+    uint8_t insn = 0;
+    memcpy(&insn, (const void *)brk_addr, sizeof(insn));
+    if (insn != X86_INT3) return; /* 不是 INT3 */
+
+    swbreak_bp_t *bp = swbreak_engine_find_by_addr(brk_addr);
+#endif
     if (!bp || bp->mode != SWBREAK_MODE_HOOK || !bp->enabled) return;
 
     /* ── BRK 断点命中! ── */
@@ -173,11 +203,11 @@ static void hook_handle_sigtrap(int sig, siginfo_t *si, void *ctx)
         swbreak_regs_to_ucontext(ctx, &regs);
         {
             ucontext_t *uc = (ucontext_t *)ctx;
-            uint64_t *raw = (uint64_t *)&uc->uc_mcontext;
 #ifdef __aarch64__
+            uint64_t *raw = (uint64_t *)&uc->uc_mcontext;
             raw[34] |= (1UL << 21); /* SPSR_SS */
-#else
-            raw[16] |= 0x100UL; /* EFLAGS TF */
+#elif defined(__x86_64__)
+            uc->uc_mcontext.gregs[REG_EFL] |= 0x100; /* EFLAGS TF */
 #endif
         }
         break;
@@ -225,13 +255,18 @@ int swbreak_hook_set(swbreak_bp_t *bp)
     if (!bp) return -1;
 
     /* 保存原始指令 */
-    memcpy(&bp->orig_insn, (const void *)bp->addr, sizeof(bp->orig_insn));
+    memcpy(&bp->orig_insn, (const void *)bp->addr, HOOK_INSN_SIZE);
 
-    /* 编码 BRK 指令 (imm = 断点 ID) */
+#ifdef __aarch64__
+    /* ARM64: 编码 BRK 指令 (imm = 断点 ID) */
     if (bp->id > SWBREAK_BRK_IMM_MAX) return -1;
     bp->brk_insn = swbreak_brk_encode((uint16_t)bp->id);
+#else
+    /* x86_64: 使用 INT3, 不需要编码 imm */
+    bp->brk_insn = X86_INT3;
+#endif
 
-    /* 插入 BRK */
+    /* 插入断点指令 */
     if (insert_brk(bp) != 0) return -1;
 
     bp->enabled = 1;
@@ -274,11 +309,11 @@ int swbreak_hook_prepare_step(swbreak_bp_t *bp, void *ucontext)
     if (bp->is_inserted) remove_brk(bp);
 
     ucontext_t *uc = (ucontext_t *)ucontext;
-    uint64_t *raw = (uint64_t *)&uc->uc_mcontext;
 #ifdef __aarch64__
+    uint64_t *raw = (uint64_t *)&uc->uc_mcontext;
     raw[34] |= (1UL << 21);
-#else
-    raw[16] |= 0x100UL;
+#elif defined(__x86_64__)
+    uc->uc_mcontext.gregs[REG_EFL] |= 0x100;
 #endif
 
     g_hook_state.active_bp = bp;

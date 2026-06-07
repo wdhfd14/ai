@@ -62,15 +62,32 @@ void swbreak_regs_to_ucontext(void *ucontext, const swbreak_regs_t *regs)
 
 #else
 
-/* 非 ARM64: 桩实现 (交叉编译用) */
+/* x86_64: 从 gregs 提取, 映射到 ARM64 风格结构 */
 void swbreak_regs_from_ucontext(swbreak_regs_t *regs, const void *ucontext)
 {
     memset(regs, 0, sizeof(*regs));
-    /* x86_64: 从 gregs 提取部分信息映射到 ARM64 结构 */
     const ucontext_t *uc = (const ucontext_t *)ucontext;
     regs->pc = (uint64_t)uc->uc_mcontext.gregs[REG_RIP];
     regs->sp = (uint64_t)uc->uc_mcontext.gregs[REG_RSP];
-    regs->x[30] = (uint64_t)uc->uc_mcontext.gregs[REG_RBP]; /* FP */
+    regs->x[29] = (uint64_t)uc->uc_mcontext.gregs[REG_RBP]; /* FP */
+    regs->x[30] = (uint64_t)uc->uc_mcontext.gregs[REG_RBP]; /* LR ≈ RBP on x86_64 */
+    /* 映射 x86_64 通用寄存器到 x[0..15] */
+    regs->x[0]  = (uint64_t)uc->uc_mcontext.gregs[REG_RAX];
+    regs->x[1]  = (uint64_t)uc->uc_mcontext.gregs[REG_RBX];
+    regs->x[2]  = (uint64_t)uc->uc_mcontext.gregs[REG_RCX];
+    regs->x[3]  = (uint64_t)uc->uc_mcontext.gregs[REG_RDX];
+    regs->x[4]  = (uint64_t)uc->uc_mcontext.gregs[REG_RSI];
+    regs->x[5]  = (uint64_t)uc->uc_mcontext.gregs[REG_RDI];
+    regs->x[6]  = (uint64_t)uc->uc_mcontext.gregs[REG_R8];
+    regs->x[7]  = (uint64_t)uc->uc_mcontext.gregs[REG_R9];
+    regs->x[8]  = (uint64_t)uc->uc_mcontext.gregs[REG_R10];
+    regs->x[9]  = (uint64_t)uc->uc_mcontext.gregs[REG_R11];
+    regs->x[10] = (uint64_t)uc->uc_mcontext.gregs[REG_R12];
+    regs->x[11] = (uint64_t)uc->uc_mcontext.gregs[REG_R13];
+    regs->x[12] = (uint64_t)uc->uc_mcontext.gregs[REG_R14];
+    regs->x[13] = (uint64_t)uc->uc_mcontext.gregs[REG_R15];
+    regs->x[14] = (uint64_t)uc->uc_mcontext.gregs[REG_RBP];
+    regs->x[15] = (uint64_t)uc->uc_mcontext.gregs[REG_RSP];
 }
 
 void swbreak_regs_to_ucontext(void *ucontext, const swbreak_regs_t *regs)
@@ -78,6 +95,21 @@ void swbreak_regs_to_ucontext(void *ucontext, const swbreak_regs_t *regs)
     ucontext_t *uc = (ucontext_t *)ucontext;
     uc->uc_mcontext.gregs[REG_RIP] = (greg_t)regs->pc;
     uc->uc_mcontext.gregs[REG_RSP] = (greg_t)regs->sp;
+    uc->uc_mcontext.gregs[REG_RAX] = (greg_t)regs->x[0];
+    uc->uc_mcontext.gregs[REG_RBX] = (greg_t)regs->x[1];
+    uc->uc_mcontext.gregs[REG_RCX] = (greg_t)regs->x[2];
+    uc->uc_mcontext.gregs[REG_RDX] = (greg_t)regs->x[3];
+    uc->uc_mcontext.gregs[REG_RSI] = (greg_t)regs->x[4];
+    uc->uc_mcontext.gregs[REG_RDI] = (greg_t)regs->x[5];
+    uc->uc_mcontext.gregs[REG_R8]  = (greg_t)regs->x[6];
+    uc->uc_mcontext.gregs[REG_R9]  = (greg_t)regs->x[7];
+    uc->uc_mcontext.gregs[REG_R10] = (greg_t)regs->x[8];
+    uc->uc_mcontext.gregs[REG_R11] = (greg_t)regs->x[9];
+    uc->uc_mcontext.gregs[REG_R12] = (greg_t)regs->x[10];
+    uc->uc_mcontext.gregs[REG_R13] = (greg_t)regs->x[11];
+    uc->uc_mcontext.gregs[REG_R14] = (greg_t)regs->x[12];
+    uc->uc_mcontext.gregs[REG_R15] = (greg_t)regs->x[13];
+    uc->uc_mcontext.gregs[REG_RBP] = (greg_t)regs->x[14];
 }
 
 #endif /* __aarch64__ */

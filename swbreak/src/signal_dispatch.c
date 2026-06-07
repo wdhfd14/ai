@@ -93,44 +93,21 @@ static void dispatch_sigtrap(int sig, siginfo_t *si, void *ctx)
 {
     /*
      * SIGTRAP 有两个来源:
-     * 1. BRK 指令触发 → Hook 引擎处理
+     * 1. BRK/INT3 指令触发 → Hook 引擎处理
      * 2. 单步执行完成 → 信号驱动引擎或 Hook 引擎处理
      *
-     * 判断逻辑:
-     * - 先检查是否为 BRK 触发 (PC-4 处的指令是否为 BRK)
-     * - 如果是 BRK → 交给 Hook 引擎
-     * - 否则 → 交给单步完成处理器
+     * 判断逻辑 (关键: 先检查单步状态, 再检查 BRK/INT3):
+     * - 如果正在单步且 step_bp 是 SIGNAL/HYBRID → 信号引擎单步完成
+     * - 如果正在单步且 step_bp 是 HOOK → Hook 引擎单步完成
+     * - 否则检查 PC 前一条指令是否为 BRK/INT3 → Hook 引擎
+     * - 都不匹配 → 传递给原始处理器
+     *
+     * 注意: 必须先检查单步状态, 因为 x86_64 单步执行后的指令
+     * 可能包含 0xCC 字节被误判为 INT3。
      */
 
-    /* 提取寄存器上下文 */
-    swbreak_regs_t regs;
-    swbreak_regs_from_ucontext(&regs, ctx);
-
-    /* 检查 PC-4 处是否为 BRK 指令 */
-    uint64_t pc = regs.pc;
-    /* ARM64: BRK 触发后 PC 指向 BRK 之后, 所以回退 4 字节 */
-    uint64_t brk_addr = pc - 4;
-
-    /* 安全读取指令 (可能访问无效内存) */
-    uint32_t insn = 0;
-    if (pc > 4) {
-        /* 使用 volatile 防止优化, 但仍需小心 */
-        memcpy(&insn, (const void *)brk_addr, sizeof(insn));
-    }
-
-    int brk_imm = swbreak_brk_decode(insn);
-
-    if (brk_imm >= 0) {
-        /* BRK 指令触发 → 交给 Hook 引擎 */
-        if (g_dispatch.hook_trap_handler) {
-            g_dispatch.hook_trap_handler(sig, si, ctx);
-            return;
-        }
-    }
-
-    /* 单步完成 → 先检查 Hook 引擎的单步, 再检查信号驱动引擎 */
+    /* 优先检查单步状态 */
     if (swbreak_engine_is_stepping()) {
-        /* 判断是哪个引擎的单步 */
         swbreak_bp_t *step_bp = swbreak_engine_get_step_bp();
         if (step_bp) {
             if (step_bp->mode == SWBREAK_MODE_HOOK) {
@@ -146,6 +123,37 @@ static void dispatch_sigtrap(int sig, siginfo_t *si, void *ctx)
                     return;
                 }
             }
+        }
+    }
+
+    /* 非单步: 检查是否为 BRK/INT3 触发 */
+    swbreak_regs_t regs;
+    swbreak_regs_from_ucontext(&regs, ctx);
+    uint64_t pc = regs.pc;
+
+#ifdef __aarch64__
+    /* ARM64: BRK 触发后 PC 指向 BRK 之后, 回退 4 字节 */
+    uint64_t brk_addr = pc - 4;
+    uint32_t insn = 0;
+    if (pc > 4) {
+        memcpy(&insn, (const void *)brk_addr, sizeof(insn));
+    }
+    int is_brk = (swbreak_brk_decode(insn) >= 0);
+#else
+    /* x86_64: INT3 触发后 PC 指向 INT3 之后, 回退 1 字节 */
+    uint64_t brk_addr = pc - 1;
+    uint8_t insn = 0;
+    if (pc > 1) {
+        memcpy(&insn, (const void *)brk_addr, sizeof(insn));
+    }
+    int is_brk = (insn == 0xCC);
+#endif
+
+    if (is_brk) {
+        /* BRK/INT3 触发 → 交给 Hook 引擎 */
+        if (g_dispatch.hook_trap_handler) {
+            g_dispatch.hook_trap_handler(sig, si, ctx);
+            return;
         }
     }
 

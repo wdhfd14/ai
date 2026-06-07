@@ -6,5 +6,5 @@ C_DEFINES = -D_GNU_SOURCE
 
 C_INCLUDES = -I/workspace/swbreak/include -I/workspace/swbreak/src -I/workspace/swbreak/lua5.2/src
 
-C_FLAGS = -std=gnu11 -Wall -Wextra -Wno-unused-parameter
+C_FLAGS = -g -std=gnu11 -Wall -Wextra -Wno-unused-parameter
 

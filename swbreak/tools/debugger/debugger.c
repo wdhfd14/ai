@@ -21,7 +21,9 @@
  *   quit
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,6 +33,8 @@
 #include <sys/types.h>
 #include <errno.h>
 #include "swbreak.h"
+#include "bp_engine.h"
+#include "bp_types.h"
 #include "mem_ops.h"
 #include "reg_ops.h"
 
@@ -135,9 +139,40 @@ static void cmd_delete(int argc, char *argv[])
 
 static void cmd_list(void)
 {
-    const swbreak_bp_t *bp = swbreak_get(-1); /* TODO: 遍历接口 */
-    (void)bp;
-    printf("断点列表功能待完善\n");
+    swbreak_bp_t *bp = swbreak_engine_list();
+    if (!bp) {
+        printf("无断点\n");
+        return;
+    }
+
+    printf("%-4s  %-18s  %-10s  %-10s  %-7s  %s\n",
+           "ID", "Address", "Type", "Mode", "Enabled", "HitCount");
+    printf("----  ------------------  ----------  ----------  -------  --------\n");
+
+    while (bp) {
+        const char *type_str;
+        switch (bp->type) {
+        case SWBREAK_BP_EXECUTE:   type_str = "exec";  break;
+        case SWBREAK_BP_READ:      type_str = "read";  break;
+        case SWBREAK_BP_WRITE:     type_str = "write"; break;
+        case SWBREAK_BP_READWRITE: type_str = "rw";    break;
+        default:                   type_str = "???";   break;
+        }
+
+        const char *mode_str;
+        switch (bp->mode) {
+        case SWBREAK_MODE_SIGNAL: mode_str = "signal"; break;
+        case SWBREAK_MODE_HOOK:   mode_str = "hook";   break;
+        case SWBREAK_MODE_HYBRID: mode_str = "hybrid"; break;
+        default:                  mode_str = "???";    break;
+        }
+
+        printf("%-4d  0x%016lx  %-10s  %-10s  %-7s  %d\n",
+               bp->id, bp->addr, type_str, mode_str,
+               bp->enabled ? "yes" : "no", bp->hit_count);
+
+        bp = bp->next;
+    }
 }
 
 static void cmd_regs(void)

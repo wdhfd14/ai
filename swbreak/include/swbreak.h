@@ -104,6 +104,22 @@ int  swbreak_continue(void);
 int  swbreak_single_step(void);
 
 /* ══════════════════════════════════════
+ *  条件断点
+ * ══════════════════════════════════════ */
+
+/* 设置断点命中次数限制 (0=无限) */
+int  swbreak_set_max_hits(int bp_id, int max_hits);
+
+/* 设置断点忽略次数 (跳过前 N 次命中) */
+int  swbreak_set_ignore_count(int bp_id, int count);
+
+/* 设置条件断点: 仅当 *cond_addr == cond_value 时触发 */
+int  swbreak_set_condition(int bp_id, uint64_t cond_addr, uint64_t cond_value);
+
+/* 清除条件断点 */
+int  swbreak_clear_condition(int bp_id);
+
+/* ══════════════════════════════════════
  *  Lua 脚本
  * ══════════════════════════════════════ */
 

@@ -6,5 +6,5 @@ C_DEFINES = -DLUA_COMPAT_ALL -DLUA_USE_POSIX
 
 C_INCLUDES = -I/workspace/swbreak/lua5.2/src
 
-C_FLAGS = -std=gnu11 -fPIC -Wall -Wextra -Wno-unused-parameter
+C_FLAGS = -g -std=gnu11 -fPIC -Wall -Wextra -Wno-unused-parameter
 

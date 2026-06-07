@@ -94,5 +94,8 @@ CMakeFiles/swbreak-debugger.dir/tools/debugger/debugger.c.o: \
  /usr/include/x86_64-linux-gnu/bits/wchar.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
+ /workspace/swbreak/include/bp_engine.h \
+ /workspace/swbreak/include/swbreak.h \
+ /workspace/swbreak/include/bp_types.h \
  /workspace/swbreak/include/mem_ops.h \
  /workspace/swbreak/include/reg_ops.h

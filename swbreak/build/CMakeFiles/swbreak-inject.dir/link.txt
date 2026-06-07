@@ -1,1 +1,1 @@
-/usr/bin/gcc "CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o" -o swbreak-inject  -Wl,-rpath,/workspace/swbreak/build: libswbreak.so liblua52.a -ldl 
+/usr/bin/gcc -g "CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o" -o swbreak-inject  -Wl,-rpath,/workspace/swbreak/build: libswbreak.so liblua52.a -ldl 

@@ -6,7 +6,9 @@
  * 远程进程通过 ptrace / process_vm_readv 操作。
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,14 +63,24 @@ int swbreak__mem_write(pid_t pid, uint64_t addr, const void *buf, size_t len)
         uint64_t page_base = addr & ~(uint64_t)(page_sz - 1);
         size_t page_len = ((addr + len) - page_base + page_sz - 1) & ~(size_t)(page_sz - 1);
 
+        /* 保存原始页保护属性 */
+        int orig_prot;
+        void *map_base;
+        size_t map_size;
+        int has_orig = (swbreak_mem_get_prot(addr, &orig_prot, &map_base, &map_size) == 0);
+
         /* 修改页权限为可读写 */
-        if (mprotect((void *)page_base, page_len, PROT_READ | PROT_WRITE | PROT_EXEC) != 0)
+        if (mprotect((void *)page_base, page_len, PROT_READ | PROT_WRITE) != 0)
             return -1;
 
         memcpy((void *)addr, buf, len);
 
-        /* 恢复为可读可执行 (代码段典型权限) */
-        mprotect((void *)page_base, page_len, PROT_READ | PROT_EXEC);
+        /* 恢复原始保护属性 */
+        if (has_orig) {
+            mprotect(map_base, map_size, orig_prot);
+        } else {
+            mprotect((void *)page_base, page_len, PROT_READ);
+        }
         return 0;
     }
 
@@ -140,7 +152,7 @@ int swbreak_mem_set_prot(uint64_t addr, int prot)
     long page_sz = sysconf(_SC_PAGESIZE);
     if (page_sz <= 0) return -1;
 
-    uint64_t base = addr & ~(uint64_t)(page_sz - 1);
+    (void)((addr & ~(uint64_t)(page_sz - 1))); /* base not needed, using map_base */
 
     /* 需要按 maps 中的区域设置, 否则 mprotect 可能失败 */
     int orig_prot;

@@ -104,14 +104,18 @@ int swbreak_set(const swbreak_bp_params_t *params)
         return -1;
     }
 
-    bp->id          = swbreak_engine_alloc_id();
-    bp->addr        = params->addr;
-    bp->type        = params->type;
-    bp->mode        = params->mode;
-    bp->one_shot    = params->one_shot;
-    bp->c_callback  = params->callback;
-    bp->c_user_data = params->user_data;
-    bp->lua_ref     = LUA_NOREF;
+    bp->id           = swbreak_engine_alloc_id();
+    bp->addr         = params->addr;
+    bp->type         = params->type;
+    bp->mode         = params->mode;
+    bp->one_shot     = params->one_shot;
+    bp->max_hits     = params->max_hits;
+    bp->ignore_count = params->ignore_count;
+    bp->cond_addr    = params->cond_addr;
+    bp->cond_value   = params->cond_value;
+    bp->c_callback   = params->callback;
+    bp->c_user_data  = params->user_data;
+    bp->lua_ref      = LUA_NOREF;
 
     if (params->lua_script) {
         if (swbreak_lua_load_script(params->lua_script) != 0) {
@@ -262,6 +266,48 @@ int swbreak_continue(void)
 
 int swbreak_single_step(void)
 {
+    return 0;
+}
+
+/* ══════════════════════════════════════
+ *  条件断点
+ * ══════════════════════════════════════ */
+
+int swbreak_set_max_hits(int bp_id, int max_hits)
+{
+    if (!g_swbreak.initialized) return -1;
+    swbreak_bp_t *bp = swbreak_engine_find_by_id(bp_id);
+    if (!bp) return -1;
+    bp->max_hits = max_hits;
+    return 0;
+}
+
+int swbreak_set_ignore_count(int bp_id, int count)
+{
+    if (!g_swbreak.initialized) return -1;
+    swbreak_bp_t *bp = swbreak_engine_find_by_id(bp_id);
+    if (!bp) return -1;
+    bp->ignore_count = count;
+    return 0;
+}
+
+int swbreak_set_condition(int bp_id, uint64_t cond_addr, uint64_t cond_value)
+{
+    if (!g_swbreak.initialized) return -1;
+    swbreak_bp_t *bp = swbreak_engine_find_by_id(bp_id);
+    if (!bp) return -1;
+    bp->cond_addr  = cond_addr;
+    bp->cond_value = cond_value;
+    return 0;
+}
+
+int swbreak_clear_condition(int bp_id)
+{
+    if (!g_swbreak.initialized) return -1;
+    swbreak_bp_t *bp = swbreak_engine_find_by_id(bp_id);
+    if (!bp) return -1;
+    bp->cond_addr  = 0;
+    bp->cond_value = 0;
     return 0;
 }
 

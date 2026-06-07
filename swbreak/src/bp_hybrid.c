@@ -7,7 +7,9 @@
  * 同一地址可同时挂载两种断点, 引擎协同工作。
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include "bp_hybrid.h"
@@ -24,13 +26,7 @@ int swbreak_hybrid_init(void)
 {
     if (g_hybrid_state.initialized) return 0;
 
-    /* 混合模式依赖两种子引擎 */
-    if (swbreak_signal_init() != 0) return -1;
-    if (swbreak_hook_init() != 0) {
-        swbreak_signal_destroy();
-        return -1;
-    }
-
+    /* 混合模式仅做路由, 子引擎由 bp_engine 统一初始化 */
     g_hybrid_state.initialized = 1;
     return 0;
 }
@@ -38,8 +34,7 @@ int swbreak_hybrid_init(void)
 void swbreak_hybrid_destroy(void)
 {
     if (!g_hybrid_state.initialized) return;
-    swbreak_signal_destroy();
-    swbreak_hook_destroy();
+    /* 子引擎由 bp_engine 统一销毁, 此处仅清除路由层状态 */
     g_hybrid_state.initialized = 0;
 }
 

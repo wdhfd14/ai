@@ -263,6 +263,40 @@ swbreak_bp_action_t swbreak_engine_fire_callback(swbreak_hit_info_t *info)
 
     swbreak_bp_t *bp = info->bp;
 
+    /* ── 条件断点检查 ── */
+
+    /* 忽略计数: 跳过前 N 次命中 */
+    if (bp->ignore_count > 0) {
+        bp->ignore_count--;
+        return SWBREAK_ACTION_CONTINUE;
+    }
+
+    /* 最大命中次数: 超过则标记待删除, 返回 DELETE 让信号处理器安全移除 */
+    if (bp->max_hits > 0 && bp->hit_count > bp->max_hits) {
+        return SWBREAK_ACTION_DELETE;
+    }
+
+    /* 条件地址: 仅当 *cond_addr == cond_value 时触发 */
+    if (bp->cond_addr != 0) {
+        uint64_t val = 0;
+        /* 安全读取条件地址的值 */
+        memcpy(&val, (const void *)bp->cond_addr, sizeof(val));
+        if (val != bp->cond_value) {
+            return SWBREAK_ACTION_CONTINUE; /* 条件不满足, 跳过 */
+        }
+    }
+
+    /* 一次性断点: 命中后标记删除 */
+    if (bp->one_shot) {
+        if (bp->lua_ref != LUA_NOREF && bp->lua_ref != LUA_REFNIL) {
+            (void)swbreak_lua_call_callback(bp->lua_ref, info);
+        } else if (bp->c_callback) {
+            (void)bp->c_callback(info, bp->c_user_data);
+        }
+        /* 返回 DELETE, 由信号处理器在安全上下文中移除 */
+        return SWBREAK_ACTION_DELETE;
+    }
+
     /* 优先执行 Lua 回调 */
     if (bp->lua_ref != LUA_NOREF && bp->lua_ref != LUA_REFNIL) {
         return swbreak_lua_call_callback(bp->lua_ref, info);

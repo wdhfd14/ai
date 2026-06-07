@@ -69,6 +69,13 @@ struct swbreak_bp {
     int               hit_count;    /* 命中次数          */
     int               one_shot;     /* 是否一次性断点     */
 
+    /* ── 条件断点 ── */
+    int               max_hits;     /* 最大命中次数 (0=无限) */
+    int               ignore_count; /* 忽略前 N 次命中       */
+    uint64_t          cond_addr;    /* 条件: 仅当此地址访问时触发 (0=无条件) */
+    uint64_t          cond_value;   /* 条件: 仅当 *cond_addr == cond_value 时触发 */
+    int               pending_delete; /* 待删除标记 (信号处理器中安全删除) */
+
     /* ── 信号驱动模式专用 ── */
     int    orig_prot;               /* 原始页保护属性     */
     void  *page_base;               /* 页基址            */
@@ -97,6 +104,10 @@ typedef struct {
     void              *user_data;   /* C 回调用户数据     */
     const char        *lua_script;  /* Lua 脚本路径 (可选) */
     int                one_shot;    /* 一次性断点         */
+    int                max_hits;    /* 最大命中次数 (0=无限) */
+    int                ignore_count;/* 忽略前 N 次命中    */
+    uint64_t          cond_addr;    /* 条件地址 (0=无条件) */
+    uint64_t          cond_value;   /* 条件值            */
 } swbreak_bp_params_t;
 
 /* ── 引擎配置 ── */
