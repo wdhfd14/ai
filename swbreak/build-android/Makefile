@@ -1010,6 +1010,9 @@ src/bp_engine.o: src/bp_engine.c.o
 # target to build an object file
 src/bp_engine.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/bp_engine.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/bp_engine.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/bp_engine.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/bp_engine.c.o
 .PHONY : src/bp_engine.c.o
 
 src/bp_engine.i: src/bp_engine.c.i
@@ -1018,6 +1021,9 @@ src/bp_engine.i: src/bp_engine.c.i
 # target to preprocess a source file
 src/bp_engine.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/bp_engine.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/bp_engine.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/bp_engine.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/bp_engine.c.i
 .PHONY : src/bp_engine.c.i
 
 src/bp_engine.s: src/bp_engine.c.s
@@ -1026,6 +1032,9 @@ src/bp_engine.s: src/bp_engine.c.s
 # target to generate assembly for a file
 src/bp_engine.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/bp_engine.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/bp_engine.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/bp_engine.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/bp_engine.c.s
 .PHONY : src/bp_engine.c.s
 
 src/bp_hook.o: src/bp_hook.c.o
@@ -1034,6 +1043,9 @@ src/bp_hook.o: src/bp_hook.c.o
 # target to build an object file
 src/bp_hook.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/bp_hook.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/bp_hook.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/bp_hook.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/bp_hook.c.o
 .PHONY : src/bp_hook.c.o
 
 src/bp_hook.i: src/bp_hook.c.i
@@ -1042,6 +1054,9 @@ src/bp_hook.i: src/bp_hook.c.i
 # target to preprocess a source file
 src/bp_hook.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/bp_hook.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/bp_hook.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/bp_hook.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/bp_hook.c.i
 .PHONY : src/bp_hook.c.i
 
 src/bp_hook.s: src/bp_hook.c.s
@@ -1050,6 +1065,9 @@ src/bp_hook.s: src/bp_hook.c.s
 # target to generate assembly for a file
 src/bp_hook.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/bp_hook.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/bp_hook.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/bp_hook.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/bp_hook.c.s
 .PHONY : src/bp_hook.c.s
 
 src/bp_hybrid.o: src/bp_hybrid.c.o
@@ -1058,6 +1076,9 @@ src/bp_hybrid.o: src/bp_hybrid.c.o
 # target to build an object file
 src/bp_hybrid.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/bp_hybrid.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/bp_hybrid.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/bp_hybrid.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/bp_hybrid.c.o
 .PHONY : src/bp_hybrid.c.o
 
 src/bp_hybrid.i: src/bp_hybrid.c.i
@@ -1066,6 +1087,9 @@ src/bp_hybrid.i: src/bp_hybrid.c.i
 # target to preprocess a source file
 src/bp_hybrid.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/bp_hybrid.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/bp_hybrid.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/bp_hybrid.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/bp_hybrid.c.i
 .PHONY : src/bp_hybrid.c.i
 
 src/bp_hybrid.s: src/bp_hybrid.c.s
@@ -1074,6 +1098,9 @@ src/bp_hybrid.s: src/bp_hybrid.c.s
 # target to generate assembly for a file
 src/bp_hybrid.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/bp_hybrid.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/bp_hybrid.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/bp_hybrid.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/bp_hybrid.c.s
 .PHONY : src/bp_hybrid.c.s
 
 src/bp_signal.o: src/bp_signal.c.o
@@ -1082,6 +1109,9 @@ src/bp_signal.o: src/bp_signal.c.o
 # target to build an object file
 src/bp_signal.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/bp_signal.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/bp_signal.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/bp_signal.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/bp_signal.c.o
 .PHONY : src/bp_signal.c.o
 
 src/bp_signal.i: src/bp_signal.c.i
@@ -1090,6 +1120,9 @@ src/bp_signal.i: src/bp_signal.c.i
 # target to preprocess a source file
 src/bp_signal.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/bp_signal.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/bp_signal.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/bp_signal.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/bp_signal.c.i
 .PHONY : src/bp_signal.c.i
 
 src/bp_signal.s: src/bp_signal.c.s
@@ -1098,6 +1131,9 @@ src/bp_signal.s: src/bp_signal.c.s
 # target to generate assembly for a file
 src/bp_signal.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/bp_signal.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/bp_signal.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/bp_signal.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/bp_signal.c.s
 .PHONY : src/bp_signal.c.s
 
 src/lua_api.o: src/lua_api.c.o
@@ -1106,6 +1142,9 @@ src/lua_api.o: src/lua_api.c.o
 # target to build an object file
 src/lua_api.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/lua_api.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/lua_api.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/lua_api.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/lua_api.c.o
 .PHONY : src/lua_api.c.o
 
 src/lua_api.i: src/lua_api.c.i
@@ -1114,6 +1153,9 @@ src/lua_api.i: src/lua_api.c.i
 # target to preprocess a source file
 src/lua_api.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/lua_api.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/lua_api.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/lua_api.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/lua_api.c.i
 .PHONY : src/lua_api.c.i
 
 src/lua_api.s: src/lua_api.c.s
@@ -1122,6 +1164,9 @@ src/lua_api.s: src/lua_api.c.s
 # target to generate assembly for a file
 src/lua_api.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/lua_api.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/lua_api.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/lua_api.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/lua_api.c.s
 .PHONY : src/lua_api.c.s
 
 src/lua_engine.o: src/lua_engine.c.o
@@ -1130,6 +1175,9 @@ src/lua_engine.o: src/lua_engine.c.o
 # target to build an object file
 src/lua_engine.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/lua_engine.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/lua_engine.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/lua_engine.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/lua_engine.c.o
 .PHONY : src/lua_engine.c.o
 
 src/lua_engine.i: src/lua_engine.c.i
@@ -1138,6 +1186,9 @@ src/lua_engine.i: src/lua_engine.c.i
 # target to preprocess a source file
 src/lua_engine.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/lua_engine.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/lua_engine.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/lua_engine.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/lua_engine.c.i
 .PHONY : src/lua_engine.c.i
 
 src/lua_engine.s: src/lua_engine.c.s
@@ -1146,6 +1197,9 @@ src/lua_engine.s: src/lua_engine.c.s
 # target to generate assembly for a file
 src/lua_engine.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/lua_engine.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/lua_engine.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/lua_engine.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/lua_engine.c.s
 .PHONY : src/lua_engine.c.s
 
 src/mem_ops.o: src/mem_ops.c.o
@@ -1154,6 +1208,9 @@ src/mem_ops.o: src/mem_ops.c.o
 # target to build an object file
 src/mem_ops.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/mem_ops.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/mem_ops.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/mem_ops.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/mem_ops.c.o
 .PHONY : src/mem_ops.c.o
 
 src/mem_ops.i: src/mem_ops.c.i
@@ -1162,6 +1219,9 @@ src/mem_ops.i: src/mem_ops.c.i
 # target to preprocess a source file
 src/mem_ops.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/mem_ops.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/mem_ops.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/mem_ops.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/mem_ops.c.i
 .PHONY : src/mem_ops.c.i
 
 src/mem_ops.s: src/mem_ops.c.s
@@ -1170,6 +1230,9 @@ src/mem_ops.s: src/mem_ops.c.s
 # target to generate assembly for a file
 src/mem_ops.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/mem_ops.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/mem_ops.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/mem_ops.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/mem_ops.c.s
 .PHONY : src/mem_ops.c.s
 
 src/reg_ops.o: src/reg_ops.c.o
@@ -1178,6 +1241,9 @@ src/reg_ops.o: src/reg_ops.c.o
 # target to build an object file
 src/reg_ops.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/reg_ops.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/reg_ops.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/reg_ops.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/reg_ops.c.o
 .PHONY : src/reg_ops.c.o
 
 src/reg_ops.i: src/reg_ops.c.i
@@ -1186,6 +1252,9 @@ src/reg_ops.i: src/reg_ops.c.i
 # target to preprocess a source file
 src/reg_ops.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/reg_ops.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/reg_ops.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/reg_ops.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/reg_ops.c.i
 .PHONY : src/reg_ops.c.i
 
 src/reg_ops.s: src/reg_ops.c.s
@@ -1194,6 +1263,9 @@ src/reg_ops.s: src/reg_ops.c.s
 # target to generate assembly for a file
 src/reg_ops.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/reg_ops.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/reg_ops.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/reg_ops.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/reg_ops.c.s
 .PHONY : src/reg_ops.c.s
 
 src/signal_dispatch.o: src/signal_dispatch.c.o
@@ -1202,6 +1274,9 @@ src/signal_dispatch.o: src/signal_dispatch.c.o
 # target to build an object file
 src/signal_dispatch.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/signal_dispatch.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/signal_dispatch.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/signal_dispatch.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/signal_dispatch.c.o
 .PHONY : src/signal_dispatch.c.o
 
 src/signal_dispatch.i: src/signal_dispatch.c.i
@@ -1210,6 +1285,9 @@ src/signal_dispatch.i: src/signal_dispatch.c.i
 # target to preprocess a source file
 src/signal_dispatch.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/signal_dispatch.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/signal_dispatch.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/signal_dispatch.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/signal_dispatch.c.i
 .PHONY : src/signal_dispatch.c.i
 
 src/signal_dispatch.s: src/signal_dispatch.c.s
@@ -1218,6 +1296,9 @@ src/signal_dispatch.s: src/signal_dispatch.c.s
 # target to generate assembly for a file
 src/signal_dispatch.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/signal_dispatch.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/signal_dispatch.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/signal_dispatch.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/signal_dispatch.c.s
 .PHONY : src/signal_dispatch.c.s
 
 src/swbreak.o: src/swbreak.c.o
@@ -1226,6 +1307,9 @@ src/swbreak.o: src/swbreak.c.o
 # target to build an object file
 src/swbreak.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/swbreak.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/swbreak.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/swbreak.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/swbreak.c.o
 .PHONY : src/swbreak.c.o
 
 src/swbreak.i: src/swbreak.c.i
@@ -1234,6 +1318,9 @@ src/swbreak.i: src/swbreak.c.i
 # target to preprocess a source file
 src/swbreak.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/swbreak.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/swbreak.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/swbreak.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/swbreak.c.i
 .PHONY : src/swbreak.c.i
 
 src/swbreak.s: src/swbreak.c.s
@@ -1242,6 +1329,9 @@ src/swbreak.s: src/swbreak.c.s
 # target to generate assembly for a file
 src/swbreak.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/swbreak.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/swbreak.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/swbreak.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/swbreak.c.s
 .PHONY : src/swbreak.c.s
 
 src/ui_android.o: src/ui_android.c.o
@@ -1250,6 +1340,9 @@ src/ui_android.o: src/ui_android.c.o
 # target to build an object file
 src/ui_android.c.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/ui_android.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/ui_android.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/ui_android.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/ui_android.c.o
 .PHONY : src/ui_android.c.o
 
 src/ui_android.i: src/ui_android.c.i
@@ -1258,6 +1351,9 @@ src/ui_android.i: src/ui_android.c.i
 # target to preprocess a source file
 src/ui_android.c.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/ui_android.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/ui_android.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/ui_android.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/ui_android.c.i
 .PHONY : src/ui_android.c.i
 
 src/ui_android.s: src/ui_android.c.s
@@ -1266,6 +1362,9 @@ src/ui_android.s: src/ui_android.c.s
 # target to generate assembly for a file
 src/ui_android.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/ui_android.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-debugger.dir/build.make CMakeFiles/swbreak-debugger.dir/src/ui_android.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak-inject.dir/build.make CMakeFiles/swbreak-inject.dir/src/ui_android.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_core.dir/build.make CMakeFiles/test_core.dir/src/ui_android.c.s
 .PHONY : src/ui_android.c.s
 
 tests/test_core.o: tests/test_core.c.o

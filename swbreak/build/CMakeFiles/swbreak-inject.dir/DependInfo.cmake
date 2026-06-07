@@ -8,6 +8,16 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/workspace/swbreak/src/bp_engine.c" "CMakeFiles/swbreak-inject.dir/src/bp_engine.c.o" "gcc" "CMakeFiles/swbreak-inject.dir/src/bp_engine.c.o.d"
+  "/workspace/swbreak/src/bp_hook.c" "CMakeFiles/swbreak-inject.dir/src/bp_hook.c.o" "gcc" "CMakeFiles/swbreak-inject.dir/src/bp_hook.c.o.d"
+  "/workspace/swbreak/src/bp_hybrid.c" "CMakeFiles/swbreak-inject.dir/src/bp_hybrid.c.o" "gcc" "CMakeFiles/swbreak-inject.dir/src/bp_hybrid.c.o.d"
+  "/workspace/swbreak/src/bp_signal.c" "CMakeFiles/swbreak-inject.dir/src/bp_signal.c.o" "gcc" "CMakeFiles/swbreak-inject.dir/src/bp_signal.c.o.d"
+  "/workspace/swbreak/src/lua_api.c" "CMakeFiles/swbreak-inject.dir/src/lua_api.c.o" "gcc" "CMakeFiles/swbreak-inject.dir/src/lua_api.c.o.d"
+  "/workspace/swbreak/src/lua_engine.c" "CMakeFiles/swbreak-inject.dir/src/lua_engine.c.o" "gcc" "CMakeFiles/swbreak-inject.dir/src/lua_engine.c.o.d"
+  "/workspace/swbreak/src/mem_ops.c" "CMakeFiles/swbreak-inject.dir/src/mem_ops.c.o" "gcc" "CMakeFiles/swbreak-inject.dir/src/mem_ops.c.o.d"
+  "/workspace/swbreak/src/reg_ops.c" "CMakeFiles/swbreak-inject.dir/src/reg_ops.c.o" "gcc" "CMakeFiles/swbreak-inject.dir/src/reg_ops.c.o.d"
+  "/workspace/swbreak/src/signal_dispatch.c" "CMakeFiles/swbreak-inject.dir/src/signal_dispatch.c.o" "gcc" "CMakeFiles/swbreak-inject.dir/src/signal_dispatch.c.o.d"
+  "/workspace/swbreak/src/swbreak.c" "CMakeFiles/swbreak-inject.dir/src/swbreak.c.o" "gcc" "CMakeFiles/swbreak-inject.dir/src/swbreak.c.o.d"
   "/workspace/swbreak/tools/injector/injector.c" "CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o" "gcc" "CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o.d"
   )
 

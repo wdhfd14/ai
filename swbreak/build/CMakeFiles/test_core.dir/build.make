@@ -73,29 +73,188 @@ CMakeFiles/test_core.dir/tests/test_core.c.o: CMakeFiles/test_core.dir/flags.mak
 CMakeFiles/test_core.dir/tests/test_core.c.o: /workspace/swbreak/tests/test_core.c
 CMakeFiles/test_core.dir/tests/test_core.c.o: CMakeFiles/test_core.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/test_core.dir/tests/test_core.c.o"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/test_core.dir/tests/test_core.c.o -MF CMakeFiles/test_core.dir/tests/test_core.c.o.d -o CMakeFiles/test_core.dir/tests/test_core.c.o -c /workspace/swbreak/tests/test_core.c
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/test_core.dir/tests/test_core.c.o -MF CMakeFiles/test_core.dir/tests/test_core.c.o.d -o CMakeFiles/test_core.dir/tests/test_core.c.o -c /workspace/swbreak/tests/test_core.c
 
 CMakeFiles/test_core.dir/tests/test_core.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/test_core.dir/tests/test_core.c.i"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/swbreak/tests/test_core.c > CMakeFiles/test_core.dir/tests/test_core.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/swbreak/tests/test_core.c > CMakeFiles/test_core.dir/tests/test_core.c.i
 
 CMakeFiles/test_core.dir/tests/test_core.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/test_core.dir/tests/test_core.c.s"
-	/usr/bin/gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/swbreak/tests/test_core.c -o CMakeFiles/test_core.dir/tests/test_core.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/swbreak/tests/test_core.c -o CMakeFiles/test_core.dir/tests/test_core.c.s
+
+CMakeFiles/test_core.dir/src/mem_ops.c.o: CMakeFiles/test_core.dir/flags.make
+CMakeFiles/test_core.dir/src/mem_ops.c.o: /workspace/swbreak/src/mem_ops.c
+CMakeFiles/test_core.dir/src/mem_ops.c.o: CMakeFiles/test_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/test_core.dir/src/mem_ops.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/test_core.dir/src/mem_ops.c.o -MF CMakeFiles/test_core.dir/src/mem_ops.c.o.d -o CMakeFiles/test_core.dir/src/mem_ops.c.o -c /workspace/swbreak/src/mem_ops.c
+
+CMakeFiles/test_core.dir/src/mem_ops.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/test_core.dir/src/mem_ops.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/swbreak/src/mem_ops.c > CMakeFiles/test_core.dir/src/mem_ops.c.i
+
+CMakeFiles/test_core.dir/src/mem_ops.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/test_core.dir/src/mem_ops.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/swbreak/src/mem_ops.c -o CMakeFiles/test_core.dir/src/mem_ops.c.s
+
+CMakeFiles/test_core.dir/src/reg_ops.c.o: CMakeFiles/test_core.dir/flags.make
+CMakeFiles/test_core.dir/src/reg_ops.c.o: /workspace/swbreak/src/reg_ops.c
+CMakeFiles/test_core.dir/src/reg_ops.c.o: CMakeFiles/test_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/test_core.dir/src/reg_ops.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/test_core.dir/src/reg_ops.c.o -MF CMakeFiles/test_core.dir/src/reg_ops.c.o.d -o CMakeFiles/test_core.dir/src/reg_ops.c.o -c /workspace/swbreak/src/reg_ops.c
+
+CMakeFiles/test_core.dir/src/reg_ops.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/test_core.dir/src/reg_ops.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/swbreak/src/reg_ops.c > CMakeFiles/test_core.dir/src/reg_ops.c.i
+
+CMakeFiles/test_core.dir/src/reg_ops.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/test_core.dir/src/reg_ops.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/swbreak/src/reg_ops.c -o CMakeFiles/test_core.dir/src/reg_ops.c.s
+
+CMakeFiles/test_core.dir/src/signal_dispatch.c.o: CMakeFiles/test_core.dir/flags.make
+CMakeFiles/test_core.dir/src/signal_dispatch.c.o: /workspace/swbreak/src/signal_dispatch.c
+CMakeFiles/test_core.dir/src/signal_dispatch.c.o: CMakeFiles/test_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/test_core.dir/src/signal_dispatch.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/test_core.dir/src/signal_dispatch.c.o -MF CMakeFiles/test_core.dir/src/signal_dispatch.c.o.d -o CMakeFiles/test_core.dir/src/signal_dispatch.c.o -c /workspace/swbreak/src/signal_dispatch.c
+
+CMakeFiles/test_core.dir/src/signal_dispatch.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/test_core.dir/src/signal_dispatch.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/swbreak/src/signal_dispatch.c > CMakeFiles/test_core.dir/src/signal_dispatch.c.i
+
+CMakeFiles/test_core.dir/src/signal_dispatch.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/test_core.dir/src/signal_dispatch.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/swbreak/src/signal_dispatch.c -o CMakeFiles/test_core.dir/src/signal_dispatch.c.s
+
+CMakeFiles/test_core.dir/src/bp_signal.c.o: CMakeFiles/test_core.dir/flags.make
+CMakeFiles/test_core.dir/src/bp_signal.c.o: /workspace/swbreak/src/bp_signal.c
+CMakeFiles/test_core.dir/src/bp_signal.c.o: CMakeFiles/test_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/test_core.dir/src/bp_signal.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/test_core.dir/src/bp_signal.c.o -MF CMakeFiles/test_core.dir/src/bp_signal.c.o.d -o CMakeFiles/test_core.dir/src/bp_signal.c.o -c /workspace/swbreak/src/bp_signal.c
+
+CMakeFiles/test_core.dir/src/bp_signal.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/test_core.dir/src/bp_signal.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/swbreak/src/bp_signal.c > CMakeFiles/test_core.dir/src/bp_signal.c.i
+
+CMakeFiles/test_core.dir/src/bp_signal.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/test_core.dir/src/bp_signal.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/swbreak/src/bp_signal.c -o CMakeFiles/test_core.dir/src/bp_signal.c.s
+
+CMakeFiles/test_core.dir/src/bp_hook.c.o: CMakeFiles/test_core.dir/flags.make
+CMakeFiles/test_core.dir/src/bp_hook.c.o: /workspace/swbreak/src/bp_hook.c
+CMakeFiles/test_core.dir/src/bp_hook.c.o: CMakeFiles/test_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/test_core.dir/src/bp_hook.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/test_core.dir/src/bp_hook.c.o -MF CMakeFiles/test_core.dir/src/bp_hook.c.o.d -o CMakeFiles/test_core.dir/src/bp_hook.c.o -c /workspace/swbreak/src/bp_hook.c
+
+CMakeFiles/test_core.dir/src/bp_hook.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/test_core.dir/src/bp_hook.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/swbreak/src/bp_hook.c > CMakeFiles/test_core.dir/src/bp_hook.c.i
+
+CMakeFiles/test_core.dir/src/bp_hook.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/test_core.dir/src/bp_hook.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/swbreak/src/bp_hook.c -o CMakeFiles/test_core.dir/src/bp_hook.c.s
+
+CMakeFiles/test_core.dir/src/bp_hybrid.c.o: CMakeFiles/test_core.dir/flags.make
+CMakeFiles/test_core.dir/src/bp_hybrid.c.o: /workspace/swbreak/src/bp_hybrid.c
+CMakeFiles/test_core.dir/src/bp_hybrid.c.o: CMakeFiles/test_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/test_core.dir/src/bp_hybrid.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/test_core.dir/src/bp_hybrid.c.o -MF CMakeFiles/test_core.dir/src/bp_hybrid.c.o.d -o CMakeFiles/test_core.dir/src/bp_hybrid.c.o -c /workspace/swbreak/src/bp_hybrid.c
+
+CMakeFiles/test_core.dir/src/bp_hybrid.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/test_core.dir/src/bp_hybrid.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/swbreak/src/bp_hybrid.c > CMakeFiles/test_core.dir/src/bp_hybrid.c.i
+
+CMakeFiles/test_core.dir/src/bp_hybrid.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/test_core.dir/src/bp_hybrid.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/swbreak/src/bp_hybrid.c -o CMakeFiles/test_core.dir/src/bp_hybrid.c.s
+
+CMakeFiles/test_core.dir/src/bp_engine.c.o: CMakeFiles/test_core.dir/flags.make
+CMakeFiles/test_core.dir/src/bp_engine.c.o: /workspace/swbreak/src/bp_engine.c
+CMakeFiles/test_core.dir/src/bp_engine.c.o: CMakeFiles/test_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/test_core.dir/src/bp_engine.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/test_core.dir/src/bp_engine.c.o -MF CMakeFiles/test_core.dir/src/bp_engine.c.o.d -o CMakeFiles/test_core.dir/src/bp_engine.c.o -c /workspace/swbreak/src/bp_engine.c
+
+CMakeFiles/test_core.dir/src/bp_engine.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/test_core.dir/src/bp_engine.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/swbreak/src/bp_engine.c > CMakeFiles/test_core.dir/src/bp_engine.c.i
+
+CMakeFiles/test_core.dir/src/bp_engine.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/test_core.dir/src/bp_engine.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/swbreak/src/bp_engine.c -o CMakeFiles/test_core.dir/src/bp_engine.c.s
+
+CMakeFiles/test_core.dir/src/lua_api.c.o: CMakeFiles/test_core.dir/flags.make
+CMakeFiles/test_core.dir/src/lua_api.c.o: /workspace/swbreak/src/lua_api.c
+CMakeFiles/test_core.dir/src/lua_api.c.o: CMakeFiles/test_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/test_core.dir/src/lua_api.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/test_core.dir/src/lua_api.c.o -MF CMakeFiles/test_core.dir/src/lua_api.c.o.d -o CMakeFiles/test_core.dir/src/lua_api.c.o -c /workspace/swbreak/src/lua_api.c
+
+CMakeFiles/test_core.dir/src/lua_api.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/test_core.dir/src/lua_api.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/swbreak/src/lua_api.c > CMakeFiles/test_core.dir/src/lua_api.c.i
+
+CMakeFiles/test_core.dir/src/lua_api.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/test_core.dir/src/lua_api.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/swbreak/src/lua_api.c -o CMakeFiles/test_core.dir/src/lua_api.c.s
+
+CMakeFiles/test_core.dir/src/lua_engine.c.o: CMakeFiles/test_core.dir/flags.make
+CMakeFiles/test_core.dir/src/lua_engine.c.o: /workspace/swbreak/src/lua_engine.c
+CMakeFiles/test_core.dir/src/lua_engine.c.o: CMakeFiles/test_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/test_core.dir/src/lua_engine.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/test_core.dir/src/lua_engine.c.o -MF CMakeFiles/test_core.dir/src/lua_engine.c.o.d -o CMakeFiles/test_core.dir/src/lua_engine.c.o -c /workspace/swbreak/src/lua_engine.c
+
+CMakeFiles/test_core.dir/src/lua_engine.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/test_core.dir/src/lua_engine.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/swbreak/src/lua_engine.c > CMakeFiles/test_core.dir/src/lua_engine.c.i
+
+CMakeFiles/test_core.dir/src/lua_engine.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/test_core.dir/src/lua_engine.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/swbreak/src/lua_engine.c -o CMakeFiles/test_core.dir/src/lua_engine.c.s
+
+CMakeFiles/test_core.dir/src/swbreak.c.o: CMakeFiles/test_core.dir/flags.make
+CMakeFiles/test_core.dir/src/swbreak.c.o: /workspace/swbreak/src/swbreak.c
+CMakeFiles/test_core.dir/src/swbreak.c.o: CMakeFiles/test_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/test_core.dir/src/swbreak.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/test_core.dir/src/swbreak.c.o -MF CMakeFiles/test_core.dir/src/swbreak.c.o.d -o CMakeFiles/test_core.dir/src/swbreak.c.o -c /workspace/swbreak/src/swbreak.c
+
+CMakeFiles/test_core.dir/src/swbreak.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/test_core.dir/src/swbreak.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /workspace/swbreak/src/swbreak.c > CMakeFiles/test_core.dir/src/swbreak.c.i
+
+CMakeFiles/test_core.dir/src/swbreak.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/test_core.dir/src/swbreak.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /workspace/swbreak/src/swbreak.c -o CMakeFiles/test_core.dir/src/swbreak.c.s
 
 # Object files for target test_core
 test_core_OBJECTS = \
-"CMakeFiles/test_core.dir/tests/test_core.c.o"
+"CMakeFiles/test_core.dir/tests/test_core.c.o" \
+"CMakeFiles/test_core.dir/src/mem_ops.c.o" \
+"CMakeFiles/test_core.dir/src/reg_ops.c.o" \
+"CMakeFiles/test_core.dir/src/signal_dispatch.c.o" \
+"CMakeFiles/test_core.dir/src/bp_signal.c.o" \
+"CMakeFiles/test_core.dir/src/bp_hook.c.o" \
+"CMakeFiles/test_core.dir/src/bp_hybrid.c.o" \
+"CMakeFiles/test_core.dir/src/bp_engine.c.o" \
+"CMakeFiles/test_core.dir/src/lua_api.c.o" \
+"CMakeFiles/test_core.dir/src/lua_engine.c.o" \
+"CMakeFiles/test_core.dir/src/swbreak.c.o"
 
 # External object files for target test_core
 test_core_EXTERNAL_OBJECTS =
 
 test_core: CMakeFiles/test_core.dir/tests/test_core.c.o
+test_core: CMakeFiles/test_core.dir/src/mem_ops.c.o
+test_core: CMakeFiles/test_core.dir/src/reg_ops.c.o
+test_core: CMakeFiles/test_core.dir/src/signal_dispatch.c.o
+test_core: CMakeFiles/test_core.dir/src/bp_signal.c.o
+test_core: CMakeFiles/test_core.dir/src/bp_hook.c.o
+test_core: CMakeFiles/test_core.dir/src/bp_hybrid.c.o
+test_core: CMakeFiles/test_core.dir/src/bp_engine.c.o
+test_core: CMakeFiles/test_core.dir/src/lua_api.c.o
+test_core: CMakeFiles/test_core.dir/src/lua_engine.c.o
+test_core: CMakeFiles/test_core.dir/src/swbreak.c.o
 test_core: CMakeFiles/test_core.dir/build.make
-test_core: libswbreak.so
 test_core: liblua52.a
 test_core: CMakeFiles/test_core.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable test_core"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspace/swbreak/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Linking C executable test_core"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/test_core.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

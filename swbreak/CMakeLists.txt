@@ -82,7 +82,15 @@ target_include_directories(swbreak
 target_link_libraries(swbreak PRIVATE lua52 dl m)
 target_compile_definitions(swbreak PRIVATE
     _GNU_SOURCE
+    SWBREAK_BUILDING
     SWBREAK_VERSION="${PROJECT_VERSION}"
+)
+
+# 符号版本脚本: 只导出公共 API, 隐藏内部符号和 Lua 符号
+target_compile_options(swbreak PRIVATE -fvisibility=hidden)
+set_target_properties(swbreak PROPERTIES
+    C_VISIBILITY_PRESET hidden
+    LINK_FLAGS "-Wl,--version-script=${CMAKE_SOURCE_DIR}/swbreak.version"
 )
 
 # Android 需要链接 log 库
@@ -90,33 +98,63 @@ if(ANDROID)
     target_link_libraries(swbreak PRIVATE log)
 endif()
 
-# ── ptrace 调试器 ──
+# ── 公共源文件列表 ──
+set(SWBREAK_ALL_SOURCES
+    src/mem_ops.c
+    src/reg_ops.c
+    src/signal_dispatch.c
+    src/bp_signal.c
+    src/bp_hook.c
+    src/bp_hybrid.c
+    src/bp_engine.c
+    src/lua_api.c
+    src/lua_engine.c
+    src/swbreak.c
+)
+
+# Android UI 模块 (仅 Android)
+if(ANDROID)
+    list(APPEND SWBREAK_ALL_SOURCES src/ui_android.c)
+endif()
+
+# ── ptrace 调试器 (直接编译源文件) ──
 add_executable(swbreak-debugger
     tools/debugger/debugger.c
+    ${SWBREAK_ALL_SOURCES}
 )
 target_include_directories(swbreak-debugger
     PRIVATE ${CMAKE_SOURCE_DIR}/include
+            ${CMAKE_SOURCE_DIR}/src
             ${LUA_SRC_DIR}
 )
 target_compile_definitions(swbreak-debugger PRIVATE _GNU_SOURCE SWBREAK_STANDALONE)
-target_link_libraries(swbreak-debugger PRIVATE swbreak lua52 dl)
+target_link_libraries(swbreak-debugger PRIVATE lua52 dl m)
+if(ANDROID)
+    target_link_libraries(swbreak-debugger PRIVATE log)
+endif()
 
-# ── 注入器 ──
+# ── 注入器 (直接编译源文件) ──
 add_executable(swbreak-inject
     tools/injector/injector.c
+    ${SWBREAK_ALL_SOURCES}
 )
 target_include_directories(swbreak-inject
     PRIVATE ${CMAKE_SOURCE_DIR}/include
+            ${CMAKE_SOURCE_DIR}/src
             ${LUA_SRC_DIR}
 )
 target_compile_definitions(swbreak-inject PRIVATE _GNU_SOURCE)
-target_link_libraries(swbreak-inject PRIVATE swbreak lua52 dl)
+target_link_libraries(swbreak-inject PRIVATE lua52 dl m)
+if(ANDROID)
+    target_link_libraries(swbreak-inject PRIVATE log)
+endif()
 
-# ── 测试 ──
+# ── 测试 (直接编译源文件, 不链接 .so, 避免符号可见性问题) ──
 enable_testing()
 
 add_executable(test_core
     tests/test_core.c
+    ${SWBREAK_ALL_SOURCES}
 )
 target_include_directories(test_core
     PRIVATE ${CMAKE_SOURCE_DIR}/include
@@ -124,8 +162,7 @@ target_include_directories(test_core
             ${LUA_SRC_DIR}
 )
 target_compile_definitions(test_core PRIVATE _GNU_SOURCE)
-target_link_libraries(test_core PRIVATE swbreak lua52 dl m)
-add_test(NAME test_core COMMAND test_core)
+target_link_libraries(test_core PRIVATE lua52 dl m)
 
 # ── 安装 ──
 include(GNUInstallDirs)

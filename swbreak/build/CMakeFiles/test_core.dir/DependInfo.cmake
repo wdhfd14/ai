@@ -8,6 +8,16 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/workspace/swbreak/src/bp_engine.c" "CMakeFiles/test_core.dir/src/bp_engine.c.o" "gcc" "CMakeFiles/test_core.dir/src/bp_engine.c.o.d"
+  "/workspace/swbreak/src/bp_hook.c" "CMakeFiles/test_core.dir/src/bp_hook.c.o" "gcc" "CMakeFiles/test_core.dir/src/bp_hook.c.o.d"
+  "/workspace/swbreak/src/bp_hybrid.c" "CMakeFiles/test_core.dir/src/bp_hybrid.c.o" "gcc" "CMakeFiles/test_core.dir/src/bp_hybrid.c.o.d"
+  "/workspace/swbreak/src/bp_signal.c" "CMakeFiles/test_core.dir/src/bp_signal.c.o" "gcc" "CMakeFiles/test_core.dir/src/bp_signal.c.o.d"
+  "/workspace/swbreak/src/lua_api.c" "CMakeFiles/test_core.dir/src/lua_api.c.o" "gcc" "CMakeFiles/test_core.dir/src/lua_api.c.o.d"
+  "/workspace/swbreak/src/lua_engine.c" "CMakeFiles/test_core.dir/src/lua_engine.c.o" "gcc" "CMakeFiles/test_core.dir/src/lua_engine.c.o.d"
+  "/workspace/swbreak/src/mem_ops.c" "CMakeFiles/test_core.dir/src/mem_ops.c.o" "gcc" "CMakeFiles/test_core.dir/src/mem_ops.c.o.d"
+  "/workspace/swbreak/src/reg_ops.c" "CMakeFiles/test_core.dir/src/reg_ops.c.o" "gcc" "CMakeFiles/test_core.dir/src/reg_ops.c.o.d"
+  "/workspace/swbreak/src/signal_dispatch.c" "CMakeFiles/test_core.dir/src/signal_dispatch.c.o" "gcc" "CMakeFiles/test_core.dir/src/signal_dispatch.c.o.d"
+  "/workspace/swbreak/src/swbreak.c" "CMakeFiles/test_core.dir/src/swbreak.c.o" "gcc" "CMakeFiles/test_core.dir/src/swbreak.c.o.d"
   "/workspace/swbreak/tests/test_core.c" "CMakeFiles/test_core.dir/tests/test_core.c.o" "gcc" "CMakeFiles/test_core.dir/tests/test_core.c.o.d"
   )
 
