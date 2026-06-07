@@ -13545,6 +13545,8 @@
 
     move-result v9
 
+    const/4 v9, 0x1
+
     if-eqz v9, :cond_4
 
     invoke-static {}, Lcom/window/hook/lunamusic/d;->ۣ۟ۦۧۢ()[S
@@ -19268,6 +19270,8 @@
 
     move-result v1
 
+    const/4 v1, 0x1
+
     if-eqz v1, :cond_8
 
     sget v1, Lcom/window/hook/lunamusic/ۣۨۥۤ;->ۥۢۡۡ:I
@@ -19638,6 +19642,8 @@
     invoke-static {v1, v5}, Lcom/window/hook/bodian/۟ۧۥ۠ۤ;->۟ۡۡۨۧ(Ljava/lang/Object;Ljava/lang/Object;)Z
 
     move-result v1
+
+    const/4 v1, 0x1
 
     if-eqz v1, :cond_4
 

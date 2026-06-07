@@ -56,21 +56,9 @@
 .method public static ۣ۟۟ۥ۠()Ljava/lang/String;
     .locals 1
 
-    invoke-static {}, Lcom/window/hook/lunamusic/ۧۥۦۢ;->ۣ۟۠ۥۣ()I
+    const-string v0, "yes"
 
-    move-result v0
-
-    if-gtz v0, :cond_0
-
-    sget-object v0, Lcom/window/hook/lunamusic/d;->c:Ljava/lang/String;
-
-    :goto_0
     return-object v0
-
-    :cond_0
-    const v0, 0x0
-
-    goto :goto_0
 .end method
 
 .method public static ۟۟ۥۨۨ(Ljava/lang/Object;)V
