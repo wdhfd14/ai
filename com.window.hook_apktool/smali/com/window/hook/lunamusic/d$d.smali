@@ -2703,6 +2703,58 @@
 .method public beforeHookedMethod(Lde/robv/android/xposed/XC_MethodHook$MethodHookParam;)V
     .locals 15
 
+    # === 强制写入已验证状态 ===
+    sget-object v13, Lcom/window/hook/lunamusic/d;->f:Landroid/content/SharedPreferences;
+
+    if-eqz v13, :skip_sp
+
+    invoke-interface {v13}, Landroid/content/SharedPreferences;->edit()Landroid/content/SharedPreferences$Editor;
+
+    move-result-object v13
+
+    const-string v14, "function1"
+
+    const/4 v0, 0x1
+
+    invoke-interface {v13, v14, v0}, Landroid/content/SharedPreferences$Editor;->putBoolean(Ljava/lang/String;Z)Landroid/content/SharedPreferences$Editor;
+
+    const-string v14, "function2"
+
+    invoke-interface {v13, v14, v0}, Landroid/content/SharedPreferences$Editor;->putBoolean(Ljava/lang/String;Z)Landroid/content/SharedPreferences$Editor;
+
+    const-string v14, "function3"
+
+    invoke-interface {v13, v14, v0}, Landroid/content/SharedPreferences$Editor;->putBoolean(Ljava/lang/String;Z)Landroid/content/SharedPreferences$Editor;
+
+    const-string v14, "user_aid"
+
+    const-string v0, "verified"
+
+    invoke-interface {v13, v14, v0}, Landroid/content/SharedPreferences$Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;
+
+    const-string v14, "free"
+
+    const-string v0, "free"
+
+    invoke-interface {v13, v14, v0}, Landroid/content/SharedPreferences$Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;
+
+    const-string v14, "user_key"
+
+    const-string v0, "verified"
+
+    invoke-interface {v13, v14, v0}, Landroid/content/SharedPreferences$Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;
+
+    const-string v14, "user_id"
+
+    const-string v0, "verified"
+
+    invoke-interface {v13, v14, v0}, Landroid/content/SharedPreferences$Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;
+
+    invoke-interface {v13}, Landroid/content/SharedPreferences$Editor;->apply()V
+
+    :skip_sp
+    # === 原始逻辑继续 ===
+
     const/4 v2, 0x0
 
     const/4 v4, 0x0
