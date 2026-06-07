@@ -1,0 +1,31 @@
+CMakeFiles/lua52.dir/lua5.2/src/ldump.c.o: \
+ /workspace/swbreak/lua5.2/src/ldump.c \
+ /usr/aarch64-linux-gnu/include/stdc-predef.h \
+ /usr/lib/gcc-cross/aarch64-linux-gnu/13/include/stddef.h \
+ /workspace/swbreak/lua5.2/src/lua.h \
+ /usr/lib/gcc-cross/aarch64-linux-gnu/13/include/stdarg.h \
+ /workspace/swbreak/lua5.2/src/luaconf.h \
+ /usr/lib/gcc-cross/aarch64-linux-gnu/13/include/limits.h \
+ /usr/lib/gcc-cross/aarch64-linux-gnu/13/include/syslimits.h \
+ /usr/aarch64-linux-gnu/include/limits.h \
+ /usr/aarch64-linux-gnu/include/bits/libc-header-start.h \
+ /usr/aarch64-linux-gnu/include/features.h \
+ /usr/aarch64-linux-gnu/include/features-time64.h \
+ /usr/aarch64-linux-gnu/include/bits/wordsize.h \
+ /usr/aarch64-linux-gnu/include/bits/timesize.h \
+ /usr/aarch64-linux-gnu/include/sys/cdefs.h \
+ /usr/aarch64-linux-gnu/include/bits/long-double.h \
+ /usr/aarch64-linux-gnu/include/gnu/stubs.h \
+ /usr/aarch64-linux-gnu/include/gnu/stubs-lp64.h \
+ /usr/aarch64-linux-gnu/include/bits/posix1_lim.h \
+ /usr/aarch64-linux-gnu/include/bits/local_lim.h \
+ /usr/aarch64-linux-gnu/include/linux/limits.h \
+ /usr/aarch64-linux-gnu/include/bits/pthread_stack_min-dynamic.h \
+ /usr/aarch64-linux-gnu/include/bits/pthread_stack_min.h \
+ /usr/aarch64-linux-gnu/include/bits/posix2_lim.h \
+ /workspace/swbreak/lua5.2/src/lobject.h \
+ /workspace/swbreak/lua5.2/src/llimits.h \
+ /workspace/swbreak/lua5.2/src/lstate.h \
+ /workspace/swbreak/lua5.2/src/ltm.h /workspace/swbreak/lua5.2/src/lzio.h \
+ /workspace/swbreak/lua5.2/src/lmem.h \
+ /workspace/swbreak/lua5.2/src/lundump.h

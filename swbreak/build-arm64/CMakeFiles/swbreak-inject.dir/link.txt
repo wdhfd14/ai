@@ -1,0 +1,1 @@
+/usr/bin/aarch64-linux-gnu-gcc "CMakeFiles/swbreak-inject.dir/tools/injector/injector.c.o" -o swbreak-inject  -Wl,-rpath,/workspace/swbreak/build-arm64: libswbreak.so liblua52.a -ldl 

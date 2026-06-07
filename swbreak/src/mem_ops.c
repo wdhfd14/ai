@@ -30,21 +30,23 @@ int swbreak__mem_read(pid_t pid, uint64_t addr, void *buf, size_t len)
         return 0;
     }
 
-    /* 远程进程: process_vm_readv */
+    /* 远程进程 */
+#ifndef __ANDROID__
+    /* process_vm_readv 在 Android 上不可用, 仅 Linux 桌面可用 */
     struct iovec local  = { .iov_base = buf,        .iov_len = len };
     struct iovec remote = { .iov_base = (void *)addr, .iov_len = len };
 
     ssize_t n = process_vm_readv(pid, &local, 1, &remote, 1, 0);
-    if (n < 0) {
-        /* 回退到 ptrace 逐字读取 */
-        size_t i;
-        for (i = 0; i < len; i += sizeof(long)) {
-            long val = ptrace(PTRACE_PEEKDATA, pid, (void *)(addr + i), NULL);
-            if (val == -1 && errno != 0) return -1;
-            size_t copy = (len - i < sizeof(long)) ? (len - i) : sizeof(long);
-            memcpy((uint8_t *)buf + i, &val, copy);
-        }
-        return 0;
+    if (n >= 0) return 0;
+#endif
+
+    /* 回退到 ptrace 逐字读取 */
+    size_t i;
+    for (i = 0; i < len; i += sizeof(long)) {
+        long val = ptrace(PTRACE_PEEKDATA, pid, (void *)(addr + i), NULL);
+        if (val == -1 && errno != 0) return -1;
+        size_t copy = (len - i < sizeof(long)) ? (len - i) : sizeof(long);
+        memcpy((uint8_t *)buf + i, &val, copy);
     }
     return 0;
 }
@@ -70,27 +72,29 @@ int swbreak__mem_write(pid_t pid, uint64_t addr, const void *buf, size_t len)
         return 0;
     }
 
-    /* 远程进程: process_vm_writev */
+    /* 远程进程 */
+#ifndef __ANDROID__
+    /* process_vm_writev 在 Android 上不可用, 仅 Linux 桌面可用 */
     struct iovec local  = { .iov_base = (void *)buf,  .iov_len = len };
     struct iovec remote = { .iov_base = (void *)addr, .iov_len = len };
 
     ssize_t n = process_vm_writev(pid, &local, 1, &remote, 1, 0);
-    if (n < 0) {
-        /* 回退到 ptrace 逐字写入 */
-        size_t i;
-        for (i = 0; i < len; i += sizeof(long)) {
-            long val = 0;
-            size_t copy = (len - i < sizeof(long)) ? (len - i) : sizeof(long);
-            /* 先读取原值 (对齐要求) */
-            if (copy < sizeof(long)) {
-                val = ptrace(PTRACE_PEEKDATA, pid, (void *)(addr + i), NULL);
-                if (val == -1 && errno != 0) return -1;
-            }
-            memcpy(&val, (const uint8_t *)buf + i, copy);
-            if (ptrace(PTRACE_POKEDATA, pid, (void *)(addr + i), (void *)val) != 0)
-                return -1;
+    if (n >= 0) return 0;
+#endif
+
+    /* 回退到 ptrace 逐字写入 */
+    size_t i;
+    for (i = 0; i < len; i += sizeof(long)) {
+        long val = 0;
+        size_t copy = (len - i < sizeof(long)) ? (len - i) : sizeof(long);
+        /* 先读取原值 (对齐要求) */
+        if (copy < sizeof(long)) {
+            val = ptrace(PTRACE_PEEKDATA, pid, (void *)(addr + i), NULL);
+            if (val == -1 && errno != 0) return -1;
         }
-        return 0;
+        memcpy(&val, (const uint8_t *)buf + i, copy);
+        if (ptrace(PTRACE_POKEDATA, pid, (void *)(addr + i), (void *)val) != 0)
+            return -1;
     }
     return 0;
 }

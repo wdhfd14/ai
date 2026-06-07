@@ -96,9 +96,10 @@ add_executable(swbreak-inject
 )
 target_include_directories(swbreak-inject
     PRIVATE ${CMAKE_SOURCE_DIR}/include
+            ${LUA_SRC_DIR}
 )
 target_compile_definitions(swbreak-inject PRIVATE _GNU_SOURCE)
-target_link_libraries(swbreak-inject PRIVATE dl)
+target_link_libraries(swbreak-inject PRIVATE swbreak lua52 dl)
 
 # ── 安装 ──
 include(GNUInstallDirs)

@@ -17,9 +17,12 @@
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 #include <sys/user.h>
+#include <sys/uio.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <errno.h>
+#include "bp_types.h"
+#include "reg_ops.h"
 #include <linux/ptrace.h>
 
 #define SWBREAK_SOCK_PATH "/tmp/swbreak_%d.sock"
@@ -37,18 +40,18 @@ static int ptrace_inject(pid_t pid, const char *lib_path)
     waitpid(pid, NULL, 0);
 
 #ifdef __aarch64__
-    /* ARM64 注入流程 */
-    struct user_regs_struct orig_regs, regs;
-    if (ptrace(PTRACE_GETREGS, pid, NULL, &orig_regs) != 0) {
-        fprintf(stderr, "PTRACE_GETREGS failed: %s\n", strerror(errno));
+    /* ARM64 注入流程: 使用 PTRACE_GETREGSET/SETREGSET */
+    swbreak_regs_t orig_regs, regs;
+    if (swbreak_regs_ptrace_get(pid, &orig_regs) != 0) {
+        fprintf(stderr, "PTRACE_GETREGSET failed: %s\n", strerror(errno));
         ptrace(PTRACE_DETACH, pid, NULL, NULL);
         return -1;
     }
     memcpy(&regs, &orig_regs, sizeof(regs));
 
     /* 在栈上分配空间 */
-    regs.x[0] -= 2048;
-    uint64_t str_addr = regs.x[0];
+    regs.sp -= 2048;
+    uint64_t str_addr = regs.sp;
 
     /* 写入 lib_path 到目标进程栈 */
     size_t lib_len = strlen(lib_path) + 1;
@@ -60,7 +63,7 @@ static int ptrace_inject(pid_t pid, const char *lib_path)
         memcpy(&val, lib_path + i, copy);
         if (ptrace(PTRACE_POKEDATA, pid, (void *)(str_addr + i), (void *)val) != 0) {
             fprintf(stderr, "PTRACE_POKEDATA failed: %s\n", strerror(errno));
-            ptrace(PTRACE_SETREGS, pid, NULL, &orig_regs);
+            swbreak_regs_ptrace_set(pid, &orig_regs);
             ptrace(PTRACE_DETACH, pid, NULL, NULL);
             return -1;
         }
@@ -68,7 +71,7 @@ static int ptrace_inject(pid_t pid, const char *lib_path)
 
     /* TODO: 完整的 dlopen 调用链 */
     fprintf(stderr, "ARM64 注入: 库路径 %s 已写入目标栈\n", lib_path);
-    ptrace(PTRACE_SETREGS, pid, NULL, &orig_regs);
+    swbreak_regs_ptrace_set(pid, &orig_regs);
 #else
     /* 非 ARM64: 桩实现 */
     (void)lib_path;
