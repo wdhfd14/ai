@@ -1,0 +1,18 @@
+{
+  "app": "com.luna.music",
+  "duration": "665ms",
+  "headers": {
+    "Accept-Language": "zh-Hans-CN",
+    "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 10; YAL-AL50 Build/HUAWEIYAL-AL50)",
+    "Host": "160.202.238.171:25409",
+    "Connection": "Keep-Alive",
+    "Accept-Encoding": "gzip"
+  },
+  "method": "GET",
+  "protocol": "HTTP/1.1",
+  "remoteIp": "160.202.238.171",
+  "remotePort": 25409,
+  "sessionId": "ce8ad204-bc94-4367-b75e-3036d2a83952",
+  "time": "2026-06-07 18:14:04",
+  "url": "http://160.202.238.171:25409/feature/register/verify?app_id\u003d0bc0736b79f944bd8ad0ff352af72d0b\u0026device_id\u003d3ba201db5694c6bf\u0026uid\u003d2911C7240F\u0026channel_id\u003d1000\u0026app_version_code\u003d100192030\u0026app_version_name\u003d19.2.0\u0026agent_user_id\u003d\u0026code\u003d"
+}

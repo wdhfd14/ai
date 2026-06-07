@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-Optimized decryptor for the obfuscated short array in d.smali.
-Algorithm: result[i] = (char)(arr[offset + i] ^ xorKey)
+Decrypt ALL strings from the short array using ALL offset/xor_key pairs
+found in the smali code.
 """
 
-# The short array - parsed directly
-raw = [
+arr = [
 0x7e5,0x7e6,0x7e3,0x7ef,0x7e5,0x7e6,0x7e7,0x7e5,0x7e6,0x7e0,
 0x7e6,0x7e1,0x7e4,0x7b7,0x7ee,0x7e0,0x7e2,0x7ee,0x7b5,0x7b3,
 0x7e5,0x7b2,0x7e6,0x7e4,0x7e6,0x7e7,0x7e6,0x7e0,0x7e6,0x7ee,
@@ -28,12 +27,8 @@ raw = [
 0x6eb,0x6f8,0x6e3,0x6ee,0x6f9,0x6e4,0x6e2,0x6e3,0x6bf,
 0x5be,0x5ad,0x5b6,0x5bb,0x5ac,0x5b1,0x5b7,0x5b6,0x5eb,
 0x46a,0x479,0x462,0x46f,0x478,0x465,0x463,0x462,0x43d,
-0x8c0f,  # -0x73f1 as unsigned short
-0x90ed,  # -0x6f13
-0x4af6,0x51b4,0x7b0d,0x7c33,0x5926,0x6fbc,
-0x8921,  # -0x76df
-0x8b15,  # -0x74eb
-0x5aad,0x5098,
+0x8c0f,0x90ed,0x4af6,0x51b4,0x7b0d,0x7c33,0x5926,0x6fbc,
+0x8921,0x8b15,0x5aad,0x5098,
 0x884,0x8bb,0x8a2,0x8f2,0x887,0x8bc,0x8be,0x8bd,0x8b1,0x8b9,
 0x19a,0x1be,0x1b9,0x1be,0x1f7,0x195,0x1b6,0x1a5,
 0x297,0x2b6,0x2f9,0x298,0x2bd,0x2aa,
@@ -110,8 +105,7 @@ raw = [
 0x6f7,0x6fc,0x6f5,0x6fe,0x6fb,0x6e1,0x6fa,
 0x66c,0x609,0x609,0x609,0x609,0x609,0x609,0x609,0x609,
 0x7fb,0x7c9,0x7ce,0x78c,0x7ff,0x7c5,0x7d8,0x7c9,
-0x9244,  # -0x6dbc
-0x57a6,
+0x9244,0x57a6,
 0x546,0x540,0x556,0x541,0x56c,0x55a,0x557,
 0xbcb,0xbcd,0xbdb,0xbcc,0xbe1,0xbd5,0xbdb,0xbc7,
 0x90b,0x90a,0x90b,0x900,
@@ -120,7 +114,7 @@ raw = [
 0x97b,0x948,0x95f,0x95e,0x944,0x942,0x943,0x917,0x90d,
 0x2aa,0x2aa,0x2df,0x2f9,0x2ef,0x2f8,0x2e3,0x2ee,0x2b0,0x2aa,
 0x553,0x55b,0x6f1,0x6ed,0x6fb,
-0x5c4d,0x9b33,0x8a7e,0x6e9f,0x9339,0x8274,  # negative values as unsigned
+0x5c4d,0x9b33,0x8a7e,0x6e9f,0x9339,0x8274,
 0xa5c,0x2ef,0x2f4,0x2fc,
 0x28a,0x28a,0x28a,0x28a,0x28a,0x28a,
 0xa87,0xa84,0xa9f,0x826,0x831,0x846,0x844,0x843,0x830,0x835,
@@ -134,27 +128,25 @@ raw = [
 0xaa4,0xaa6,0xab7,
 0x890,0x89b,0x892,0x899,0x89c,0x886,0x89d,
 0x3af,0x382,0x382,0x3ce,0x3a1,0x388,0x388,
-0x53d5,0x9255,0x53ce,0x9750,  # negative as unsigned
+0x53d5,0x9255,0x53ce,0x9750,
 0x5a6,0x58b,0x58b,0x5c7,0x5a8,0x589,
 0x59e2,0x9862,0x578a,0x5ca5,
-0xa0a,0xa65,0xa44,
-0x902f,  # -0x6fd1
-0x5756,0x5c79,
+0xa0a,0xa65,0xa44,0x902f,0x5756,0x5c79,
 0xc7c,0xc73,0xc76,0xc6f,0xc7d,0xc70,0xc7e,0xc6d,0xc7b,
 0x9ec,0x9ca,0x9dc,0x9cb,0x9d0,0x9dd,
 0x51d4,0x552b,0x5e10,
 0xc73,0xc55,0xc43,0xc54,0xc4f,0xc42,0xc1c,0xc06,
 0x955,0x973,0x965,0x972,0x949,0x964,
 0x473a,0x737a,
-0xf60c,0x82f7,0x7f7b,0x5655,0x5d0e,0x98cd,0x82d5,  # negative as unsigned
+0xf60c,0x82f7,0x7f7b,0x5655,0x5d0e,0x98cd,0x82d5,
 0x2c6,0x2c0,0x2d6,0x2c1,0x2ec,0x2d8,0x2d6,0x2ca,
 0xc47,0xc5b,0xc4d,
 0x486,0x4a8,0x4b4,
 0x9e41,0x8f0c,0x66dd,0x5652,0x8f3a,0x9500,0x50e2,
-0xfbcc,  # -0x434
+0xfbcc,
 0x534,0x51a,0x506,
 0x9066,0x8e90,0x8e88,0x7d11,0x8edb,0x7bae,0x5ee5,0x54fa,0x5ec6,
-0xfa7e,  # -0x582
+0xfa7e,
 0x18d,0x1a3,0x1bf,
 0x4fcb,0x813b,0x4ffc,0x7bbc,
 0xb31,0xb2d,0xb3b,
@@ -167,65 +159,176 @@ raw = [
 0x2103,0x2066,
 ]
 
-print(f"Array length: {len(arr)}")
-
 def decrypt(arr, offset, length, xor_key):
     result = []
     for i in range(length):
         if offset + i >= len(arr):
             break
         val = arr[offset + i]
-        decoded = val ^ (xor_key & 0xFFFF)
-        # Only take lower 16 bits
-        decoded = decoded & 0xFFFF
-        if decoded > 0x7f:
-            return None  # Not ASCII
-        if decoded < 0x20 and decoded not in (0x09, 0x0a, 0x0d):
-            return None  # Not printable
+        decoded = (val ^ (xor_key & 0xFFFF)) & 0xFFFF
         result.append(chr(decoded))
     return ''.join(result)
 
-# Strategy: For each offset, try XOR keys that make the first char a common letter
-# Then check if the whole string is printable ASCII
-# Focus on finding strings >= 3 chars
+# ALL known offset/xor_key pairs from smali analysis
+# Format: (offset, xor_key, source)
+calls = [
+    # clinit
+    (0, 0x7d6, "clinit->d"),
+    (0xbf, 0x5d8, "clinit sswitch_5 #1"),
+    (0xc8, 0x40c, "clinit sswitch_5 #2"),
+    (0xd1, 0x5ec, "clinit sswitch_7"),
+    # v() method
+    (0x595, 0x392, "v sswitch_21"),
+    (0x5bc, 0xa2a, "v sswitch_1"),
+    (0x5bf, 0x856, "v sswitch_2"),
+    (0x5a0, 0x8f5, "v sswitch_5"),
+    (0x5b8, 0x88a, "v sswitch_c"),
+    # x() method
+    (0x601, 0x57f, "x sswitch_0"),
+    (0x60e, 0x1c6, "x sswitch_4"),
+    (0x5f6, 0x4cd, "x sswitch_5"),
+    (0x5f3, 0xc3e, "x sswitch_6"),
+    (0x5eb, 0x2b3, "x sswitch_a"),
+    # Additional offsets found in the smali
+    (0x5d8, 0x7d6, "clinit const/16 v7"),
+    (0x5a5, 0x0, "v method 0x5a5"),
+    (0x5cd, 0x0, "method 0x5cd"),
+    (0x52e, 0x0, "method 0x52e"),
+    (0x546, 0x0, "method 0x546"),
+    (0x547, 0x0, "method 0x547"),
+    (0x51c, 0x0, "method 0x51c"),
+    (0x550, 0x0, "method 0x550"),
+    (0x528, 0x0, "method 0x528"),
+    (0x531, 0x0, "method 0x531"),
+    (0x509, 0x0, "method 0x509"),
+    (0x533, 0x0, "method 0x533"),
+    (0x510, 0x0, "method 0x510"),
+    (0x518, 0x0, "method 0x518"),
+    (0x543, 0x0, "method 0x543"),
+    (0x53b, 0x0, "method 0x53b"),
+    (0x573, 0x0, "method 0x573"),
+    (0x53d, 0x0, "method 0x53d"),
+    (0x540, 0x0, "method 0x540"),
+    (0x507, 0x0, "method 0x507"),
+    (0x520, 0x0, "method 0x520"),
+    (0x553, 0x0, "method 0x553"),
+    (0x55a, 0x0, "method 0x55a"),
+    (0x563, 0x0, "method 0x563"),
+    (0x59a, 0x0, "method 0x59a"),
+    (0x52d, 0x0, "method 0x52d"),
+    (0x59d, 0x0, "method 0x59d"),
+    (0x56c, 0x0, "method 0x56c"),
+    (0x5b2, 0x0, "method 0x5b2"),
+    (0x5e7, 0x0, "method 0x5e7"),
+    (0x5ae, 0x0, "method 0x5ae"),
+    (0x5a7, 0x0, "method 0x5a7"),
+    (0x5c2, 0x0, "method 0x5c2"),
+    (0x5cb, 0x0, "method 0x5cb"),
+    (0x5dc, 0x0, "method 0x5dc"),
+    (0x5d1, 0x0, "method 0x5d1"),
+    (0x54e, 0x0, "method 0x54e"),
+    (0x5ad, 0x0, "method 0x5ad"),
+]
 
-all_found = {}
+print(f"Array length: {len(arr)}")
+print()
 
+# First, decrypt the known offset/xor_key pairs
+print("=== Known offset/xor_key pairs ===\n")
+for offset, xor_key, source in calls:
+    if xor_key == 0:
+        # Try all possible XOR keys for this offset
+        val = arr[offset]
+        best = None
+        for target_ord in range(0x20, 0x7f):
+            xk = val ^ target_ord
+            if xk > 0xFFFF:
+                continue
+            # Find max printable length
+            length = 0
+            while offset + length < len(arr):
+                v = arr[offset + length]
+                d = (v ^ (xk & 0xFFFF)) & 0xFFFF
+                if 0x20 <= d <= 0x7e:
+                    length += 1
+                else:
+                    break
+            if length >= 3:
+                s = decrypt(arr, offset, length, xk)
+                if best is None or length > best[0]:
+                    best = (length, xk, s)
+        if best:
+            length, xk, s = best
+            print(f"  [{offset:4d}] xor=0x{xk:04x} len={length:3d} ({source}): \"{s}\"")
+        continue
+    
+    # Find max printable length
+    length = 0
+    while offset + length < len(arr):
+        val = arr[offset + length]
+        decoded = (val ^ (xor_key & 0xFFFF)) & 0xFFFF
+        if 0x20 <= decoded <= 0x7e:
+            length += 1
+        else:
+            break
+    if length > 0:
+        s = decrypt(arr, offset, length, xor_key)
+        print(f"  [{offset:4d}] xor=0x{xor_key:04x} len={length:3d} ({source}): \"{s}\"")
+    else:
+        print(f"  [{offset:4d}] xor=0x{xor_key:04x} len=0 ({source}): (no printable chars)")
+
+# Now try ALL offsets with a comprehensive XOR key search
+# Focus on finding IP addresses, URLs, and verification-related strings
+print("\n\n=== Comprehensive search for IP/URL/verification strings ===\n")
 for offset in range(len(arr)):
     val = arr[offset]
-    # Try all possible XOR keys (0x0000 to 0xFFFF) but only those that produce printable ASCII
-    for first_char_ord in range(0x20, 0x7f):
-        xor_key = val ^ first_char_ord
+    for target_ord in range(0x20, 0x7f):
+        xor_key = val ^ target_ord
         if xor_key > 0xFFFF:
             continue
         
-        # Find the longest printable string at this offset with this xor_key
+        # Find the length
         length = 0
-        for i in range(offset, len(arr)):
-            decoded = arr[i] ^ (xor_key & 0xFFFF)
-            decoded = decoded & 0xFFFF
-            if 0x20 <= decoded <= 0x7e:
+        while offset + length < len(arr):
+            v = arr[offset + length]
+            d = (v ^ (xor_key & 0xFFFF)) & 0xFFFF
+            if 0x20 <= d <= 0x7e:
                 length += 1
             else:
                 break
         
-        if length >= 3:
+        if length >= 4:
+            # Check if previous char would NOT be printable (string start)
+            if offset > 0:
+                prev_val = arr[offset - 1]
+                prev_decoded = (prev_val ^ (xor_key & 0xFFFF)) & 0xFFFF
+                if 0x20 <= prev_decoded <= 0x7e:
+                    continue
+            
             s = decrypt(arr, offset, length, xor_key)
-            if s is not None:
-                key = (offset, xor_key)
-                if key not in all_found or len(s) > len(all_found[key]):
-                    all_found[key] = s
-
-# Sort by offset and print
-print(f"\nFound {len(all_found)} unique (offset, xor_key) combinations with strings >= 3 chars\n")
-
-# Group by offset - for each offset, only keep the longest string
-by_offset = {}
-for (offset, xor_key), s in all_found.items():
-    if offset not in by_offset or len(s) > len(by_offset[offset][1]):
-        by_offset[offset] = (xor_key, s)
-
-print("=== All decoded strings (sorted by offset) ===\n")
-for offset in sorted(by_offset.keys()):
-    xor_key, s = by_offset[offset]
-    print(f"  [{offset:4d}] xor=0x{xor_key:04x} len={len(s):3d}: \"{s}\"")
+            s_lower = s.lower()
+            # Look for IP addresses, ports, URLs, verification patterns
+            import re
+            if (re.search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', s) or  # IP address
+                'http' in s_lower or
+                'feature' in s_lower or
+                'register' in s_lower or
+                'verify' in s_lower or
+                'device_id' in s_lower or
+                'app_id' in s_lower or
+                'status' in s_lower or
+                'result' in s_lower or
+                'message' in s_lower or
+                'connect' in s_lower or
+                'socket' in s_lower or
+                'port' in s_lower or
+                'host' in s_lower or
+                'json' in s_lower or
+                'getstring' in s_lower or
+                'optstring' in s_lower or
+                'getjson' in s_lower or
+                'response' in s_lower or
+                'code=' in s_lower or
+                'uid=' in s_lower or
+                'token' in s_lower):
+                print(f"  [{offset:4d}] xor=0x{xor_key:04x} len={length}: \"{s}\"")

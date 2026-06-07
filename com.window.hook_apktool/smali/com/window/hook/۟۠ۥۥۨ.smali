@@ -64,21 +64,7 @@
 .method public static ۟۟ۥۨۨ(Ljava/lang/Object;)V
     .locals 1
 
-    invoke-static {}, Lcom/window/hook/lunamusic/ۦۦ۠ۤ;->ۥۣۨۢ()I
-
-    move-result v0
-
-    if-gtz v0, :cond_0
-
-    check-cast p0, Landroid/app/Dialog;
-
-    invoke-virtual {p0}, Landroid/app/Dialog;->show()V
-
-    :goto_0
     return-void
-
-    :cond_0
-    goto :goto_0
 .end method
 
 .method public static ۟۟ۦۡۨ(Ljava/lang/Object;)V

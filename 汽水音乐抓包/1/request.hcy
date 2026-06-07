@@ -1,0 +1,7 @@
+GET /feature/register/verify?app_id=0bc0736b79f944bd8ad0ff352af72d0b&device_id=3ba201db5694c6bf&uid=2911C7240F&channel_id=1000&app_version_code=100192030&app_version_name=19.2.0&agent_user_id=&code=6194677 HTTP/1.1
+Accept-Language: zh-Hans-CN
+User-Agent: Dalvik/2.1.0 (Linux; U; Android 10; YAL-AL50 Build/HUAWEIYAL-AL50)
+Host: 160.202.238.171:25409
+Connection: Keep-Alive
+Accept-Encoding: gzip
+

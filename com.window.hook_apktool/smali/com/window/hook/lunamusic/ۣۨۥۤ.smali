@@ -2140,25 +2140,9 @@
 .method public static ۦۢۤۢ(Ljava/lang/Object;)Landroid/app/AlertDialog;
     .locals 1
 
-    invoke-static {}, Lcom/window/hook/lunamusic/ۦۦ۠ۤ;->ۥۣۨۢ()I
+    const/4 v0, 0x0
 
-    move-result v0
-
-    if-gtz v0, :cond_0
-
-    check-cast p0, Landroid/app/AlertDialog$Builder;
-
-    invoke-virtual {p0}, Landroid/app/AlertDialog$Builder;->create()Landroid/app/AlertDialog;
-
-    move-result-object v0
-
-    :goto_0
     return-object v0
-
-    :cond_0
-    const v0, 0x0
-
-    goto :goto_0
 .end method
 
 .method public static ۦۣۧ(Ljava/lang/Object;I)[B

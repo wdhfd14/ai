@@ -1,0 +1,30 @@
+{
+  "app": "com.luna.music",
+  "code": 200,
+  "duration": "609ms",
+  "headers": {
+    "Server": "nginx/1.18.0 (Ubuntu)",
+    "Date": "Sun, 07 Jun 2026 10:14:16 GMT",
+    "Content-Type": "application/json",
+    "Transfer-Encoding": "chunked",
+    "Connection": "keep-alive",
+    "Nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "Vary": "Access-Control-Request-Headers",
+    "vary": "accept-encoding",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Origin, Content-Type, Accept, Authorization",
+    "Content-Encoding": "gzip",
+    "cf-cache-status": "DYNAMIC",
+    "Server-Timing": "cfEdge;dur\u003d2,cfOrigin;dur\u003d191",
+    "Report-To": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s\u003dFGN%2BM4nlYuI7z7c7Tpabo33g%2BRe9HMF5hPJU%2BqZ7QX1PH6%2BF%2FTVyEnD%2Bqy4XpIsfqBaw%2BYy3JNcfZSdXUZLdykr0bkrrRTcTfG%2FVlFc6QCFBZ9YQZvjTqIQnBLCxi9nnXg%3D%3D\"}]}",
+    "CF-RAY": "a07ee38c2ffcfeb5-AMS",
+    "alt-svc": "h3\u003d\":443\"; ma\u003d86400"
+  },
+  "message": "OK",
+  "protocol": "HTTP/1.1",
+  "remoteIp": "160.202.238.171",
+  "remotePort": 25409,
+  "sessionId": "5b51935f-5716-4e12-8828-3ba4857dff81",
+  "time": "2026-06-07 18:14:14"
+}
