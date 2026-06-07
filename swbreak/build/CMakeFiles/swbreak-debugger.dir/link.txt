@@ -1,0 +1,1 @@
+/usr/bin/gcc "CMakeFiles/swbreak-debugger.dir/tools/debugger/debugger.c.o" -o swbreak-debugger  -Wl,-rpath,/workspace/swbreak/build: libswbreak.so liblua52.a -ldl 
