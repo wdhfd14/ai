@@ -18,6 +18,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/workspace/swbreak/src/reg_ops.c" "CMakeFiles/swbreak.dir/src/reg_ops.c.o" "gcc" "CMakeFiles/swbreak.dir/src/reg_ops.c.o.d"
   "/workspace/swbreak/src/signal_dispatch.c" "CMakeFiles/swbreak.dir/src/signal_dispatch.c.o" "gcc" "CMakeFiles/swbreak.dir/src/signal_dispatch.c.o.d"
   "/workspace/swbreak/src/swbreak.c" "CMakeFiles/swbreak.dir/src/swbreak.c.o" "gcc" "CMakeFiles/swbreak.dir/src/swbreak.c.o.d"
+  "/workspace/swbreak/src/ui_android.c" "CMakeFiles/swbreak.dir/src/ui_android.c.o" "gcc" "CMakeFiles/swbreak.dir/src/ui_android.c.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

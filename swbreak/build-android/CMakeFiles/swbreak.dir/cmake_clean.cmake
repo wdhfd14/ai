@@ -19,6 +19,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/swbreak.dir/src/signal_dispatch.c.o.d"
   "CMakeFiles/swbreak.dir/src/swbreak.c.o"
   "CMakeFiles/swbreak.dir/src/swbreak.c.o.d"
+  "CMakeFiles/swbreak.dir/src/ui_android.c.o"
+  "CMakeFiles/swbreak.dir/src/ui_android.c.o.d"
   "libswbreak.pdb"
   "libswbreak.so"
 )

@@ -1244,6 +1244,30 @@ src/swbreak.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/swbreak.c.s
 .PHONY : src/swbreak.c.s
 
+src/ui_android.o: src/ui_android.c.o
+.PHONY : src/ui_android.o
+
+# target to build an object file
+src/ui_android.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/ui_android.c.o
+.PHONY : src/ui_android.c.o
+
+src/ui_android.i: src/ui_android.c.i
+.PHONY : src/ui_android.i
+
+# target to preprocess a source file
+src/ui_android.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/ui_android.c.i
+.PHONY : src/ui_android.c.i
+
+src/ui_android.s: src/ui_android.c.s
+.PHONY : src/ui_android.s
+
+# target to generate assembly for a file
+src/ui_android.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/swbreak.dir/build.make CMakeFiles/swbreak.dir/src/ui_android.c.s
+.PHONY : src/ui_android.c.s
+
 tests/test_core.o: tests/test_core.c.o
 .PHONY : tests/test_core.o
 
@@ -1460,6 +1484,9 @@ help:
 	@echo "... src/swbreak.o"
 	@echo "... src/swbreak.i"
 	@echo "... src/swbreak.s"
+	@echo "... src/ui_android.o"
+	@echo "... src/ui_android.i"
+	@echo "... src/ui_android.s"
 	@echo "... tests/test_core.o"
 	@echo "... tests/test_core.i"
 	@echo "... tests/test_core.s"

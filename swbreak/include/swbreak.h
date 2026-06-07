@@ -139,6 +139,29 @@ const char *swbreak_version(void);
 /* 获取上次错误信息 */
 const char *swbreak_strerror(int err);
 
+/* ══════════════════════════════════════
+ *  Android UI (仅 Android 平台)
+ * ══════════════════════════════════════ */
+
+#ifdef __ANDROID__
+
+/* 初始化 UI 模块 (swbreak_init 自动调用) */
+int  swbreak_ui_init(void);
+
+/* 显示调试面板 */
+void swbreak_ui_show(void);
+
+/* 隐藏调试面板 */
+void swbreak_ui_hide(void);
+
+/* 向面板日志区输出消息 */
+void swbreak_ui_log(const char *msg);
+
+/* 销毁 UI 模块 (swbreak_destroy 自动调用) */
+void swbreak_ui_destroy(void);
+
+#endif /* __ANDROID__ */
+
 #ifdef __cplusplus
 }
 #endif

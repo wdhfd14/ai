@@ -21,6 +21,10 @@
 #include "reg_ops.h"
 #include "lua_api.h"
 
+#ifdef __ANDROID__
+#include "ui_android.h"
+#endif
+
 /* ── 全局状态 ── */
 static struct {
     int initialized;
@@ -70,12 +74,24 @@ int swbreak_init(const swbreak_config_t *config)
     }
 
     g_swbreak.initialized = 1;
+
+    /* Android: 自动初始化并显示调试面板 */
+#ifdef __ANDROID__
+    if (swbreak_ui_init() == 0) {
+        swbreak_ui_show();
+    }
+#endif
+
     return 0;
 }
 
 void swbreak_destroy(void)
 {
     if (!g_swbreak.initialized) return;
+
+#ifdef __ANDROID__
+    swbreak_ui_destroy();
+#endif
 
     swbreak_lua_destroy();
     swbreak_engine_destroy();

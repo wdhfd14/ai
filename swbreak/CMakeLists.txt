@@ -68,6 +68,11 @@ set(SWBREAK_SOURCES
     src/swbreak.c
 )
 
+# Android UI 模块 (仅 Android)
+if(ANDROID)
+    list(APPEND SWBREAK_SOURCES src/ui_android.c)
+endif()
+
 add_library(swbreak SHARED ${SWBREAK_SOURCES})
 target_include_directories(swbreak
     PUBLIC  ${CMAKE_SOURCE_DIR}/include
@@ -79,6 +84,11 @@ target_compile_definitions(swbreak PRIVATE
     _GNU_SOURCE
     SWBREAK_VERSION="${PROJECT_VERSION}"
 )
+
+# Android 需要链接 log 库
+if(ANDROID)
+    target_link_libraries(swbreak PRIVATE log)
+endif()
 
 # ── ptrace 调试器 ──
 add_executable(swbreak-debugger
