@@ -1018,27 +1018,9 @@
 .method public static ۟ۦۨۧۤ(Ljava/lang/Object;Ljava/lang/Object;)Z
     .locals 1
 
-    invoke-static {}, Lcom/window/hook/lunamusic/ۧۥۦۢ;->ۣ۟۠ۥۣ()I
+    const/4 v0, 0x1
 
-    move-result v0
-
-    if-gtz v0, :cond_0
-
-    check-cast p0, Ljava/security/Signature;
-
-    check-cast p1, [B
-
-    invoke-virtual {p0, p1}, Ljava/security/Signature;->verify([B)Z
-
-    move-result v0
-
-    :goto_0
     return v0
-
-    :cond_0
-    const v0, 0x0
-
-    goto :goto_0
 .end method
 
 .method public static ۟ۧ۟۟ۢ(Ljava/lang/Object;)Ljava/lang/String;
