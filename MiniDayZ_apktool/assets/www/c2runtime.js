@@ -3450,6 +3450,17 @@ function uc(f, l, q, k) {
     aa--;
     return c || e
   };
+  // MDZ MOD: AI trigger interceptor - wraps the C2 trigger system
+  (function() {
+    var _origTrigger = f.prototype.trigger;
+    f.prototype.trigger = function(b, a, d) {
+      if (window.__mdz_onTrigger) {
+        var result = window.__mdz_onTrigger(b, a, d, this);
+        if (result !== undefined) return result;
+      }
+      return _origTrigger.call(this, b, a, d);
+    };
+  })();
   f.prototype.Ky = function(b, a, d, g) {
     var c = !1,
       e, m, h, n;
