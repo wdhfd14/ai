@@ -1,12 +1,11 @@
-<?xml version="1.0" ?>
-
+<?xml version='1.0' encoding='UTF-8'?>
 <list>
 
-<!--Player phrases-->
+
 
 <text>
 	<id>0</id>
-	<name></name>
+	<name />
 </text>
 
 <text>
@@ -49,12 +48,12 @@
 	<name>这里面什么也没有</name>
 </text>
 
-<!--Player phrase: when no ammo for reloading-->
+
 <text>
 	<id>9</id>
 	<name>没有子弹了！</name>
 </text>
-<!--Player phrase: when ranged weapon is empited-->
+
 <text>
 	<id>10</id>
 	<name>弹匣空了！</name>
@@ -115,7 +114,7 @@
 	<name>弹药装好了！</name>
 </text>
 
-<!--Player phrase: when trying to load wrong ammo-->
+
 <text>
 	<id>34</id>
 	<name>不适配这把武器</name>
@@ -136,7 +135,7 @@
 	<name>我已输血</name>
 </text>
 
-<!--Player phrase: when trying to load battery to nvg/headlamp-->
+
 <text>
 	<id>38</id>
 	<name>电池已安装</name>
@@ -312,7 +311,7 @@
 	<name>我需要一把刀去剥皮</name>
 </text>
 
-<!-- When trying to switch to firearm and you dont have any  -->
+
 <text>
 	<id>73</id>
 	<name>我没有枪支</name>
@@ -378,13 +377,13 @@
 	<name>附近有信号！</name>
 </text>
 
-<!-- Friend bots phrase: on health lower than 50%  -->
+
 <text>
 	<id>100</id>
 	<name>该死！我受重伤了！</name>
 </text>
 
-<!-- Friend bots phrases: when player get into house, bot starts patroling entrance  -->
+
 <text>
 	<id>101</id>
 	<name>放心，我会看守外面的</name>
@@ -395,19 +394,19 @@
 	<name>我会在你寻找物资时掩护你</name>
 </text>
 
-<!-- Friend bots phrase: when player gets on firing line -->
+
 <text>
 	<id>103</id>
 	<name>你遮挡住我的视线了！</name>
 </text>
 
-<!-- Friend bots phrase: on health lower than 50%  -->
+
 <text>
 	<id>104</id>
 	<name>嘿！朋友！我们一起生存吧！</name>
 </text>
 
-<!-- Enemy Melee bot phrases on getting hit from firearm-->
+
 <text>
 	<id>105</id>
 	<name>这不公平！</name>
@@ -423,7 +422,7 @@
 	<name>该死！</name>
 </text>
 
-<!-- Enemy Bot with firearm when spots player -->
+
 <text>
 	<id>108</id>
 	<name>到这里来！</name>
@@ -449,7 +448,7 @@
 	<name>他在这！</name>
 </text>
 
-<!-- Additional player phrases -->
+
 
 <text>
 	<id>125</id>
@@ -466,7 +465,7 @@
 	<name>感谢你帮忙修船</name>
 </text>
 
-<!-- Update 1.2.0 addings -->
+
 
 <text>
 	<id>86</id>
@@ -483,7 +482,7 @@
 	<name>毒气来了！我需要防毒面具！</name>
 </text>
 
-<!-- Update 1.3.0 addings -->
+
 
 <text>
 	<id>89</id>
@@ -505,7 +504,7 @@
 	<name>这辆车的油已经加满了</name>
 </text>
 
-<!-- 任务 -->
+
 
 <text>
 	<id>131</id>
@@ -552,7 +551,7 @@
 	<name>该死！溜走了！</name>
 </text>
 
-<!-- 1.7 -->
+
 
 <text>
 	<id>142</id>
@@ -1110,4 +1109,4 @@
 </text>
 
 
-</list>
+<text><id>253</id><name>明白, 马上过去!</name></text><text><id>254</id><name>好的, 我跟着你</name></text><text><id>255</id><name>收到, 我守住这个位置</name></text><text><id>256</id><name>开始搜刮这片区域</name></text><text><id>257</id><name>收到, 正在攻击目标</name></text><text><id>258</id><name>自由开火!</name></text><text><id>259</id><name>停火, 节省弹药</name></text><text><id>260</id><name>让我看看你的伤势...</name></text><text><id>261</id><name>开始搜索幸存者</name></text><text><id>262</id><name>我来拿那个</name></text><text><id>263</id><name>好的, 丢掉了</name></text><text><id>264</id><name>我去找弹药</name></text><text><id>265</id><name>我去找食物</name></text><text><id>266</id><name>我去找水</name></text><text><id>267</id><name>切换行为模式</name></text><text><id>268</id><name>明白, 取消所有指令</name></text><text><id>269</id><name>抱歉, 我没有那个物品</name></text><text><id>270</id><name>我身上没有弹药了</name></text><text><id>271</id><name>找不到食物</name></text><text><id>272</id><name>找不到水</name></text><text><id>273</id><name>太远了, 我过不去</name></text><text><id>274</id><name>我已经在执行中!</name></text><text><id>275</id><name>现在在战斗, 等会儿!</name></text><text><id>276</id><name>视野内没有敌人</name></text><text><id>277</id><name>目标已经死了</name></text><text><id>278</id><name>没有医疗物品</name></text><text><id>279</id><name>发现敌人!</name></text><text><id>280</id><name>我需要支援!</name></text><text><id>281</id><name>发现物品!</name></text><text><id>282</id><name>这片区域搜完了</name></text><text><id>283</id><name>我受伤了, 需要治疗</name></text><text><id>284</id><name>弹药不足了</name></text><text><id>285</id><name>发现幸存者!</name></text><text><id>286</id><name>切换到激进模式, 见一个打一个</name></text><text><id>287</id><name>切换到防御模式, 安全第一</name></text><text><id>288</id><name>切换到潜行模式, 安静行动</name></text><text><id>289</id><name>你去左边包抄!</name></text><text><id>290</id><name>我掩护你!</name></text><text><id>291</id><name>跟着我走这边</name></text><text><id>292</id><name>命中了!</name></text><text><id>293</id><name>暴击! 伤害加深!</name></text><text><id>294</id><name>造成流血!</name></text><text><id>295</id><name>护甲吸收了部分伤害</name></text><text><id>296</id><name>护甲被穿透了!</name></text></list>

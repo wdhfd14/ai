@@ -1,7 +1,6 @@
-<?xml version="1.0" ?>
-
+<?xml version='1.0' encoding='UTF-8'?>
 <list>
-<!-- Inventory items-->
+
 <text>
 	<id>0</id>
 	<name>
@@ -1184,8 +1183,8 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Pistols-->
-<!-- fnx -->
+
+
 <text>
 	<id>211</id>
 	<name>操作灵活的手枪，受到大部分人的青睐
@@ -1201,7 +1200,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- colt -->
+
 
 <text>
 	<id>212</id>
@@ -1218,7 +1217,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- magnum -->
+
 
 <text>
 	<id>213</id>
@@ -1235,7 +1234,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- glock -->
+
 
 <text>
 	<id>214</id>
@@ -1252,7 +1251,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- amphibia-->
+
 
 <text>
 	<id>215</id>
@@ -1270,7 +1269,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- IZH S-->
+
 
 <text>
 	<id>216</id>
@@ -1287,7 +1286,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Mosin S-->
+
 
 <text>
 	<id>217</id>
@@ -1304,7 +1303,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Rare colt-->
+
 
 <text>
 	<id>218</id>
@@ -1321,7 +1320,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Mac-->
+
 
 <text>
 	<id>219</id>
@@ -1339,7 +1338,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Rossi-->
+
 
 <text>
 	<id>220</id>
@@ -1356,7 +1355,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- PM-->
+
 
 <text>
 	<id>221</id>
@@ -1373,7 +1372,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- PB-->
+
 
 <text>
 	<id>222</id>
@@ -1391,7 +1390,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Deagle-->
+
 
 <text>
 	<id>223</id>
@@ -1408,7 +1407,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- M79-->
+
 
 <text>
 	<id>224</id>
@@ -1425,7 +1424,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Blaze S-->
+
 
 <text>
 	<id>225</id>
@@ -1442,7 +1441,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Thompson-->
+
 
 <text>
 	<id>226</id>
@@ -1460,7 +1459,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- uzi-->
+
 
 <text>
 	<id>227</id>
@@ -1478,11 +1477,11 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Main Weapons-->
 
-<!-- null-->
 
-<!-- Mosin-->
+
+
+
 <text>
 	<id>232</id>
 	<name>俄国19世纪末生产的步枪
@@ -1497,7 +1496,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- M4-->
+
 <text>
 	<id>233</id>
 	<name>美军使用的一款性能好的步枪
@@ -1512,7 +1511,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- IZH -->
+
 <text>
 	<id>234</id>
 	<name>猎人们的好帮手
@@ -1526,7 +1525,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- AK-74 -->
+
 <text>
 	<id>235</id>
 	<name>苏联制造的一款适用于各种恶劣环境的步枪
@@ -1541,7 +1540,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- AKM -->
+
 <text>
 	<id>236</id>
 	<name>一款由著名武器衍生而来的枪械
@@ -1556,7 +1555,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- AK-74u -->
+
 <text>
 	<id>237</id>
 	<name>俄罗斯陆军主力的制式轻武器之一
@@ -1571,7 +1570,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- SKS -->
+
 <text>
 	<id>238</id>
 	<name>苏联制造的一款性能良好的武器
@@ -1586,7 +1585,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- L85 -->
+
 <text>
 	<id>240</id>
 	<name>英军的主力武器之一
@@ -1601,7 +1600,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Remington -->
+
 <text>
 	<id>241</id>
 	<name>美国平民所喜爱的流行武器
@@ -1616,7 +1615,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Bow -->
+
 <text>
 	<id>243</id>
 	<name>几千年前的武器，现如今仍然在使用
@@ -1629,7 +1628,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- CrossBow -->
+
 <text>
 	<id>244</id>
 	<name>十字弓弩，恐怖如斯
@@ -1642,7 +1641,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Sporter -->
+
 <text>
 	<id>246</id>
 	<name>小口径的一款步枪
@@ -1658,7 +1657,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Repeater -->
+
 <text>
 	<id>247</id>
 	<name>英国在19世纪末使用的军用武器
@@ -1673,7 +1672,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- SVD -->
+
 <text>
 	<id>248</id>
 	<name>苏军用于替换莫辛纳甘的一把狙击步枪
@@ -1688,7 +1687,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- MP5k -->
+
 <text>
 	<id>249</id>
 	<name>德国制造的一把超短型冲锋枪
@@ -1704,7 +1703,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- UMP -->
+
 <text>
 	<id>251</id>
 	<name>美国特种部队用于防身的枪械
@@ -1719,7 +1718,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- RPK -->
+
 <text>
 	<id>252</id>
 	<name>以AKM为基础衍生出来的轻机枪
@@ -1735,7 +1734,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- FN-FAL -->
+
 <text>
 	<id>253</id>
 	<name>比利时研制的一款战斗步枪
@@ -1750,7 +1749,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Saiga12 -->
+
 <text>
 	<id>254</id>
 	<name>俄罗斯制造的一把半自动战斗霰弹枪
@@ -1765,7 +1764,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- AUG -->
+
 <text>
 	<id>255</id>
 	<name>史上首次采用模块化和无托结构的突击步枪
@@ -1781,7 +1780,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Bizon -->
+
 <text>
 	<id>256</id>
 	<name>俄罗斯制造的一款结构新颖的冲锋枪
@@ -1796,7 +1795,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Groza -->
+
 <text>
 	<id>257</id>
 	<name>俄军使用的突击步枪+榴弹发射器武器系统
@@ -1812,7 +1811,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- VSS -->
+
 <text>
 	<id>258</id>
 	<name>苏联制造的微声狙击步枪
@@ -1828,7 +1827,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- SV98 -->
+
 <text>
 	<id>259</id>
 	<name>在SVD的基础上进行优化调整的狙击步枪
@@ -1843,7 +1842,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- MAdsen -->
+
 <text>
 	<id>260</id>
 	<name>世界上第一把轻机枪，现在早已锈迹斑斑了
@@ -1859,7 +1858,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- AN94 -->
+
 <text>
 	<id>261</id>
 	<name>俄罗斯现役现代化小口径步枪
@@ -1875,7 +1874,7 @@ Blaze、Mini-14、AS-VAL
 </text>
 
 
-<!-- Slilenced Remington-->
+
 <text>
 	<id>262</id>
 	<name>“当你试图拿回失去的东西时,也许你会失去更多……”
@@ -1891,7 +1890,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- M16A2-->
+
 <text>
 	<id>263</id>
 	<name>美国制式步枪M16系列中的其中一把
@@ -1906,7 +1905,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Vector-->
+
 <text>
 	<id>264</id>
 	<name>极高的稳定性与撕裂般的射速造就了这把武器的恐怖
@@ -1921,7 +1920,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- M4+-->
+
 <text>
 	<id>265</id>
 	<name>美军使用的一款性能好的步枪
@@ -1936,7 +1935,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- AKM -->
+
 <text>
 	<id>266</id>
 	<name>一款由著名武器衍生而来的枪械
@@ -1951,7 +1950,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- M70 -->
+
 <text>
 	<id>267</id>
 	<name>五发栓动猎枪，由内部弹匣供弹
@@ -1966,7 +1965,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Saiga12 -->
+
 <text>
 	<id>268</id>
 	<name>俄罗斯制造的一把半自动战斗霰弹枪
@@ -1981,7 +1980,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- RPK -->
+
 <text>
 	<id>269</id>
 	<name>以AKM为基础衍生出来的轻机枪
@@ -1997,7 +1996,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- M16A2-->
+
 <text>
 	<id>270</id>
 	<name>美国制式步枪M16系列中的其中一把
@@ -2012,7 +2011,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- AUG -->
+
 <text>
 	<id>271</id>
 	<name>史上首次采用模块化和无托结构的突击步枪
@@ -2028,7 +2027,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- MGL -->
+
 <text>
 	<id>272</id>
 	<name>可装填6发榴弹的转轮榴弹发射器
@@ -2042,7 +2041,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Blaze -->
+
 <text>
 	<id>273</id>
 	<name>其独特的双枪管结构能使其立刻射击第2发子弹
@@ -2056,7 +2055,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- FAMAS -->
+
 <text>
 	<id>274</id>
 	<name>一款无托突击步枪，设计紧凑以保持高射速
@@ -2072,7 +2071,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- mini14 -->
+
 <text>
 	<id>275</id>
 	<name>基于M14基础改进而来，改为发射更小口径的5.56×45
@@ -2087,7 +2086,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- AK-74 -->
+
 <text>
 	<id>276</id>
 	<name>苏联制造的一款适用于各种恶劣环境的步枪
@@ -2102,7 +2101,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- AK-74u -->
+
 <text>
 	<id>277</id>
 	<name>俄罗斯陆军主力的制式轻武器之一
@@ -2117,7 +2116,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- VAL -->
+
 <text>
 	<id>278</id>
 	<name>VSS的衍生型，机匣上配备了皮卡汀尼导轨
@@ -2133,7 +2132,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- M249-->
+
 <text>
 	<id>279</id>
 	<name>使用200发弹链盒供弹，具有很强的可靠性与火力
@@ -2149,7 +2148,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- OSV-96 -->
+
 <text>
 	<id>280</id>
 	<name>于1990年代研制的大口径半自动反器材狙击步枪
@@ -2165,7 +2164,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- fire weapon -->
+
 <text>
 	<id>281</id>
 	<name>年代久远的喷火器，使用环型燃油背包供油
@@ -2178,8 +2177,8 @@ Blaze、Mini-14、AS-VAL
 </text>
 
 
-<!-- Backpacks -->
-<!-- Taloon -->
+
+
 <text>
 	<id>301</id>
 	<name>携带量+5
@@ -2273,8 +2272,8 @@ Blaze、Mini-14、AS-VAL
 
 
 
-<!-- Pants -->
-<!-- Jeans -->
+
+
 <text>
 	<id>351</id>
 	<name>携带量+2
@@ -2282,7 +2281,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Worker -->
+
 <text>
 	<id>352</id>
 	<name>携带量+3
@@ -2290,7 +2289,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Sport -->
+
 <text>
 	<id>353</id>
 	<name>携带量+1
@@ -2298,7 +2297,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Gorka -->
+
 <text>
 	<id>354</id>
 	<name>携带量+3
@@ -2308,7 +2307,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Medic -->
+
 <text>
 	<id>355</id>
 	<name>携带量+2
@@ -2316,7 +2315,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Orel -->
+
 <text>
 	<id>356</id>
 	<name>携带量+2
@@ -2325,7 +2324,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Hunter -->
+
 <text>
 	<id>357</id>
 	<name>携带量+3
@@ -2335,7 +2334,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- fire -->
+
 <text>
 	<id>358</id>
 	<name>携带量+2
@@ -2347,8 +2346,8 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Vest -->
-<!-- Bulletproof -->
+
+
 <text>
 	<id>401</id>
 	<name>防御+8
@@ -2356,7 +2355,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- assault -->
+
 <text>
 	<id>402</id>
 	<name>携带量+2
@@ -2367,7 +2366,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- press -->
+
 <text>
 	<id>403</id>
 	<name>携带量+1
@@ -2376,7 +2375,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- High Capacity -->
+
 <text>
 	<id>404</id>
 	<name>携带量+3
@@ -2387,7 +2386,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Kevlar -->
+
 <text>
 	<id>405</id>
 	<name>携带量+3
@@ -2398,7 +2397,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Soviet -->
+
 <text>
 	<id>406</id>
 	<name>携带量+2
@@ -2407,14 +2406,14 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- FARTUK -->
+
 <text>
 	<id>407</id>
 	<name>携带量+1
 </name>
 </text>
 
-<!-- jilifu -->
+
 <text>
 	<id>408</id>
 	<name>耐久不低于50%时有效，静止一段时间后提供隐匿
@@ -2424,7 +2423,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- M vest -->
+
 <text>
 	<id>409</id>
 	<name>防御+20
@@ -2432,7 +2431,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- fanghuafu -->
+
 <text>
 	<id>410</id>
 	<name>气密性良好的A级防护服
@@ -2444,7 +2443,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- re fanghuafu -->
+
 <text>
 	<id>411</id>
 	<name>携带量+3
@@ -2459,7 +2458,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- m fanghuafu -->
+
 <text>
 	<id>412</id>
 	<name>防御+20
@@ -2471,7 +2470,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- ji fanghuafu -->
+
 <text>
 	<id>413</id>
 	<name>耐久不低于50%时有效，静止一段时间后提供隐匿
@@ -2483,7 +2482,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- c fanghuafu -->
+
 <text>
 	<id>414</id>
 	<name>仅具备基础防护能力的C级防护服
@@ -2494,7 +2493,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- b fanghuafu -->
+
 <text>
 	<id>415</id>
 	<name>具备防辐射能力的B级防护服
@@ -2505,7 +2504,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- a fanghuafu -->
+
 <text>
 	<id>416</id>
 	<name>军用级防护服，允许加挂伪装服、凯夫拉背心、M重甲
@@ -2520,14 +2519,14 @@ Blaze、Mini-14、AS-VAL
 
 
 
-<!-- Helmets -->
+
 <text>
 	<id>450</id>
 	<name>点击脱下内衬的装备
 </name>
 </text>
 
-<!-- Moto -->
+
 <text>
 	<id>451</id>
 	<name>热量+2
@@ -2536,7 +2535,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Military -->
+
 <text>
 	<id>452</id>
 	<name>热量+2
@@ -2547,7 +2546,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Hard -->
+
 <text>
 	<id>453</id>
 	<name>热量+2
@@ -2556,7 +2555,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Gasmask -->
+
 <text>
 	<id>454</id>
 	<name>热量+2
@@ -2564,7 +2563,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Moto2 -->
+
 <text>
 	<id>455</id>
 	<name>热量+2
@@ -2573,7 +2572,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Moto3 -->
+
 <text>
 	<id>456</id>
 	<name>热量+2
@@ -2582,42 +2581,42 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Cap -->
+
 <text>
 	<id>457</id>
 	<name>热量+2
 </name>
 </text>
 
-<!-- WarmHat -->
+
 <text>
 	<id>458</id>
 	<name>热量+4
 </name>
 </text>
 
-<!-- Ushanka -->
+
 <text>
 	<id>459</id>
 	<name>热量+6
 </name>
 </text>
 
-<!-- Beret -->
+
 <text>
 	<id>460</id>
 	<name>热量+2
 </name>
 </text>
 
-<!-- Balaklava -->
+
 <text>
 	<id>461</id>
 	<name>热量+3
 </name>
 </text>
 
-<!-- Lamp -->
+
 <text>
 	<id>462</id>
 	<name>热量+1
@@ -2627,14 +2626,14 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Cowboy -->
+
 <text>
 	<id>463</id>
 	<name>热量+2
 </name>
 </text>
 
-<!-- Welding -->
+
 <text>
 	<id>464</id>
 	<name>热量+1
@@ -2642,7 +2641,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Gorka -->
+
 <text>
 	<id>465</id>
 	<name>热量+3
@@ -2653,14 +2652,14 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Police Hat -->
+
 <text>
 	<id>466</id>
 	<name>热量+2
 </name>
 </text>
 
-<!-- NVG -->
+
 <text>
 	<id>467</id>
 	<name>热量+1
@@ -2670,7 +2669,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Bandana -->
+
 <text>
 	<id>468</id>
 	<name>热量+2
@@ -2678,7 +2677,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Knight helmet -->
+
 <text>
 	<id>469</id>
 	<name>热量+4
@@ -2689,7 +2688,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Pilot helmet -->
+
 <text>
 	<id>470</id>
 	<name>热量+3
@@ -2698,7 +2697,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- m2 helmet -->
+
 <text>
 	<id>471</id>
 	<name>热量+3
@@ -2709,7 +2708,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- m3 helmet -->
+
 <text>
 	<id>472</id>
 	<name>热量+3
@@ -2720,7 +2719,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- gp5 -->
+
 <text>
 	<id>473</id>
 	<name>热量+2
@@ -2728,14 +2727,14 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- joker -->
+
 <text>
 	<id>474</id>
 	<name>热量+1
 </name>
 </text>
 
-<!-- tuji -->
+
 <text>
 	<id>475</id>
 	<name>热量+3
@@ -2747,7 +2746,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- tuji -->
+
 <text>
 	<id>476</id>
 	<name>热量+3
@@ -2759,7 +2758,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- tuji -->
+
 <text>
 	<id>477</id>
 	<name>热量+3
@@ -2771,7 +2770,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- tuji -->
+
 <text>
 	<id>478</id>
 	<name>热量+3
@@ -2783,9 +2782,9 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Outfits -->
 
-<!-- Hoodie -->
+
+
 <text>
 	<id>501</id>
 	<name>携带量+2
@@ -2793,7 +2792,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Shirt -->
+
 <text>
 	<id>502</id>
 	<name>携带量+1
@@ -2802,7 +2801,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Hoodie -->
+
 <text>
 	<id>504</id>
 	<name>携带量+2
@@ -2810,7 +2809,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- rain -->
+
 <text>
 	<id>505</id>
 	<name>携带量+2
@@ -2820,7 +2819,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- rain2 -->
+
 <text>
 	<id>506</id>
 	<name>携带量+2
@@ -2830,7 +2829,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- raider jacket -->
+
 <text>
 	<id>507</id>
 	<name>携带量+2
@@ -2840,7 +2839,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- fur coat -->
+
 <text>
 	<id>509</id>
 	<name>携带量+1
@@ -2848,7 +2847,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Gorka -->
+
 <text>
 	<id>510</id>
 	<name>携带量+3
@@ -2858,7 +2857,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- tshirt -->
+
 <text>
 	<id>511</id>
 	<name>
@@ -2866,7 +2865,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- paramedic -->
+
 <text>
 	<id>512</id>
 	<name>携带量+2
@@ -2874,7 +2873,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- orel -->
+
 <text>
 	<id>513</id>
 	<name>携带量+2
@@ -2883,7 +2882,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- tracksuit -->
+
 <text>
 	<id>514</id>
 	<name>携带量+1
@@ -2891,7 +2890,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Dress -->
+
 <text>
 	<id>515</id>
 	<name>携带量+1
@@ -2899,7 +2898,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Down -->
+
 <text>
 	<id>516</id>
 	<name>携带量+2
@@ -2907,7 +2906,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Hunter -->
+
 <text>
 	<id>517</id>
 	<name>携带量+3
@@ -2917,7 +2916,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Sweater -->
+
 <text>
 	<id>518</id>
 	<name>携带量+1
@@ -2925,7 +2924,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Hoodie Red-->
+
 <text>
 	<id>519</id>
 	<name>携带量+3
@@ -2933,7 +2932,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- fire -->
+
 <text>
 	<id>520</id>
 	<name>携带量+2
@@ -2945,7 +2944,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- suolian -->
+
 <text>
 	<id>521</id>
 	<name>热量+3
@@ -2955,9 +2954,9 @@ Blaze、Mini-14、AS-VAL
 </text>
 
 
-<!-- Melee -->
 
-<!-- Axe -->
+
+
 <text>
 	<id>551</id>
 	<name>伤害: 38-63
@@ -2969,7 +2968,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Shovel -->
+
 <text>
 	<id>552</id>
 	<name>伤害: 19-31
@@ -2982,7 +2981,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Wrench -->
+
 <text>
 	<id>553</id>
 	<name>伤害: 23-38
@@ -2994,7 +2993,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Baseball bat -->
+
 <text>
 	<id>554</id>
 	<name>伤害: 26-44
@@ -3006,7 +3005,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Fire axe -->
+
 <text>
 	<id>555</id>
 	<name>伤害: 45-75
@@ -3019,7 +3018,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Crowbar -->
+
 <text>
 	<id>556</id>
 	<name>伤害: 19-31
@@ -3029,7 +3028,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Kitchen knife -->
+
 <text>
 	<id>557</id>
 	<name>伤害: 14-24
@@ -3039,7 +3038,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Hunter knife -->
+
 <text>
 	<id>558</id>
 	<name>伤害: 15-25
@@ -3049,7 +3048,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Army knife -->
+
 <text>
 	<id>559</id>
 	<name>伤害: 16-26
@@ -3059,7 +3058,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Pickaxe-->
+
 <text>
 	<id>560</id>
 	<name>伤害: 33-55
@@ -3071,7 +3070,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Pitchfork -->
+
 <text>
 	<id>561</id>
 	<name>伤害: 30-50
@@ -3083,7 +3082,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Sledgehammer -->
+
 <text>
 	<id>562</id>
 	<name>伤害: 41-69
@@ -3095,7 +3094,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Sword -->
+
 <text>
 	<id>563</id>
 	<name>一种更高雅的武器，如今依旧锋利致命
@@ -3108,7 +3107,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Pan -->
+
 <text>
 	<id>564</id>
 	<name>子弹是不是穿不透它？
@@ -3122,7 +3121,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Katana -->
+
 <text>
 	<id>565</id>
 	<name>伤害: 48-81
@@ -3134,7 +3133,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Baseball bat+ -->
+
 <text>
 	<id>566</id>
 	<name>缠着带刺铁丝的棒球棍，这给受害者带来了极大痛苦
@@ -3145,7 +3144,7 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Dianju -->
+
 <text>
 	<id>567</id>
 	<name>伤害: 0(未启动)/10(启动)
@@ -3158,14 +3157,14 @@ Blaze、Mini-14、AS-VAL
 </name>
 </text>
 
-<!-- Fadianji -->
+
 <text>
 	<id>568</id>
 	<name>一台沉重的发电机，需要占用双手来挪动
 </name>
 </text>
 
-<!-- Tiepi -->
+
 <text>
 	<id>569</id>
 	<name>一块巨大的金属板，需要占用双手来挪动
@@ -3175,7 +3174,7 @@ Blaze、Mini-14、AS-VAL
 </text>
 
 
-<!-- Secret location reveal-->
+
 <text>
 	<id>150</id>
 	<name>这是个隐秘地点！</name>
@@ -3243,7 +3242,7 @@ Blaze、Mini-14、AS-VAL
 	<name>我们之间已经没有什么好说的了</name>
 </text>
 
-<!-- Фразы бота при командах-->
+
 
 
 <text>
@@ -3256,7 +3255,7 @@ Blaze、Mini-14、AS-VAL
 	<name>我会看守这片区域的！</name>
 </text>
 
-<!-- Фразы для сна-->
+
 
 <text>
 	<id>165</id>
@@ -3334,7 +3333,7 @@ Blaze、Mini-14、AS-VAL
 	<name>太近了！会误伤我的！</name>
 </text>
 
-<!-- Персонажи -->
+
 
 <text>
 	<id>180</id>
@@ -4670,4 +4669,59 @@ C-MAG弹鼓(5.45)🔄C-MAG弹鼓(5.56)
 </name>
 </text>
 
-</list>
+<text><id>785</id><name>【新伤害系统】
+不同僵尸有独立的伤害范围(最低～最高)：
+• 普通僵尸: 4-14 伤害
+• 快速僵尸: 6-13 伤害
+• 军用僵尸: 10-22 伤害
+• 坦克僵尸: 18-35 伤害
+• 跳跃僵尸: 8-18 伤害
+• 防暴僵尸: 12-25 伤害
+• 喷吐僵尸: 3-8 伤害
+• 步枪僵尸: 15-28 伤害
+• 红色生化僵尸: 20-40 伤害
+• 沉睡僵尸: 5-12 伤害
+• 狼: 4-12 伤害
+• 熊: 15-28 伤害
+• 土匪: 8-18 伤害
+• 老兵敌人: 12-25 伤害
+• BOSS土匪: 25-45 伤害
+每次攻击在你受到的伤害范围内随机取值</name></text><text><id>786</id><name>【护甲减免机制】
+护甲减免 = 护甲值×0.3(最小减免1)
+暴击率: 5%, 暴击伤害: 1.5倍
+流血几率: 普通15%, 护甲穿透型35%
+流血每跳: 1伤害
+伤害类型修正:
+• 锐器-&gt;软甲: 1.2倍
+• 钝器-&gt;硬甲: 0.8倍
+• 火焰-&gt;所有: 无视护甲
+• 爆炸-&gt;所有: 1.3倍</name></text><text><id>787</id><name>【难度缩放系统】
+Day 1-5: 基础伤害
+Day 6-10: 伤害×1.15, +快速僵尸概率
+Day 11-15: 伤害×1.3, +军用僵尸概率
+Day 16-20: 伤害×1.45, +坦克僵尸概率
+Day 21-25: 伤害×1.6, +特殊僵尸种类
+Day 26-30: 伤害×1.75, 全特殊僵尸出现
+Day 31+: 伤害×1.8(上限), 保持Day 30配置</name></text><text><id>788</id><name>【队友指令系统】
+长按队友打开指令轮盘(8扇区2层):
+第1层 - 基础指令:
+↑跟随 →坚守 ↓搜刮 ←攻击
+↖移动到 ↗自由开火 ↘停火 ↙治疗
+第2层 - 高级指令(第1层选择后):
+• 搜刮→ 指定方向/指定物品类型
+• 移动到→ 指定方向距离
+• 攻击→ 选择攻击目标
+• 治疗→ 使用物品/继续搜刮治疗物品</name></text><text><id>789</id><name>【移动到】指定队友移动到目标位置
+双击地图指定精确坐标, 或拖动选择方向距离</name></text><text><id>790</id><name>【跟随我】队友切换为跟随模式, 自动保持与玩家距离</name></text><text><id>791</id><name>【坚守位置】队友在当前位置防守, 攻击接近的敌人, 不离开该区域</name></text><text><id>792</id><name>【搜刮区域】队友在指定区域搜索物品, 可指定物品类型优先搜索</name></text><text><id>793</id><name>【攻击目标】队友集中攻击指定目标, 优先使用远程武器</name></text><text><id>794</id><name>【自由开火】队友自由射击视野内的敌人, 不等待指令</name></text><text><id>795</id><name>【停火】队友停止射击, 节省弹药, 仅在近战被攻击时反击</name></text><text><id>796</id><name>【治疗我】队友尝试治疗玩家, 优先使用绷带/急救包</name></text><text><id>797</id><name>【搜索幸存者】队友在区域搜索其他幸存者, 返回报告</name></text><text><id>798</id><name>【取物品】指示队友拾取/交换指定物品</name></text><text><id>799</id><name>【丢弃物品】指示队友丢弃指定物品</name></text><text><id>800</id><name>【获取弹药】队友优先搜索弹药, 并将多余弹药交给玩家</name></text><text><id>801</id><name>【获取食物】队友优先搜索食物/水, 共享给队伍</name></text><text><id>802</id><name>【获取水源】队友优先搜索水源/水瓶</name></text><text><id>803</id><name>【设置行为】切换队友行为模式: 激进/防御/潜行</name></text><text><id>804</id><name>【取消指令】取消当前队友的所有指令, 恢复默认行为</name></text><text><id>805</id><name>【队友行为模式】
+• 激进模式: 主动攻击发现的所有敌人, 使用最强武器
+• 防御模式: 只在被攻击时反击, 优先保存自己
+• 潜行模式: 避免战斗, 蹲行走路, 被发现时才反击</name></text><text><id>806</id><name>【僵尸AI状态机】
+IDLE(空闲)→ALERT(警戒)→INVESTIGATE(调查)→CHASE(追逐)→WINDUP(蓄力)→ATTACK(攻击)→COOLDOWN(冷却)→STUN(眩晕)→DOWN(倒地)→DEATH(死亡)
+特殊状态: DECEIVE(假死, 有几率再次站起)
+日夜影响: 夜晚感知范围+60%, 雨天感知范围-60%
+群组行为: 3只以上开始包抄夹击</name></text><text><id>807</id><name>【动物AI系统】
+• 狼: 群体狩猎, 头狼指挥围攻, 可被枪声吓退
+• 熊: 独行巡逻, 受惊后狂暴攻击, 可被火焰驱赶
+• 乌鸦: 警戒哨兵, 被惊飞时发出警报吸引僵尸
+• 鹿/兔: 受惊逃跑, 鹿可冲撞造成伤害
+• 鸡: 逃跑并发出叫声, 微弱概率吸引僵尸</name></text></list>

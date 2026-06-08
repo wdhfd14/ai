@@ -1,7 +1,6 @@
-<?xml version="1.0" ?>
-
+<?xml version='1.0' encoding='UTF-8'?>
 <list>
-<!-- Main menu buttons-->
+
 <text>
 	<id>1</id>
 	<name>新游戏</name>
@@ -57,7 +56,7 @@
 	<name>返回游戏</name>
 </text>
 
-<!-- Main menu player achieves labels-->
+
 
 <text>
 	<id>12</id>
@@ -79,7 +78,7 @@
 	<name>难度</name>
 </text>
 
-<!-- Level loading-->
+
 
 <text>
 	<id>16</id>
@@ -111,7 +110,7 @@
 	<name>生成小地图</name>
 </text>
 
-<!-- Menu btns-->
+
 
 <text>
 	<id>23</id>
@@ -133,7 +132,7 @@
 	<name>确定要跳过教程吗？</name>
 </text>
 
-<!--MENU ADDITIONS -->
+
 
 <text>
 	<id>27</id>
@@ -205,7 +204,7 @@
 	<name>镀金</name>
 </text>
 
-<!-- level changing dialog window -->
+
 
 <text>
 	<id>41</id>
@@ -527,7 +526,7 @@
 	<id>99</id>
 	<name>!!!</name>
 </text>
-<!-- Achievements-->
+
 
 
 <text>
@@ -694,7 +693,7 @@
 	<id>133</id>
 	<name>地狱已空</name>
 </text>
-<!-- Achievements descriptions-->
+
 
 <text>
 	<id>151</id>
@@ -861,7 +860,7 @@
 	<name>在地狱难度中击杀所有类型的感染者</name>
 </text>
 
-<!--TUTORIAL PAD -->
+
 <text>
 	<id>228</id>
 	<name>战斗</name>
@@ -1234,14 +1233,14 @@
 
 
 
-<!-- INVENTORY-->
+
 
 <text>
 	<id>301</id>
 	<name>损坏</name>
 </text>
 
-<!-- Ammo ejecting from ranged weapon-->
+
 <text>
 	<id>302</id>
 	<name>退弹</name>
@@ -1252,13 +1251,13 @@
 	<name>撕成破布</name>
 </text>
 
-<!-- for NVG and headlamp-->
+
 <text>
 	<id>304</id>
 	<name>开关</name>
 </text>
 
-<!-- for fireplace kit, barberwire, landmine and beartrap -->
+
 <text>
 	<id>305</id>
 	<name>放置</name>
@@ -1344,7 +1343,7 @@
 	<name>剥皮</name>
 </text>
 
-<!-- for waterbottle and canteen-->
+
 <text>
 	<id>322</id>
 	<name>接水</name>
@@ -1370,7 +1369,7 @@
 	<name>输血</name>
 </text>
 
-<!-- for flare-->
+
 <text>
 	<id>327</id>
 	<name>点燃并投掷</name>
@@ -1436,7 +1435,7 @@
 	<name>装载副武器</name>
 </text>
 
-<!-- Perks Title and Description-->
+
 
 <text>
 	<id>400</id>
@@ -1567,7 +1566,7 @@
 </text>
 
 
-<!--1.2.0 Content-->
+
 
 
 <text>
@@ -1686,7 +1685,7 @@
 	<name>拒绝</name>
 </text>
 
-<!--PAD-->
+
 
 <text>
 	<id>242</id>
@@ -1713,7 +1712,7 @@
 	<name>消音器 - 消除开枪时枪口闪光和噪音</name>
 </text>
 
-<!--1.3.0 Content-->
+
 
 <text>
 	<id>363</id>
@@ -1976,7 +1975,7 @@
 	<name>新武器解锁！</name>
 </text>
 
-<!--1.4.0 Content-->
+
 
 <text>
 	<id>416</id>
@@ -2096,7 +2095,7 @@
 允许使用经验兑换物资</name>
 </text>
 
-<!--以下娱乐模式-->
+
 
 <text>
 	<id>435</id>
@@ -2150,7 +2149,7 @@
 	<name>特殊模式无法解锁成就</name>
 </text>
 
-<!--以上娱乐模式-->
+
 
 <text>
 	<id>444</id>
@@ -2172,7 +2171,7 @@
 	<name>波次</name>
 </text>
 
-<!--1.7-->
+
 
 <text>
 	<id>448</id>
@@ -3058,7 +3057,7 @@
 
 <text>
 	<id>664</id>
-	<name>切换近战武器和远程武器, 顺序为 近战->主武器->副武器</name>
+	<name>切换近战武器和远程武器, 顺序为 近战-&gt;主武器-&gt;副武器</name>
 </text>
 
 <text>
@@ -3117,4 +3116,4 @@
 	<name>你可以在四处转转, 从一些灌木上面采摘浆果</name>
 </text>
 
-</list>
+<text><id>676</id><name>指令轮盘</name></text><text><id>677</id><name>移动到</name></text><text><id>678</id><name>跟随我</name></text><text><id>679</id><name>坚守位置</name></text><text><id>680</id><name>搜刮区域</name></text><text><id>681</id><name>攻击目标</name></text><text><id>682</id><name>自由开火</name></text><text><id>683</id><name>停火</name></text><text><id>684</id><name>治疗我</name></text><text><id>685</id><name>更多指令</name></text><text><id>686</id><name>搜索幸存者</name></text><text><id>687</id><name>取物品</name></text><text><id>688</id><name>丢弃物品</name></text><text><id>689</id><name>获取弹药</name></text><text><id>690</id><name>获取食物</name></text><text><id>691</id><name>获取水源</name></text><text><id>692</id><name>设置行为</name></text><text><id>693</id><name>取消指令</name></text><text><id>694</id><name>返回</name></text><text><id>695</id><name>指定方向</name></text><text><id>696</id><name>指定距离: 近</name></text><text><id>697</id><name>指定距离: 中</name></text><text><id>698</id><name>指定距离: 远</name></text><text><id>699</id><name>选择目标</name></text><text><id>700</id><name>一切物品</name></text><text><id>701</id><name>武器优先</name></text><text><id>702</id><name>食物优先</name></text><text><id>703</id><name>医疗优先</name></text><text><id>704</id><name>弹药优先</name></text><text><id>705</id><name>行为模式: 激进</name></text><text><id>706</id><name>行为模式: 防御</name></text><text><id>707</id><name>行为模式: 潜行</name></text><text><id>708</id><name>指令已接收</name></text><text><id>709</id><name>指令失败: 没有此物品</name></text><text><id>710</id><name>指令失败: 没有弹药</name></text><text><id>711</id><name>指令失败: 没有食物</name></text><text><id>712</id><name>指令失败: 没有水源</name></text><text><id>713</id><name>指令失败: 距离太远</name></text><text><id>714</id><name>指令失败: 已在执行中</name></text><text><id>715</id><name>指令失败: 队友正在战斗中</name></text><text><id>716</id><name>指令失败: 队友视野内无敌人</name></text><text><id>717</id><name>指令失败: 目标已死亡</name></text><text><id>718</id><name>指令已取消</name></text><text><id>719</id><name>僵尸: 空闲</name></text><text><id>720</id><name>僵尸: 警戒</name></text><text><id>721</id><name>僵尸: 调查中</name></text><text><id>722</id><name>僵尸: 追逐中</name></text><text><id>723</id><name>僵尸: 攻击</name></text><text><id>724</id><name>僵尸: 眩晕</name></text><text><id>725</id><name>僵尸: 倒地</name></text><text><id>726</id><name>选择队友</name></text><text><id>727</id><name>队友已选中</name></text><text><id>728</id><name>双击切换队友</name></text><text><id>729</id><name>长按打开指令轮盘</name></text><text><id>730</id><name>所有队友</name></text><text><id>731</id><name>拖拽指定方向</name></text></list>
