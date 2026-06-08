@@ -1,0 +1,24 @@
+.class final enum Lcom/google/android/gms/internal/zzegn;
+.super Lcom/google/android/gms/internal/zzegk;
+
+
+# direct methods
+.method constructor <init>(Ljava/lang/String;ILcom/google/android/gms/internal/zzegp;I)V
+    .locals 6
+
+    const/16 v2, 0xa
+
+    const/4 v4, 0x2
+
+    const/4 v5, 0x0
+
+    move-object v0, p0
+
+    move-object v1, p1
+
+    move-object v3, p3
+
+    invoke-direct/range {v0 .. v5}, Lcom/google/android/gms/internal/zzegk;-><init>(Ljava/lang/String;ILcom/google/android/gms/internal/zzegp;ILcom/google/android/gms/internal/zzegj;)V
+
+    return-void
+.end method
