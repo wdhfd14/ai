@@ -1,1 +1,0 @@
-/usr/bin/aarch64-linux-gnu-gcc "CMakeFiles/swbreak-debugger.dir/tools/debugger/debugger.c.o" -o swbreak-debugger  -Wl,-rpath,/workspace/swbreak/build-arm64: libswbreak.so liblua52.a -ldl 
