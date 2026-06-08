@@ -1,7 +1,0 @@
-package com.shadowfight.ai;
-
-public enum AIAction {
-    IDLE, MOVE_LEFT, MOVE_RIGHT, LIGHT_ATTACK, HEAVY_ATTACK,
-    BLOCK, DODGE_LEFT, DODGE_RIGHT, SKILL1, SKILL2,
-    WEAPON_SKILL1, WEAPON_SKILL2
-}
