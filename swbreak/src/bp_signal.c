@@ -11,14 +11,12 @@
  *   4. 临时恢复权限, 设置单步, 执行后重新保护
  */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
 #include <signal.h>
 #include <sys/mman.h>
-#include <pthread.h>
 #include "bp_signal.h"
 #include "bp_engine.h"
 #include "signal_dispatch.h"
@@ -28,15 +26,6 @@
 /* ── 内部状态 ── */
 static struct {
     int initialized;
-    /* 同页多断点: 页保护恢复计数 */
-    struct {
-        uint64_t page_base;
-        int      unprotected;  /* 临时恢复保护的次数 */
-        int      orig_prot;
-        size_t   page_size;
-    } page_state[256];        /* 最多 256 个不同页 */
-    int page_state_count;
-    pthread_mutex_t lock;
 } g_signal_state;
 
 /* ── 根据断点类型计算需要的页保护 ── */
@@ -97,7 +86,7 @@ static void signal_handle_sigsegv(int sig, siginfo_t *si, void *ctx)
     /* 设置线程局部上下文 (供回调中使用) */
     swbreak_dispatch_set_context(&regs, ctx);
 
-    /* 查找匹配的断点 */
+    /* 查找匹配的断点 (seqlock 安全) */
     swbreak_bp_t *bp = swbreak_engine_find_by_addr(fault_addr);
 
     if (!bp || (bp->mode != SWBREAK_MODE_SIGNAL && bp->mode != SWBREAK_MODE_HYBRID) || !bp->enabled) {
@@ -165,6 +154,24 @@ static void signal_handle_sigsegv(int sig, siginfo_t *si, void *ctx)
 
     case SWBREAK_ACTION_STOP:
         mprotect(bp->page_base, bp->page_size, bp->orig_prot);
+        swbreak_engine_stop_thread(tid, bp, ctx);
+        /* futex_wait 返回, 检查恢复方式 */
+        if (swbreak_engine_get_step_request()) {
+            /* 单步恢复 */
+            swbreak_engine_set_stepping(tid, bp);
+            ucontext_t *uc = (ucontext_t *)ctx;
+#ifdef __aarch64__
+            uint64_t *raw = (uint64_t *)&uc->uc_mcontext;
+            raw[34] |= (1UL << 21);
+#elif defined(__x86_64__)
+            uc->uc_mcontext.gregs[REG_EFL] |= 0x100;
+#endif
+        } else {
+            /* 继续恢复: 重新保护页 */
+            int prot = calc_merged_prot((uint64_t)bp->page_base);
+            if (prot < 0) prot = bp->orig_prot;
+            mprotect(bp->page_base, bp->page_size, prot);
+        }
         break;
 
     case SWBREAK_ACTION_SINGLE_STEP:
@@ -250,9 +257,6 @@ int swbreak_signal_init(void)
 {
     if (g_signal_state.initialized) return 0;
 
-    pthread_mutex_init(&g_signal_state.lock, NULL);
-    g_signal_state.page_state_count = 0;
-
     /* 向分发器注册处理函数 (不自己注册信号) */
     swbreak_dispatch_register_signal(signal_handle_sigsegv, signal_handle_sigtrap);
 
@@ -276,7 +280,6 @@ void swbreak_signal_destroy(void)
     /* 注销处理函数 */
     swbreak_dispatch_register_signal(NULL, NULL);
 
-    pthread_mutex_destroy(&g_signal_state.lock);
     g_signal_state.initialized = 0;
 }
 

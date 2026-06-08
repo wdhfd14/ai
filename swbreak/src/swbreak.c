@@ -29,15 +29,22 @@
 static struct {
     int initialized;
     swbreak_config_t config;
-    char last_error[256];
 } g_swbreak;
+
+static __thread char g_last_error[256];
 
 static void set_error(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    vsnprintf(g_swbreak.last_error, sizeof(g_swbreak.last_error), fmt, ap);
+    vsnprintf(g_last_error, sizeof(g_last_error), fmt, ap);
     va_end(ap);
+}
+
+const char *swbreak_strerror(int err)
+{
+    (void)err;
+    return g_last_error;
 }
 
 /* ══════════════════════════════════════
@@ -277,12 +284,14 @@ int swbreak_reg_write(const char *name, uint64_t value)
 
 int swbreak_continue(void)
 {
-    return 0;
+    if (!g_swbreak.initialized) return -1;
+    return swbreak_engine_resume(0); /* do_step=0, 继续执行 */
 }
 
 int swbreak_single_step(void)
 {
-    return 0;
+    if (!g_swbreak.initialized) return -1;
+    return swbreak_engine_resume(1); /* do_step=1, 单步执行 */
 }
 
 /* ══════════════════════════════════════
@@ -354,10 +363,4 @@ const char *swbreak_version(void)
 #else
     return "1.0.0";
 #endif
-}
-
-const char *swbreak_strerror(int err)
-{
-    (void)err;
-    return g_swbreak.last_error;
 }

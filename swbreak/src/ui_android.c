@@ -202,16 +202,22 @@ static jclass load_dex_class(JNIEnv *env)
         return NULL;
     }
 
-    /* 获取当前 ClassLoader */
-    jclass activity_class = (*env)->FindClass(env, "android/app/Activity");
-    jmethodID get_cl = (*env)->GetMethodID(env, activity_class, "getClassLoader",
-                                           "()Ljava/lang/ClassLoader;");
-    jobject class_loader = (*env)->CallObjectMethod(env, g_activity, get_cl);
+    /* 获取当前 ClassLoader - 兼容 Activity 和 Application Context */
+    jobject class_loader = NULL;
+    jclass ctx_class = (*env)->FindClass(env, "android/content/ContextWrapper");
+    if (ctx_class) {
+        jmethodID get_cl = (*env)->GetMethodID(env, ctx_class, "getClassLoader",
+                                               "()Ljava/lang/ClassLoader;");
+        if (get_cl) {
+            class_loader = (*env)->CallObjectMethod(env, g_activity, get_cl);
+        }
+        (*env)->DeleteLocalRef(env, ctx_class);
+    }
+
     if (!class_loader) {
         LOGE("Failed to get ClassLoader");
         (*env)->DeleteLocalRef(env, dex_bytes);
         (*env)->DeleteLocalRef(env, imdcl_class);
-        (*env)->DeleteLocalRef(env, activity_class);
         return NULL;
     }
 
@@ -222,7 +228,6 @@ static jclass load_dex_class(JNIEnv *env)
     (*env)->DeleteLocalRef(env, dex_bytes);
     (*env)->DeleteLocalRef(env, lib_path);
     (*env)->DeleteLocalRef(env, imdcl_class);
-    (*env)->DeleteLocalRef(env, activity_class);
     (*env)->DeleteLocalRef(env, class_loader);
 
     if (!dex_cl) {
@@ -251,12 +256,12 @@ static jclass load_dex_class(JNIEnv *env)
 }
 
 /* ══════════════════════════════════════
- *  获取当前 Activity
+ *  获取当前 Activity (Android 15+ 兼容回退)
  * ══════════════════════════════════════ */
 
-static jobject find_current_activity(JNIEnv *env)
+/* 方案 1: 通过 ActivityThread.mActivities 反射获取 (Android 9-14) */
+static jobject find_activity_via_thread(JNIEnv *env)
 {
-    /* 方法: ActivityThread.currentActivity().mActivity */
     jclass at_class = (*env)->FindClass(env, "android/app/ActivityThread");
     if (!at_class) {
         LOGE("ActivityThread class not found");
@@ -274,6 +279,11 @@ static jobject find_current_activity(JNIEnv *env)
 
     jobject activity_thread = (*env)->CallStaticObjectMethod(env, at_class, current_at);
     (*env)->DeleteLocalRef(env, at_class);
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("Exception calling currentActivityThread");
+        (*env)->ExceptionClear(env);
+        return NULL;
+    }
     if (!activity_thread) {
         LOGE("ActivityThread instance is null");
         return NULL;
@@ -285,6 +295,12 @@ static jobject find_current_activity(JNIEnv *env)
         "mActivities", "Landroid/util/ArrayMap;");
     (*env)->DeleteLocalRef(env, at_instance);
 
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("Exception getting mActivities field (Android 15+ may restrict this)");
+        (*env)->ExceptionClear(env);
+        (*env)->DeleteLocalRef(env, activity_thread);
+        return NULL;
+    }
     if (!m_activities) {
         LOGE("mActivities field not found");
         (*env)->DeleteLocalRef(env, activity_thread);
@@ -293,6 +309,11 @@ static jobject find_current_activity(JNIEnv *env)
 
     jobject activities_map = (*env)->GetObjectField(env, activity_thread, m_activities);
     (*env)->DeleteLocalRef(env, activity_thread);
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("Exception accessing mActivities");
+        (*env)->ExceptionClear(env);
+        return NULL;
+    }
     if (!activities_map) {
         LOGE("mActivities is null");
         return NULL;
@@ -303,6 +324,14 @@ static jobject find_current_activity(JNIEnv *env)
     jmethodID size_method = (*env)->GetMethodID(env, map_class, "size", "()I");
     jmethodID value_at = (*env)->GetMethodID(env, map_class, "valueAt",
         "(I)Ljava/lang/Object;");
+
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("Exception getting ArrayMap methods");
+        (*env)->ExceptionClear(env);
+        (*env)->DeleteLocalRef(env, map_class);
+        (*env)->DeleteLocalRef(env, activities_map);
+        return NULL;
+    }
 
     jint map_size = (*env)->CallIntMethod(env, activities_map, size_method);
     (*env)->DeleteLocalRef(env, map_class);
@@ -315,6 +344,11 @@ static jobject find_current_activity(JNIEnv *env)
 
     /* 获取最后一个 (最顶层的) Activity */
     jobject activity_record = (*env)->CallObjectMethod(env, activities_map, value_at, map_size - 1);
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("Exception calling valueAt");
+        (*env)->ExceptionClear(env);
+        return NULL;
+    }
     if (!activity_record) {
         LOGE("ActivityRecord is null");
         return NULL;
@@ -327,18 +361,76 @@ static jobject find_current_activity(JNIEnv *env)
     (*env)->DeleteLocalRef(env, ar_class);
     (*env)->DeleteLocalRef(env, activity_record);
 
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("Exception getting ActivityRecord.activity field");
+        (*env)->ExceptionClear(env);
+        return NULL;
+    }
     if (!activity_field) {
         LOGE("ActivityRecord.activity field not found");
         return NULL;
     }
 
     jobject activity = (*env)->GetObjectField(env, activity_record, activity_field);
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("Exception accessing ActivityRecord.activity");
+        (*env)->ExceptionClear(env);
+        return NULL;
+    }
     if (!activity) {
         LOGE("Activity is null");
         return NULL;
     }
 
     return activity;
+}
+
+/* 方案 3: 使用 Application Context 作为最后回退 */
+static jobject find_activity_via_context(JNIEnv *env)
+{
+    /* 尝试获取 ActivityThread.currentApplication() */
+    jclass at_class = (*env)->FindClass(env, "android/app/ActivityThread");
+    if (!at_class) return NULL;
+
+    jmethodID current_app = (*env)->GetStaticMethodID(env, at_class,
+        "currentApplication", "()Landroid/app/Application;");
+    (*env)->DeleteLocalRef(env, at_class);
+
+    if (!current_app) return NULL;
+
+    jobject app = (*env)->CallStaticObjectMethod(env, at_class, current_app);
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionClear(env);
+        return NULL;
+    }
+
+    return app;  /* 返回 Application Context, 虽然不是 Activity 但可以用于加载 DEX */
+}
+
+/* 统一入口: 依次尝试多种方案获取 Activity/Context */
+static jobject find_current_activity(JNIEnv *env)
+{
+    jobject activity = NULL;
+
+    /* 方案 1: ActivityThread.mActivities (Android 9-14) */
+    activity = find_activity_via_thread(env);
+    if (activity) return activity;
+
+    /* 方案 1 失败, 清除 JNI 异常, 尝试其他方式 */
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionClear(env);
+    }
+
+    /* 方案 3: 使用 Application Context 作为最后回退 */
+    activity = find_activity_via_context(env);
+    if (activity) return activity;
+
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionClear(env);
+    }
+
+    LOGE("All methods to find Activity failed");
+    return NULL;
 }
 
 /* ══════════════════════════════════════
@@ -383,7 +475,7 @@ int swbreak_ui_init(void)
         }
     }
 
-    /* 查找当前 Activity */
+    /* 查找当前 Activity (带回退机制) */
     g_activity = find_current_activity(env);
     if (!g_activity) {
         LOGE("Failed to find current Activity");

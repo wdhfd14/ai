@@ -8,7 +8,6 @@
  * SIGTRAP → 先检查是否为 BRK 断点 → 否则检查是否为单步完成
  */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>

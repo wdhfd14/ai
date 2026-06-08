@@ -24,6 +24,9 @@
 static lua_State *g_lua = NULL;
 static int g_lua_owned = 0;
 
+/* 重入保护: 防止信号中断 Lua 执行时再次调用 Lua */
+static __thread int g_lua_busy = 0;
+
 /* ── 辅助: 将字符串动作转为枚举 ── */
 static swbreak_bp_action_t parse_action(const char *s)
 {
@@ -474,36 +477,44 @@ lua_State *swbreak_lua_get_state(void)
 int swbreak_lua_load_script(const char *path)
 {
     if (!g_lua) return -1;
+    g_lua_busy = 1;
     if (luaL_loadfile(g_lua, path) != LUA_OK) {
         fprintf(stderr, "[swbreak] Lua load error: %s\n",
                 lua_tostring(g_lua, -1));
         lua_pop(g_lua, 1);
+        g_lua_busy = 0;
         return -1;
     }
     if (lua_pcall(g_lua, 0, 0, 0) != LUA_OK) {
         fprintf(stderr, "[swbreak] Lua exec error: %s\n",
                 lua_tostring(g_lua, -1));
         lua_pop(g_lua, 1);
+        g_lua_busy = 0;
         return -1;
     }
+    g_lua_busy = 0;
     return 0;
 }
 
 int swbreak_lua_load_string(const char *script)
 {
     if (!g_lua) return -1;
+    g_lua_busy = 1;
     if (luaL_loadstring(g_lua, script) != LUA_OK) {
         fprintf(stderr, "[swbreak] Lua load error: %s\n",
                 lua_tostring(g_lua, -1));
         lua_pop(g_lua, 1);
+        g_lua_busy = 0;
         return -1;
     }
     if (lua_pcall(g_lua, 0, 0, 0) != LUA_OK) {
         fprintf(stderr, "[swbreak] Lua exec error: %s\n",
                 lua_tostring(g_lua, -1));
         lua_pop(g_lua, 1);
+        g_lua_busy = 0;
         return -1;
     }
+    g_lua_busy = 0;
     return 0;
 }
 
@@ -515,9 +526,15 @@ swbreak_bp_action_t swbreak_lua_call_callback(int lua_ref,
     if (!g_lua || lua_ref == LUA_NOREF || lua_ref == LUA_REFNIL)
         return SWBREAK_ACTION_CONTINUE;
 
+    /* 重入保护: 如果当前线程正在执行 Lua 代码时被信号中断, 跳过 Lua 回调 */
+    if (g_lua_busy) return SWBREAK_ACTION_CONTINUE;
+
+    g_lua_busy = 1;
+
     lua_rawgeti(g_lua, LUA_REGISTRYINDEX, lua_ref);
     if (!lua_isfunction(g_lua, -1)) {
         lua_pop(g_lua, 1);
+        g_lua_busy = 0;
         return SWBREAK_ACTION_CONTINUE;
     }
 
@@ -571,6 +588,7 @@ swbreak_bp_action_t swbreak_lua_call_callback(int lua_ref,
         fprintf(stderr, "[swbreak] Lua callback error: %s\n",
                 lua_tostring(g_lua, -1));
         lua_pop(g_lua, 1);
+        g_lua_busy = 0;
         return SWBREAK_ACTION_CONTINUE;
     }
 
@@ -579,5 +597,6 @@ swbreak_bp_action_t swbreak_lua_call_callback(int lua_ref,
     swbreak_bp_action_t action = parse_action(action_str);
     lua_pop(g_lua, 1);
 
+    g_lua_busy = 0;
     return action;
 }

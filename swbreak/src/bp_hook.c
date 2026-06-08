@@ -219,10 +219,25 @@ static void hook_handle_sigtrap(int sig, siginfo_t *si, void *ctx)
         break;
 
     case SWBREAK_ACTION_STOP:
-        g_hook_state.active_bp = bp;
-        g_hook_state.active_tid = tid;
-        regs.pc = brk_addr;
-        swbreak_regs_to_ucontext(ctx, &regs);
+        /* BRK 已被 remove_brk 恢复, 原始指令已还原 */
+        swbreak_engine_stop_thread(tid, bp, ctx);
+        /* futex_wait 返回 */
+        if (swbreak_engine_get_step_request()) {
+            /* 单步恢复 */
+            g_hook_state.active_bp = bp;
+            g_hook_state.active_tid = tid;
+            swbreak_engine_set_stepping(tid, bp);
+            ucontext_t *uc = (ucontext_t *)ctx;
+#ifdef __aarch64__
+            uint64_t *raw = (uint64_t *)&uc->uc_mcontext;
+            raw[34] |= (1UL << 21);
+#elif defined(__x86_64__)
+            uc->uc_mcontext.gregs[REG_EFL] |= 0x100;
+#endif
+        } else {
+            /* 继续恢复: 重新插入 BRK */
+            insert_brk(bp);
+        }
         break;
     }
 
