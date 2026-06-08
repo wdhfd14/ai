@@ -1,0 +1,21 @@
+{
+  "_description": "Meta config (segments 8-15, 17-25, 27)",
+  "media_path": "media/",
+  "flag1": true,
+  "canvas_width": 1024,
+  "canvas_height": 768,
+  "setting1": 1,
+  "enable_webgl": true,
+  "enable_minify": false,
+  "flag3": false,
+  "flag4": true,
+  "flag5": true,
+  "setting2": 0,
+  "setting3": 2,
+  "setting4": 11390,
+  "flag6": false,
+  "flag7": true,
+  "setting5": 0,
+  "flag8": true,
+  "setting6": 0
+}

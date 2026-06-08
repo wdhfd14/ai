@@ -1,0 +1,80 @@
+{
+  "_description": "MiniDayZ+ data segment manifest. Files loaded in this order to reconstruct data.js.",
+  "_total_segments": 29,
+  "files": [
+    {
+      "file": "project_info.json",
+      "segments": [
+        0,
+        1,
+        16,
+        26
+      ]
+    },
+    {
+      "file": "engine_config.json",
+      "segments": [
+        2
+      ]
+    },
+    {
+      "file": "objects.json",
+      "segments": [
+        3
+      ]
+    },
+    {
+      "file": "families.json",
+      "segments": [
+        4
+      ]
+    },
+    {
+      "file": "layouts.json",
+      "segments": [
+        5
+      ]
+    },
+    {
+      "file": "event_sheets.json",
+      "segments": [
+        6
+      ]
+    },
+    {
+      "file": "sounds.json",
+      "segments": [
+        7
+      ]
+    },
+    {
+      "file": "meta.json",
+      "segments": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        27
+      ]
+    },
+    {
+      "file": "texture_groups.json",
+      "segments": [
+        28
+      ]
+    }
+  ]
+}

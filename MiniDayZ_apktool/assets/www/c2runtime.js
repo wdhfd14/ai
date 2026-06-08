@@ -2093,6 +2093,8 @@ function uc(f, l, q, k) {
   var h = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame || window.oRequestAnimationFrame;
   f.prototype.TG = function() {
     var b = this;
+    // [MDZ MOD] Check for pre-assembled data (data_loader.js)
+    if (window.__C2_DATA) { b.Ll(window.__C2_DATA); return; }
     if (this.Bj) this.Jr("data.js", function(a) {
       b.Ll(JSON.parse(a))
     }, function() {
