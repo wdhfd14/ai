@@ -82,12 +82,8 @@ int swbreak_init(const swbreak_config_t *config)
 
     g_swbreak.initialized = 1;
 
-    /* Android: 自动初始化并显示调试面板 */
-#ifdef __ANDROID__
-    if (swbreak_ui_init() == 0) {
-        swbreak_ui_show();
-    }
-#endif
+    /* Android: UI 不再自动初始化! 用户需要手动调用 swbreak_ui_init() + swbreak_ui_show()
+     * 原因: 注入 .so 时 Activity 可能还没创建, JNI 反射会崩溃 */
 
     return 0;
 }

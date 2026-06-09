@@ -477,28 +477,62 @@ int swbreak_ui_init(void)
 
     /* 查找当前 Activity (带回退机制) */
     g_activity = find_current_activity(env);
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("JNI exception during find_current_activity");
+        (*env)->ExceptionClear(env);
+        g_activity = NULL;
+    }
     if (!g_activity) {
-        LOGE("Failed to find current Activity");
+        LOGE("No Activity available yet - call swbreak_ui_init() later after the app is fully launched");
         pthread_mutex_unlock(&g_ui_lock);
         return -1;
     }
     g_activity = (*env)->NewGlobalRef(env, g_activity);
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("JNI exception during NewGlobalRef");
+        (*env)->ExceptionClear(env);
+        g_activity = NULL;
+        pthread_mutex_unlock(&g_ui_lock);
+        return -1;
+    }
 
     /* 加载 DEX 中的 SwbreakPanel 类 */
     jclass panel_class = load_dex_class(env);
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("JNI exception during load_dex_class");
+        (*env)->ExceptionClear(env);
+        panel_class = NULL;
+    }
     if (!panel_class) {
         LOGE("Failed to load SwbreakPanel");
+        (*env)->DeleteGlobalRef(env, g_activity);
+        g_activity = NULL;
         pthread_mutex_unlock(&g_ui_lock);
         return -1;
     }
     g_panel_class = (*env)->NewGlobalRef(env, panel_class);
+    (*env)->DeleteLocalRef(env, panel_class);
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("JNI exception during panel NewGlobalRef");
+        (*env)->ExceptionClear(env);
+        (*env)->DeleteGlobalRef(env, g_activity);
+        g_activity = NULL;
+        g_panel_class = NULL;
+        pthread_mutex_unlock(&g_ui_lock);
+        return -1;
+    }
 
     /* 注册 Native 方法 */
     ret = (*env)->RegisterNatives(env, g_panel_class,
                                   s_native_methods,
                                   sizeof(s_native_methods) / sizeof(s_native_methods[0]));
-    if (ret != JNI_OK) {
+    if (ret != JNI_OK || (*env)->ExceptionCheck(env)) {
         LOGE("Failed to register native methods: %d", ret);
+        if ((*env)->ExceptionCheck(env)) (*env)->ExceptionClear(env);
+        (*env)->DeleteGlobalRef(env, g_panel_class);
+        (*env)->DeleteGlobalRef(env, g_activity);
+        g_panel_class = NULL;
+        g_activity = NULL;
         pthread_mutex_unlock(&g_ui_lock);
         return -1;
     }
@@ -510,8 +544,20 @@ int swbreak_ui_init(void)
     g_log_method = (*env)->GetStaticMethodID(env, g_panel_class, "log",
         "(Ljava/lang/String;)V");
 
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("JNI exception during GetStaticMethodID");
+        (*env)->ExceptionClear(env);
+    }
+
     if (!g_show_method || !g_hide_method || !g_log_method) {
         LOGE("Failed to cache method IDs");
+        (*env)->DeleteGlobalRef(env, g_panel_class);
+        (*env)->DeleteGlobalRef(env, g_activity);
+        g_panel_class = NULL;
+        g_activity = NULL;
+        g_show_method = NULL;
+        g_hide_method = NULL;
+        g_log_method = NULL;
         pthread_mutex_unlock(&g_ui_lock);
         return -1;
     }
