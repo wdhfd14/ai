@@ -1,0 +1,8 @@
+/workspace/swbreak/build/CMakeFiles/lua52.dir
+/workspace/swbreak/build/CMakeFiles/swbreak.dir
+/workspace/swbreak/build/CMakeFiles/edit_cache.dir
+/workspace/swbreak/build/CMakeFiles/rebuild_cache.dir
+/workspace/swbreak/build/CMakeFiles/list_install_components.dir
+/workspace/swbreak/build/CMakeFiles/install.dir
+/workspace/swbreak/build/CMakeFiles/install/local.dir
+/workspace/swbreak/build/CMakeFiles/install/strip.dir

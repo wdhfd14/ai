@@ -22,6 +22,15 @@
 #include "lua_api.h"
 #include "ui_android.h"
 
+/* ── .so 加载时自动初始化 ── */
+#ifdef __ANDROID__
+__attribute__((constructor))
+static void swbreak_auto_init(void)
+{
+    swbreak_init(NULL);
+}
+#endif
+
 /* ── 全局状态 (极简) ── */
 static struct {
     int   initialized;

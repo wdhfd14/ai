@@ -1,11 +1,13 @@
 package com.swbreak;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
@@ -62,6 +64,34 @@ public class SwbreakPanel {
     /* ══════════════════════════════════════
      *  公共 API
      * ══════════════════════════════════════ */
+
+    /**
+     * 自动初始化: 注册 ActivityLifecycleCallbacks, 在下一个 Activity 创建时自动弹窗。
+     * 这是终极兼容方案, 在所有 Android 版本上都能工作,
+     * 不依赖隐藏 API (ActivityThread.mActivities)。
+     *
+     * @param app Application 对象
+     */
+    public static void autoInit(Application app) {
+        android.util.Log.i("swbreak", "SwbreakPanel.autoInit called");
+        app.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+                android.util.Log.i("swbreak", "Activity created: " + activity.getLocalClassName());
+                if (!isShowing()) {
+                    show(activity);
+                }
+            }
+
+            @Override public void onActivityStarted(Activity activity) {}
+            @Override public void onActivityResumed(Activity activity) {}
+            @Override public void onActivityPaused(Activity activity) {}
+            @Override public void onActivityStopped(Activity activity) {}
+            @Override public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
+            @Override public void onActivityDestroyed(Activity activity) {}
+        });
+        android.util.Log.i("swbreak", "ActivityLifecycleCallbacks registered");
+    }
 
     public static void show(final Activity activity) {
         sActivity = activity;
