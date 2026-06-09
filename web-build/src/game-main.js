@@ -117,23 +117,49 @@ function loaded() {}
     var checks = 0;
     function wait() {
         checks++;
+        // 尝试从 canvas 获取 runtime
         var canvas = document.getElementById('c2canvas');
-        var rt = canvas && canvas.c2runtime;
-        if (rt) {
-            runtime = rt; cr = rt;
-            console.log('[GameMain] Runtime hooked.');
-            function loop(ts) { game_update(ts); requestAnimationFrame(loop); }
-            requestAnimationFrame(loop);
+        var rt = (canvas && canvas.c2runtime) || window.c2runtime || window._cr_runtime;
+        
+        // runtime 已存在 + 布局已加载完毕 (wa 属性设置时表示 ready)
+        if (rt && rt.wa) {
+            init_runtime(rt);
             return;
         }
-        if (window._cr_runtime) {
-            runtime = window._cr_runtime; cr = runtime;
-            function loop(ts) { game_update(ts); requestAnimationFrame(loop); }
-            requestAnimationFrame(loop);
+        
+        // runtime 存在但布局还没 ready - 等它
+        if (rt && !rt.wa) {
+            console.log('[GameMain] Runtime found, waiting for layout... check #' + checks);
+            if (checks < 500) setTimeout(wait, 50);
+            else console.error('[GameMain] Timeout waiting for layout init');
             return;
         }
-        if (checks < 200) setTimeout(wait, 100);
+        
+        if (checks < 500) setTimeout(wait, 100);
+        else console.error('[GameMain] FAILED to find c2runtime after 50s');
     }
-    if (document.readyState === 'complete') wait();
-    else window.addEventListener('load', function() { setTimeout(wait, 500); });
+    
+    function init_runtime(rt) {
+        runtime = rt;
+        cr = rt;
+        console.log('[GameMain] Runtime ready. Layout: ' + (rt.wa && rt.wa.Ba));
+        
+        // 使用 c2runtime 自带的每帧回调系统
+        // En() 添加回调到 ko 数组，每帧 tick 末尾自动调用
+        if (runtime.En) {
+            runtime.En(function() {
+                game_update(performance.now());
+            });
+            console.log('[GameMain] Hooked into c2runtime.En() tick callback');
+        } else {
+            // fallback to rAF
+            function loop(ts) { game_update(ts); requestAnimationFrame(loop); }
+            requestAnimationFrame(loop);
+            console.log('[GameMain] Using standalone rAF loop (fallback)');
+        }
+        
+        console.log('[GameMain] Game loop ACTIVE');
+    }
+    
+    window.addEventListener('load', function() { setTimeout(wait, 200); });
 })();
