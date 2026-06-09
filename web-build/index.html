@@ -32,19 +32,114 @@
             touch-action: none;
             -ms-touch-action: none;
             image-rendering: auto;
+            display: block;
         }
 
-        /* ── 游戏容器：不用 flexbox，用 fixed + transform 居中 ── */
-        #game-container {
+        /* ── 外层：铺满视口 ── */
+        #game-wrapper {
             position: fixed;
-            top: 50%;
-            left: 50%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: #000;
-            /* JS 动态设置 transform，保证旋转时不会漂移 */
-            will-change: transform;
         }
-        #game-container canvas {
-            display: block;
+
+        /* ── canvas 容器：始终居中 ── */
+        #canvas-area {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 竖屏时 canvas-area 只占上面一部分 */
+        #game-wrapper.portrait #canvas-area {
+            height: auto;
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            bottom: 42%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #game-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── 虚拟触控区：竖屏时可见 ── */
+        #ctrl-area {
+            display: none;
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            height: 42%;
+            background: #0a0a0a;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px 20px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        #game-wrapper.portrait #ctrl-area { display: flex; }
+
+        /* 方向键 — 十字布局 */
+        #dpad {
+            position: relative;
+            width: 160px; height: 160px;
+            flex-shrink: 0;
+        }
+        .dpad-btn {
+            position: absolute;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 6px;
+            width: 50px; height: 50px;
+            cursor: pointer;
+            touch-action: none;
+            transition: background 0.08s;
+        }
+        .dpad-btn:active, .dpad-btn.pressed {
+            background: rgba(255,255,255,0.18);
+            border-color: rgba(255,255,255,0.35);
+        }
+        .dpad-up    { top: 0;   left: 55px; }
+        .dpad-down  { top: 110px; left: 55px; }
+        .dpad-left  { top: 55px; left: 0; }
+        .dpad-right { top: 55px; left: 110px; }
+        .dpad-center {
+            top: 55px; left: 55px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* 右侧动作按钮 */
+        #action-btns {
+            display: flex;
+            flex-direction: row;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .act-btn {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.07);
+            border: 2px solid rgba(255,255,255,0.15);
+            color: #ccc;
+            font-size: 20px;
+            cursor: pointer;
+            touch-action: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.08s, border-color 0.08s;
+        }
+        .act-btn:active, .act-btn.pressed {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.45);
+            color: #fff;
         }
 
         #loading-screen {
@@ -69,34 +164,28 @@
             text-transform: uppercase;
         }
         #loading-bar-bg {
-            width: 200px;
-            height: 3px;
+            width: 200px; height: 3px;
             background: #222;
             border-radius: 2px;
             margin-top: 12px;
             overflow: hidden;
         }
         #loading-bar {
-            width: 0%;
-            height: 100%;
+            width: 0%; height: 100%;
             background: #4a4;
             transition: width 0.4s ease;
         }
         #kb-hint {
             position: fixed;
-            bottom: 10px;
-            right: 10px;
-            color: #555;
-            font-size: 10px;
-            z-index: 1000;
-            pointer-events: none;
+            bottom: 10px; right: 10px;
+            color: #555; font-size: 10px;
+            z-index: 1000; pointer-events: none;
         }
 
         /* ── 方向设置面板 ── */
         #orientation-settings {
             position: fixed;
-            top: 10px;
-            right: 10px;
+            top: 10px; right: 10px;
             z-index: 10000;
             display: flex;
             flex-direction: column;
@@ -104,13 +193,11 @@
             gap: 4px;
         }
         #orientation-toggle {
-            width: 36px;
-            height: 36px;
+            width: 36px; height: 36px;
             border-radius: 8px;
             background: rgba(0,0,0,0.55);
             border: 1px solid rgba(255,255,255,0.2);
-            color: #ccc;
-            font-size: 18px;
+            color: #ccc; font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -139,13 +226,10 @@
         #orientation-menu button {
             background: none;
             border: 1px solid transparent;
-            color: #bbb;
-            font-size: 12px;
+            color: #bbb; font-size: 12px;
             padding: 7px 14px;
-            text-align: left;
-            cursor: pointer;
-            border-radius: 5px;
-            white-space: nowrap;
+            text-align: left; cursor: pointer;
+            border-radius: 5px; white-space: nowrap;
             transition: all 0.15s;
         }
         #orientation-menu button:hover {
@@ -157,18 +241,6 @@
             border-color: rgba(100,255,100,0.4);
             background: rgba(100,255,100,0.08);
         }
-
-        /* 输入代理层 */
-        #input-proxy {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 9000;
-            background: transparent;
-            touch-action: none;
-        }
-        #input-proxy.active { display: block; }
     </style>
 </head>
 <body>
@@ -177,16 +249,31 @@
         <div id="loading-bar-bg"><div id="loading-bar"></div></div>
     </div>
 
-    <div id="game-container">
-        <div id="c2canvasdiv">
-            <canvas id="c2canvas" width="1024" height="768">
-                <h1>Your browser does not support HTML5. Please upgrade.</h1>
-            </canvas>
+    <!-- 游戏外层容器 — 竖屏时 flex column 分上下 -->
+    <div id="game-wrapper">
+        <div id="canvas-area">
+            <div id="game-container">
+                <canvas id="c2canvas" width="1024" height="768">
+                    <h1>Your browser does not support HTML5. Please upgrade.</h1>
+                </canvas>
+            </div>
+        </div>
+        <!-- 竖屏时底部的虚拟触控区 -->
+        <div id="ctrl-area">
+            <div id="dpad">
+                <div class="dpad-btn dpad-up"    data-dir="up"></div>
+                <div class="dpad-btn dpad-left"  data-dir="left"></div>
+                <div class="dpad-btn dpad-center"></div>
+                <div class="dpad-btn dpad-right" data-dir="right"></div>
+                <div class="dpad-btn dpad-down"  data-dir="down"></div>
+            </div>
+            <div id="action-btns">
+                <button class="act-btn" data-act="interact">&#x270B;</button>
+                <button class="act-btn" data-act="inventory">&#x1F392;</button>
+                <button class="act-btn" data-act="map">&#x1F5FA;</button>
+            </div>
         </div>
     </div>
-
-    <!-- 输入代理层 — 竖屏时拦截触摸/鼠标事件 -->
-    <div id="input-proxy"></div>
 
     <!-- 方向设置 -->
     <div id="orientation-settings">
@@ -243,15 +330,12 @@
     <script>
     (function() {
         var canvas = document.getElementById('c2canvas');
-        var container = document.getElementById('game-container');
+        var wrapper = document.getElementById('game-wrapper');
         var loadingScreen = document.getElementById('loading-screen');
-        var inputProxy = document.getElementById('input-proxy');
         var GAME_W = 1024, GAME_H = 768;
 
         // ═══════════════════════════════════════
-        // Orientation — stable approach:
-        // fixed position + translate(-50%,-50%) center
-        // NO flexbox = no drift on repeated rotation
+        // 方案：完全不旋转画布。横屏=全屏，竖屏=画布置顶+底部触控
         // ═══════════════════════════════════════
         var ORIENTATION_MODE = localStorage.getItem('mdz_orientation') || 'auto';
         var isPortraitMode = false;
@@ -265,25 +349,18 @@
         function applyOrientation() {
             isPortraitMode = (getEffectiveOrientation() === 'portrait');
 
-            // ── 计算缩放，让画布刚好填满视口 ──
-            var vw = window.innerWidth;
-            var vh = window.innerHeight;
-            var scale;
-
             if (isPortraitMode) {
-                // 画布旋转90°后，视觉尺寸 = H×W = 768×1024
-                scale = Math.min(vw / GAME_H, vh / GAME_W);
+                wrapper.classList.add('portrait');
+                // 画布撑满上方区域宽度
+                var areaH = window.innerHeight * 0.58;
+                var scale = Math.min(window.innerWidth / GAME_W, areaH / GAME_H);
                 canvas.style.width  = Math.floor(GAME_W * scale) + 'px';
                 canvas.style.height = Math.floor(GAME_H * scale) + 'px';
-                // translate(-50%,-50%) 以自身尺寸为基准，然后 rotate
-                container.style.transform = 'translate(-50%, -50%) rotate(90deg)';
-                inputProxy.classList.add('active');
             } else {
-                scale = Math.min(vw / GAME_W, vh / GAME_H);
-                canvas.style.width  = Math.floor(GAME_W * scale) + 'px';
-                canvas.style.height = Math.floor(GAME_H * scale) + 'px';
-                container.style.transform = 'translate(-50%, -50%)';
-                inputProxy.classList.remove('active');
+                wrapper.classList.remove('portrait');
+                var scale2 = Math.min(window.innerWidth / GAME_W, window.innerHeight / GAME_H);
+                canvas.style.width  = Math.floor(GAME_W * scale2) + 'px';
+                canvas.style.height = Math.floor(GAME_H * scale2) + 'px';
             }
 
             // 菜单选中态
@@ -293,56 +370,15 @@
             });
         }
 
-        // ═══════════════════════════════════════
-        // Coordinate transforms
-        // ═══════════════════════════════════════
-        function screenToCanvas(clientX, clientY) {
-            var rect = canvas.getBoundingClientRect();
-            if (!isPortraitMode) {
-                return {
-                    x: ((clientX - rect.left) / rect.width)  * GAME_W,
-                    y: ((clientY - rect.top)  / rect.height) * GAME_H
-                };
-            }
-            // Portrait: visual rect is axis-aligned bounding box of rotated canvas
-            // Visual (vx,vy) → normalized (nx,ny) → canvas (ny*W, (1-nx)*H)
-            var nx = (clientX - rect.left) / rect.width;
-            var ny = (clientY - rect.top)  / rect.height;
-            nx = Math.max(0, Math.min(1, nx));
-            ny = Math.max(0, Math.min(1, ny));
-            return { x: ny * GAME_W, y: (1 - nx) * GAME_H };
-        }
-
-        function canvasToScreen(cx, cy) {
-            var rect = canvas.getBoundingClientRect();
-            if (!isPortraitMode) {
-                return {
-                    x: rect.left + (cx / GAME_W) * rect.width,
-                    y: rect.top  + (cy / GAME_H) * rect.height
-                };
-            }
-            // Inverse of screenToCanvas for portrait
-            var nx = 1 - (cy / GAME_H);
-            var ny = cx / GAME_W;
-            return {
-                x: rect.left + nx * rect.width,
-                y: rect.top  + ny * rect.height
-            };
-        }
-
-        // ── 事件绑定 ──
         window.addEventListener('resize', applyOrientation);
-        window.addEventListener('orientationchange', function() {
-            setTimeout(applyOrientation, 150);
-        });
+        window.addEventListener('orientationchange', function() { setTimeout(applyOrientation, 150); });
 
         // ═══════════════════════════════════════
-        // Settings menu
+        // 设置菜单
         // ═══════════════════════════════════════
         (function() {
             var tg = document.getElementById('orientation-toggle');
             var md = document.getElementById('orientation-menu');
-
             tg.addEventListener('click', function(e) {
                 e.stopPropagation();
                 md.classList.toggle('visible');
@@ -366,7 +402,7 @@
         })();
 
         // ═══════════════════════════════════════
-        // Touch simulation
+        // 通用触摸模拟
         // ═══════════════════════════════════════
         function simulateTouch(type, clientX, clientY, id) {
             id = id || 0;
@@ -390,50 +426,136 @@
             }
         }
 
-        // ═══════════════════════════════════════
-        // Input proxy (portrait only)
-        // ═══════════════════════════════════════
-        function proxyEvent(type, e) {
-            if (!isPortraitMode) return;
-            e.preventDefault();
-            e.stopPropagation();
-            var cx, cy;
-            if (e.touches && e.touches.length)     { cx = e.touches[0].clientX;        cy = e.touches[0].clientY; }
-            else if (e.changedTouches && e.changedTouches.length) { cx = e.changedTouches[0].clientX; cy = e.changedTouches[0].clientY; }
-            else                                   { cx = e.clientX;                   cy = e.clientY; }
-            var c = screenToCanvas(cx, cy);
-            simulateTouch(type, c.x, c.y, 1);
+        function screenToCanvas(clientX, clientY) {
+            var rect = canvas.getBoundingClientRect();
+            return {
+                x: ((clientX - rect.left) / rect.width)  * GAME_W,
+                y: ((clientY - rect.top)  / rect.height) * GAME_H
+            };
+        }
+        function canvasToScreen(cx, cy) {
+            var rect = canvas.getBoundingClientRect();
+            return {
+                x: rect.left + (cx / GAME_W) * rect.width,
+                y: rect.top  + (cy / GAME_H) * rect.height
+            };
         }
 
-        inputProxy.addEventListener('touchstart',  function(e) { proxyEvent('start',  e); }, {passive: false});
-        inputProxy.addEventListener('touchmove',   function(e) { proxyEvent('move',   e); }, {passive: false});
-        inputProxy.addEventListener('touchend',    function(e) { proxyEvent('end',    e); }, {passive: false});
-        inputProxy.addEventListener('touchcancel', function(e) { proxyEvent('cancel', e); }, {passive: false});
-        inputProxy.addEventListener('mousedown',   function(e) { proxyEvent('start',  e); });
-        inputProxy.addEventListener('mousemove',   function(e) { if (e.buttons & 1) proxyEvent('move', e); });
-        inputProxy.addEventListener('mouseup',     function(e) { proxyEvent('end',    e); });
-        inputProxy.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-
         // ═══════════════════════════════════════
-        // Landscape: mouse → touch (direct on canvas)
+        // 鼠标 → 触摸 (始终在canvas上)
         // ═══════════════════════════════════════
         canvas.addEventListener('mousedown', function(e) {
-            if (isPortraitMode) return;
             e.preventDefault();
             simulateTouch('start', e.clientX, e.clientY, 2);
         });
         canvas.addEventListener('mousemove', function(e) {
-            if (isPortraitMode) return;
             if (e.buttons & 1) simulateTouch('move', e.clientX, e.clientY, 2);
         });
         canvas.addEventListener('mouseup', function(e) {
-            if (isPortraitMode) return;
             simulateTouch('end', e.clientX, e.clientY, 2);
         });
         canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
         // ═══════════════════════════════════════
-        // WASD → touch (canvas-space coords)
+        // 竖屏虚拟 D-Pad
+        // ═══════════════════════════════════════
+        var dpadState = { up: false, down: false, left: false, right: false };
+        var dpadTouchActive = false;
+        var dpadTouchX = GAME_W / 2, dpadTouchY = GAME_H / 2;
+        var DPAD_SPEED = 7;
+
+        function bindDpadBtn(sel, dir) {
+            var el = document.querySelector(sel);
+            if (!el) return;
+
+            function on(ev) { ev.preventDefault(); dpadState[dir] = true; el.classList.add('pressed'); }
+            function off(ev) { ev.preventDefault(); dpadState[dir] = false; el.classList.remove('pressed'); }
+
+            el.addEventListener('mousedown', on);
+            el.addEventListener('touchstart', on, {passive: false});
+            el.addEventListener('mouseup', off);
+            el.addEventListener('mouseleave', off);
+            el.addEventListener('touchend', off);
+            el.addEventListener('touchcancel', off);
+        }
+
+        bindDpadBtn('.dpad-up',    'up');
+        bindDpadBtn('.dpad-down',  'down');
+        bindDpadBtn('.dpad-left',  'left');
+        bindDpadBtn('.dpad-right', 'right');
+
+        function updateDpadTouch() {
+            var dx = 0, dy = 0;
+            if (dpadState.up)    dy -= 1;
+            if (dpadState.down)  dy += 1;
+            if (dpadState.left)  dx -= 1;
+            if (dpadState.right) dx += 1;
+            var moving = (dx !== 0 || dy !== 0);
+
+            if (moving) {
+                dpadTouchX = Math.max(0, Math.min(GAME_W, dpadTouchX + dx * DPAD_SPEED));
+                dpadTouchY = Math.max(0, Math.min(GAME_H, dpadTouchY + dy * DPAD_SPEED));
+                var sc = canvasToScreen(dpadTouchX, dpadTouchY);
+                if (!dpadTouchActive) { dpadTouchActive = true; simulateTouch('start', sc.x, sc.y, 10); }
+                simulateTouch('move', sc.x, sc.y, 10);
+            }
+            return moving;
+        }
+
+        setInterval(function() {
+            if (!isPortraitMode) return;
+            var m = updateDpadTouch();
+            if (!m && dpadTouchActive) {
+                dpadTouchActive = false;
+                var sc = canvasToScreen(dpadTouchX, dpadTouchY);
+                simulateTouch('end', sc.x, sc.y, 10);
+            }
+        }, 16);
+
+        // D-Pad 释放时重置位置
+        function resetDpadPos() {
+            dpadTouchX = GAME_W / 2;
+            dpadTouchY = GAME_H / 2;
+        }
+
+        // ═══════════════════════════════════════
+        // 竖屏动作按钮
+        // ═══════════════════════════════════════
+        function bindActBtn(sel, canvasX, canvasY) {
+            var el = document.querySelector(sel);
+            if (!el) return;
+
+            function press(e) {
+                e.preventDefault();
+                el.classList.add('pressed');
+                resetDpadPos();
+                var sc = canvasToScreen(canvasX, canvasY);
+                simulateTouch('start', sc.x, sc.y, 20);
+            }
+            function release(e) {
+                e.preventDefault();
+                el.classList.remove('pressed');
+                var sc = canvasToScreen(canvasX, canvasY);
+                simulateTouch('end', sc.x, sc.y, 20);
+            }
+
+            el.addEventListener('mousedown', press);
+            el.addEventListener('touchstart', press, {passive: false});
+            el.addEventListener('mouseup', release);
+            el.addEventListener('mouseleave', release);
+            el.addEventListener('touchend', release);
+            el.addEventListener('touchcancel', release);
+        }
+
+        // 交互按钮 → 点击画布中心
+        bindActBtn('.act-btn[data-act="interact"]', GAME_W * 0.5, GAME_H * 0.55);
+        // 背包按钮 → 点击右侧
+        bindActBtn('.act-btn[data-act="inventory"]', GAME_W * 0.93, GAME_H * 0.5);
+        // 地图按钮 → 点击左下角
+        bindActBtn('.act-btn[data-act="map"]',        GAME_W * 0.07, GAME_H * 0.93);
+
+        // ═══════════════════════════════════════
+        // WASD (全模式)
         // ═══════════════════════════════════════
         var kbState = {};
         var kbTouchActive = false;
