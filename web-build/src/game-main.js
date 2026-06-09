@@ -350,20 +350,13 @@ function hook_into_runtime(rt) {
     
     console.log('[GameMain] Runtime hooked. Starting game loop...');
     
-    // 注册每帧回调 - 在 c2runtime 的 tick 函数末尾调用我们的逻辑
-    if (runtime.En) {
-        runtime.En(function() {
-            game_update(performance.now());
-        });
-    }
-    
-    // 备用: 使用 requestAnimationFrame 作为独立的游戏循环
-    // (如果上面的钩子不可用)
-    function alt_loop(timestamp) {
+    // 使用 requestAnimationFrame 独立运行我们的游戏循环
+    // 不干扰 c2runtime 原有的渲染循环，这样它能正常渲染屏幕
+    function game_loop(timestamp) {
         game_update(timestamp);
-        requestAnimationFrame(alt_loop);
+        requestAnimationFrame(game_loop);
     }
-    // requestAnimationFrame(alt_loop);
+    requestAnimationFrame(game_loop);
     
     console.log('[GameMain] Game loop registered.');
 }
