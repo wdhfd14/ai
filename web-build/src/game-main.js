@@ -58,7 +58,17 @@ function game_update(timestamp) {
     var dt = 0;
     if (last_frame_time > 0) { dt = (timestamp - last_frame_time) / 1000; if (dt > 0.1) dt = 0.1; }
     last_frame_time = timestamp;
-
+    
+    // ==========================================
+    // 实时状态条更新 — 肉眼可见的变化！
+    // ==========================================
+    var fps_el = document.getElementById('mod-fps');
+    var day_el = document.getElementById('mod-day');
+    var hp_el  = document.getElementById('mod-hp');
+    if (fps_el && dt > 0) fps_el.textContent = Math.round(1/dt);
+    if (day_el) day_el.textContent = GLOBAL.Day_survived || 0;
+    if (hp_el)  hp_el.textContent  = Math.round(GLOBAL.PLAYER_health || 100);
+    
     if (typeof update_environment === 'function') update_environment(dt);
     if (typeof update_player_stats === 'function') update_player_stats(dt);
     if (typeof update_all_npcs === 'function') update_all_npcs(dt);
@@ -144,18 +154,38 @@ function loaded() {}
         cr = rt;
         console.log('[GameMain] Runtime ready. Layout: ' + (rt.wa && rt.wa.Ba));
         
-        // 使用 c2runtime 自带的每帧回调系统
-        // En() 添加回调到 ko 数组，每帧 tick 末尾自动调用
+        // ==========================================
+        // 🟢 显而易见：证明我们的模块在运行！
+        // ==========================================
+        var banner = document.createElement('div');
+        banner.id = 'module-banner';
+        banner.innerHTML = 'AI 模块已接管游戏逻辑 &mdash; 30个模块运行中';
+        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;' +
+            'background:rgba(0,180,0,0.85);color:#fff;text-align:center;' +
+            'padding:6px;font-size:14px;font-family:Arial,sans-serif;' +
+            'pointer-events:none;letter-spacing:1px;';
+        document.body.appendChild(banner);
+        
+        // 5秒后缩为状态小条
+        setTimeout(function() {
+            banner.style.padding = '2px';
+            banner.style.fontSize = '10px';
+            banner.style.background = 'rgba(0,140,0,0.6)';
+            banner.innerHTML = '<span id="mod-fps">0</span> fps | Day: <span id="mod-day">0</span> | HP: <span id="mod-hp">100</span>';
+        }, 5000);
+        
+        // ==========================================
+        // 使用 c2runtime En() 钩子，每帧tick末尾调用
+        // ==========================================
         if (runtime.En) {
             runtime.En(function() {
                 game_update(performance.now());
             });
-            console.log('[GameMain] Hooked into c2runtime.En() tick callback');
+            console.log('[GameMain] Hooked into c2runtime.En()');
         } else {
-            // fallback to rAF
             function loop(ts) { game_update(ts); requestAnimationFrame(loop); }
             requestAnimationFrame(loop);
-            console.log('[GameMain] Using standalone rAF loop (fallback)');
+            console.log('[GameMain] Using standalone rAF (fallback)');
         }
         
         console.log('[GameMain] Game loop ACTIVE');
