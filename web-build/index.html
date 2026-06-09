@@ -33,19 +33,20 @@
             -ms-touch-action: none;
             image-rendering: auto;
         }
+
+        /* ── 游戏容器：不用 flexbox，用 fixed + transform 居中 ── */
         #game-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: fixed;
+            top: 50%;
+            left: 50%;
             background: #000;
-            transition: transform 0.35s ease;
+            /* JS 动态设置 transform，保证旋转时不会漂移 */
+            will-change: transform;
         }
-        /* ── 竖屏模式：容器旋转 90° ── */
-        #game-container.portrait {
-            transform: rotate(90deg);
+        #game-container canvas {
+            display: block;
         }
+
         #loading-screen {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -157,7 +158,7 @@
             background: rgba(100,255,100,0.08);
         }
 
-        /* 输入代理层 — 竖屏时拦截并转换坐标 */
+        /* 输入代理层 */
         #input-proxy {
             display: none;
             position: fixed;
@@ -244,212 +245,177 @@
         var canvas = document.getElementById('c2canvas');
         var container = document.getElementById('game-container');
         var loadingScreen = document.getElementById('loading-screen');
-        var loadingBar = document.getElementById('loading-bar');
         var inputProxy = document.getElementById('input-proxy');
         var GAME_W = 1024, GAME_H = 768;
 
         // ═══════════════════════════════════════
-        // Orientation system
+        // Orientation — stable approach:
+        // fixed position + translate(-50%,-50%) center
+        // NO flexbox = no drift on repeated rotation
         // ═══════════════════════════════════════
         var ORIENTATION_MODE = localStorage.getItem('mdz_orientation') || 'auto';
         var isPortraitMode = false;
 
         function getEffectiveOrientation() {
-            if (ORIENTATION_MODE === 'portrait') return 'portrait';
+            if (ORIENTATION_MODE === 'portrait')  return 'portrait';
             if (ORIENTATION_MODE === 'landscape') return 'landscape';
-            // auto: follow device
             return (window.innerHeight > window.innerWidth) ? 'portrait' : 'landscape';
         }
 
         function applyOrientation() {
-            var ori = getEffectiveOrientation();
-            isPortraitMode = (ori === 'portrait');
+            isPortraitMode = (getEffectiveOrientation() === 'portrait');
+
+            // ── 计算缩放，让画布刚好填满视口 ──
+            var vw = window.innerWidth;
+            var vh = window.innerHeight;
+            var scale;
 
             if (isPortraitMode) {
-                container.classList.add('portrait');
+                // 画布旋转90°后，视觉尺寸 = H×W = 768×1024
+                scale = Math.min(vw / GAME_H, vh / GAME_W);
+                canvas.style.width  = Math.floor(GAME_W * scale) + 'px';
+                canvas.style.height = Math.floor(GAME_H * scale) + 'px';
+                // translate(-50%,-50%) 以自身尺寸为基准，然后 rotate
+                container.style.transform = 'translate(-50%, -50%) rotate(90deg)';
                 inputProxy.classList.add('active');
             } else {
-                container.classList.remove('portrait');
+                scale = Math.min(vw / GAME_W, vh / GAME_H);
+                canvas.style.width  = Math.floor(GAME_W * scale) + 'px';
+                canvas.style.height = Math.floor(GAME_H * scale) + 'px';
+                container.style.transform = 'translate(-50%, -50%)';
                 inputProxy.classList.remove('active');
             }
 
-            // Update menu selection
+            // 菜单选中态
             var btns = document.querySelectorAll('#orientation-menu button');
             btns.forEach(function(b) {
                 b.classList.toggle('selected', b.getAttribute('data-mode') === ORIENTATION_MODE);
             });
-
-            resizeCanvas();
         }
 
         // ═══════════════════════════════════════
-        // Coordinate transform — screen → canvas
-        // In portrait: CSS rotate(90deg) on container,
-        // so visual (vx,vy) maps to canvas (ny*W, (1-nx)*H)
+        // Coordinate transforms
         // ═══════════════════════════════════════
         function screenToCanvas(clientX, clientY) {
             var rect = canvas.getBoundingClientRect();
-
-            if (isPortraitMode) {
-                // Visual rect dimensions are swapped due to CSS rotation
-                var nx = (clientX - rect.left) / rect.width;
-                var ny = (clientY - rect.top) / rect.height;
-                nx = Math.max(0, Math.min(1, nx));
-                ny = Math.max(0, Math.min(1, ny));
+            if (!isPortraitMode) {
                 return {
-                    x: ny * GAME_W,
-                    y: (1 - nx) * GAME_H
-                };
-            } else {
-                var nx2 = (clientX - rect.left) / rect.width;
-                var ny2 = (clientY - rect.top) / rect.height;
-                return {
-                    x: nx2 * GAME_W,
-                    y: ny2 * GAME_H
+                    x: ((clientX - rect.left) / rect.width)  * GAME_W,
+                    y: ((clientY - rect.top)  / rect.height) * GAME_H
                 };
             }
+            // Portrait: visual rect is axis-aligned bounding box of rotated canvas
+            // Visual (vx,vy) → normalized (nx,ny) → canvas (ny*W, (1-nx)*H)
+            var nx = (clientX - rect.left) / rect.width;
+            var ny = (clientY - rect.top)  / rect.height;
+            nx = Math.max(0, Math.min(1, nx));
+            ny = Math.max(0, Math.min(1, ny));
+            return { x: ny * GAME_W, y: (1 - nx) * GAME_H };
         }
 
-        // Inverse: canvas coords → screen clientX/Y
         function canvasToScreen(cx, cy) {
             var rect = canvas.getBoundingClientRect();
-
-            if (isPortraitMode) {
-                // Canvas (cx, cy) → normalized canvas → visual
-                var nx = 1 - (cy / GAME_H);  // canvas y reversed → visual x
-                var ny = cx / GAME_W;        // canvas x → visual y
-                return {
-                    x: rect.left + nx * rect.width,
-                    y: rect.top  + ny * rect.height
-                };
-            } else {
+            if (!isPortraitMode) {
                 return {
                     x: rect.left + (cx / GAME_W) * rect.width,
                     y: rect.top  + (cy / GAME_H) * rect.height
                 };
             }
+            // Inverse of screenToCanvas for portrait
+            var nx = 1 - (cy / GAME_H);
+            var ny = cx / GAME_W;
+            return {
+                x: rect.left + nx * rect.width,
+                y: rect.top  + ny * rect.height
+            };
         }
 
-        // ═══════════════════════════════════════
-        // Responsive canvas
-        // ═══════════════════════════════════════
-        function resizeCanvas() {
-            var ww = window.innerWidth;
-            var wh = window.innerHeight;
-            // In portrait mode, canvas appears rotated, so swap target dimensions
-            var tw = isPortraitMode ? GAME_H : GAME_W;
-            var th = isPortraitMode ? GAME_W : GAME_H;
-            var scale = Math.min(ww / tw, wh / th);
-            canvas.style.width  = Math.floor(GAME_W * scale) + 'px';
-            canvas.style.height = Math.floor(GAME_H * scale) + 'px';
-        }
-
-        window.addEventListener('resize', function() {
-            applyOrientation();
-        });
+        // ── 事件绑定 ──
+        window.addEventListener('resize', applyOrientation);
         window.addEventListener('orientationchange', function() {
-            setTimeout(applyOrientation, 120);
+            setTimeout(applyOrientation, 150);
         });
 
         // ═══════════════════════════════════════
         // Settings menu
         // ═══════════════════════════════════════
-        var toggleBtn = document.getElementById('orientation-toggle');
-        var menuDiv = document.getElementById('orientation-menu');
+        (function() {
+            var tg = document.getElementById('orientation-toggle');
+            var md = document.getElementById('orientation-menu');
 
-        toggleBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            menuDiv.classList.toggle('visible');
-            toggleBtn.classList.toggle('active');
-        });
-
-        menuDiv.addEventListener('click', function(e) {
-            var btn = e.target.closest('button');
-            if (!btn) return;
-            var mode = btn.getAttribute('data-mode');
-            if (!mode) return;
-            ORIENTATION_MODE = mode;
-            localStorage.setItem('mdz_orientation', mode);
-            menuDiv.classList.remove('visible');
-            toggleBtn.classList.remove('active');
-            applyOrientation();
-        });
-
-        // Close menu when clicking elsewhere
-        document.addEventListener('click', function() {
-            menuDiv.classList.remove('visible');
-            toggleBtn.classList.remove('active');
-        });
+            tg.addEventListener('click', function(e) {
+                e.stopPropagation();
+                md.classList.toggle('visible');
+                tg.classList.toggle('active');
+            });
+            md.addEventListener('click', function(e) {
+                var b = e.target.closest('button');
+                if (!b) return;
+                var m = b.getAttribute('data-mode');
+                if (!m) return;
+                ORIENTATION_MODE = m;
+                localStorage.setItem('mdz_orientation', m);
+                md.classList.remove('visible');
+                tg.classList.remove('active');
+                applyOrientation();
+            });
+            document.addEventListener('click', function() {
+                md.classList.remove('visible');
+                tg.classList.remove('active');
+            });
+        })();
 
         // ═══════════════════════════════════════
-        // Touch simulation helper
+        // Touch simulation
         // ═══════════════════════════════════════
         function simulateTouch(type, clientX, clientY, id) {
             id = id || 0;
-            var touchObj = new Touch({
-                identifier: id,
-                target: canvas,
+            var t = new Touch({
+                identifier: id, target: canvas,
                 clientX: clientX, clientY: clientY,
                 pageX: clientX, pageY: clientY,
                 radiusX: 5, radiusY: 5,
-                rotationAngle: 0,
-                force: 1
+                rotationAngle: 0, force: 1
             });
-
-            var activeTouches = (type === 'end' || type === 'cancel') ? [] : [touchObj];
+            var at = (type === 'end' || type === 'cancel') ? [] : [t];
             try {
-                var evt = new TouchEvent('touch' + type, {
-                    bubbles: true,
-                    cancelable: true,
-                    touches: activeTouches,
-                    targetTouches: activeTouches,
-                    changedTouches: [touchObj]
-                });
-                canvas.dispatchEvent(evt);
+                canvas.dispatchEvent(new TouchEvent('touch' + type, {
+                    bubbles: true, cancelable: true,
+                    touches: at, targetTouches: at, changedTouches: [t]
+                }));
             } catch(e) {
-                var evt2 = document.createEvent('UIEvents');
-                evt2.initUIEvent('touch' + type, true, true);
-                canvas.dispatchEvent(evt2);
+                var ev = document.createEvent('UIEvents');
+                ev.initUIEvent('touch' + type, true, true);
+                canvas.dispatchEvent(ev);
             }
         }
 
         // ═══════════════════════════════════════
-        // Input proxy — portrait mode intercept
-        // Transforms screen coords → canvas coords
-        // before dispatching to the canvas
+        // Input proxy (portrait only)
         // ═══════════════════════════════════════
         function proxyEvent(type, e) {
             if (!isPortraitMode) return;
             e.preventDefault();
             e.stopPropagation();
-
-            var clientX, clientY;
-            if (e.touches && e.touches.length > 0) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            } else if (e.changedTouches && e.changedTouches.length > 0) {
-                clientX = e.changedTouches[0].clientX;
-                clientY = e.changedTouches[0].clientY;
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            }
-
-            var c = screenToCanvas(clientX, clientY);
+            var cx, cy;
+            if (e.touches && e.touches.length)     { cx = e.touches[0].clientX;        cy = e.touches[0].clientY; }
+            else if (e.changedTouches && e.changedTouches.length) { cx = e.changedTouches[0].clientX; cy = e.changedTouches[0].clientY; }
+            else                                   { cx = e.clientX;                   cy = e.clientY; }
+            var c = screenToCanvas(cx, cy);
             simulateTouch(type, c.x, c.y, 1);
         }
 
-        inputProxy.addEventListener('touchstart',  function(e) { proxyEvent('start', e); }, {passive: false});
-        inputProxy.addEventListener('touchmove',   function(e) { proxyEvent('move',  e); }, {passive: false});
-        inputProxy.addEventListener('touchend',    function(e) { proxyEvent('end',   e); }, {passive: false});
-        inputProxy.addEventListener('touchcancel', function(e) { proxyEvent('cancel',e); }, {passive: false});
-        inputProxy.addEventListener('mousedown',   function(e) { proxyEvent('start', e); });
+        inputProxy.addEventListener('touchstart',  function(e) { proxyEvent('start',  e); }, {passive: false});
+        inputProxy.addEventListener('touchmove',   function(e) { proxyEvent('move',   e); }, {passive: false});
+        inputProxy.addEventListener('touchend',    function(e) { proxyEvent('end',    e); }, {passive: false});
+        inputProxy.addEventListener('touchcancel', function(e) { proxyEvent('cancel', e); }, {passive: false});
+        inputProxy.addEventListener('mousedown',   function(e) { proxyEvent('start',  e); });
         inputProxy.addEventListener('mousemove',   function(e) { if (e.buttons & 1) proxyEvent('move', e); });
-        inputProxy.addEventListener('mouseup',     function(e) { proxyEvent('end',   e); });
+        inputProxy.addEventListener('mouseup',     function(e) { proxyEvent('end',    e); });
         inputProxy.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
         // ═══════════════════════════════════════
-        // Landscape mode: mouse → touch directly
+        // Landscape: mouse → touch (direct on canvas)
         // ═══════════════════════════════════════
         canvas.addEventListener('mousedown', function(e) {
             if (isPortraitMode) return;
@@ -458,9 +424,7 @@
         });
         canvas.addEventListener('mousemove', function(e) {
             if (isPortraitMode) return;
-            if (e.buttons & 1) {
-                simulateTouch('move', e.clientX, e.clientY, 2);
-            }
+            if (e.buttons & 1) simulateTouch('move', e.clientX, e.clientY, 2);
         });
         canvas.addEventListener('mouseup', function(e) {
             if (isPortraitMode) return;
@@ -469,13 +433,12 @@
         canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
         // ═══════════════════════════════════════
-        // WASD keyboard → touch simulation
+        // WASD → touch (canvas-space coords)
         // ═══════════════════════════════════════
         var kbState = {};
         var kbTouchActive = false;
-        var kbTouchX = GAME_W / 2;
-        var kbTouchY = GAME_H / 2;
-        var KB_SPEED = 6; // canvas-space pixels per frame
+        var kbTouchX = GAME_W / 2, kbTouchY = GAME_H / 2;
+        var KB_SPEED = 6;
 
         function updateKbTouch() {
             var dx = 0, dy = 0;
@@ -483,69 +446,52 @@
             if (kbState['s'] || kbState['ArrowDown'])  dy += 1;
             if (kbState['a'] || kbState['ArrowLeft'])  dx -= 1;
             if (kbState['d'] || kbState['ArrowRight']) dx += 1;
-
             var moving = (dx !== 0 || dy !== 0);
             if (moving) {
                 kbTouchX = Math.max(0, Math.min(GAME_W, kbTouchX + dx * KB_SPEED));
                 kbTouchY = Math.max(0, Math.min(GAME_H, kbTouchY + dy * KB_SPEED));
-
-                // Convert canvas coords to screen coords for dispatch
-                var screen = canvasToScreen(kbTouchX, kbTouchY);
-
-                if (!kbTouchActive) {
-                    kbTouchActive = true;
-                    simulateTouch('start', screen.x, screen.y, 3);
-                }
-                simulateTouch('move', screen.x, screen.y, 3);
+                var sc = canvasToScreen(kbTouchX, kbTouchY);
+                if (!kbTouchActive) { kbTouchActive = true; simulateTouch('start', sc.x, sc.y, 3); }
+                simulateTouch('move', sc.x, sc.y, 3);
             }
             return moving;
         }
-
-        var kbInterval = setInterval(updateKbTouch, 16);
-
-        function resetKbTouch() {
-            kbTouchX = GAME_W / 2;
-            kbTouchY = GAME_H / 2;
-        }
+        setInterval(updateKbTouch, 16);
 
         window.addEventListener('keydown', function(e) {
             kbState[e.key] = true;
             var key = e.key;
-            if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Spacebar','Escape'].indexOf(key) >= 0) {
+            if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Escape'].indexOf(key) >= 0) e.preventDefault();
+            if (key === ' ' || key === 'e' || key === 'E' || key === 'Enter') {
                 e.preventDefault();
-            }
-            if (key === ' ' || key === 'Spacebar' || key === 'e' || key === 'E' || key === 'Enter') {
-                e.preventDefault();
-                resetKbTouch();
+                kbTouchX = GAME_W / 2; kbTouchY = GAME_H / 2;
                 var sc = canvasToScreen(GAME_W / 2, GAME_H / 2);
                 simulateTouch('start', sc.x, sc.y, 4);
                 setTimeout(function() { simulateTouch('end', sc.x, sc.y, 4); }, 40);
             }
             if (key === 'r' || key === 'R') {
-                var sc2 = canvasToScreen(GAME_W * 0.85, GAME_H * 0.9);
-                simulateTouch('start', sc2.x, sc2.y, 5);
-                setTimeout(function() { simulateTouch('end', sc2.x, sc2.y, 5); }, 40);
+                var sc = canvasToScreen(GAME_W * 0.85, GAME_H * 0.9);
+                simulateTouch('start', sc.x, sc.y, 5);
+                setTimeout(function() { simulateTouch('end', sc.x, sc.y, 5); }, 40);
             }
             if (key === 'i' || key === 'I' || key === 'Tab') {
                 e.preventDefault();
-                var sc3 = canvasToScreen(GAME_W * 0.93, GAME_H * 0.5);
-                simulateTouch('start', sc3.x, sc3.y, 6);
-                setTimeout(function() { simulateTouch('end', sc3.x, sc3.y, 6); }, 40);
+                var sc = canvasToScreen(GAME_W * 0.93, GAME_H * 0.5);
+                simulateTouch('start', sc.x, sc.y, 6);
+                setTimeout(function() { simulateTouch('end', sc.x, sc.y, 6); }, 40);
             }
             if (key === 'm' || key === 'M') {
-                var sc4 = canvasToScreen(GAME_W * 0.07, GAME_H * 0.93);
-                simulateTouch('start', sc4.x, sc4.y, 7);
-                setTimeout(function() { simulateTouch('end', sc4.x, sc4.y, 7); }, 40);
+                var sc = canvasToScreen(GAME_W * 0.07, GAME_H * 0.93);
+                simulateTouch('start', sc.x, sc.y, 7);
+                setTimeout(function() { simulateTouch('end', sc.x, sc.y, 7); }, 40);
             }
         });
-
         window.addEventListener('keyup', function(e) {
             kbState[e.key] = false;
-            var anyMove = kbState['w'] || kbState['ArrowUp'] ||
-                         kbState['s'] || kbState['ArrowDown'] ||
-                         kbState['a'] || kbState['ArrowLeft'] ||
-                         kbState['d'] || kbState['ArrowRight'];
-            if (!anyMove && kbTouchActive) {
+            if (!kbTouchActive) return;
+            var any = kbState['w']||kbState['ArrowUp']||kbState['s']||kbState['ArrowDown']||
+                      kbState['a']||kbState['ArrowLeft']||kbState['d']||kbState['ArrowRight'];
+            if (!any) {
                 kbTouchActive = false;
                 var sc = canvasToScreen(kbTouchX, kbTouchY);
                 simulateTouch('end', sc.x, sc.y, 3);
@@ -553,29 +499,20 @@
         });
 
         // ═══════════════════════════════════════
-        // Init
+        // Boot
         // ═══════════════════════════════════════
         applyOrientation();
 
         jQuery(document).ready(function() {
             cr_createRuntime("c2canvas");
-            setTimeout(function() {
-                loadingScreen.classList.add('hidden');
-            }, 2000);
+            setTimeout(function() { loadingScreen.classList.add('hidden'); }, 2000);
         });
 
-        // Pause / Resume on tab switch
         function onVisibilityChanged() {
-            var hidden = document.hidden || document.mozHidden || document.webkitHidden || document.msHidden;
-            if (typeof cr_setSuspended === 'function') {
-                cr_setSuspended(hidden);
-            }
+            var h = document.hidden || document.mozHidden || document.webkitHidden || document.msHidden;
+            if (typeof cr_setSuspended === 'function') cr_setSuspended(h);
         }
         document.addEventListener("visibilitychange", onVisibilityChanged, false);
-        document.addEventListener("mozvisibilitychange", onVisibilityChanged, false);
-        document.addEventListener("webkitvisibilitychange", onVisibilityChanged, false);
-        document.addEventListener("msvisibilitychange", onVisibilityChanged, false);
-
     })();
     </script>
 </body>
