@@ -18,6 +18,7 @@
 #include <jni.h>
 #include <android/log.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include "swbreak.h"
 #include "bp_types.h"
@@ -626,6 +627,55 @@ void swbreak_ui_destroy(void)
 
     g_ui_initialized = 0;
     LOGI("UI module destroyed");
+}
+
+/* ══════════════════════════════════════
+ *  自动初始化 (后台线程等待 Activity 就绪)
+ * ══════════════════════════════════════ */
+
+static volatile int g_auto_init_running = 0;
+
+static void *auto_init_thread(void *arg)
+{
+    (void)arg;
+
+    LOGI("Auto-init thread started, waiting for Activity...");
+
+    /* 轮询等待 Activity 就绪, 最多等 30 秒 */
+    for (int i = 0; i < 60; i++) {
+        if (!g_auto_init_running) break;
+
+        /* 尝试初始化 UI */
+        if (swbreak_ui_init() == 0) {
+            LOGI("UI auto-initialized successfully");
+            swbreak_ui_show();
+            g_auto_init_running = 0;
+            return NULL;
+        }
+
+        /* 还没就绪, 等 500ms 再试 */
+        usleep(500000);
+    }
+
+    LOGE("UI auto-init timed out after 30s");
+    g_auto_init_running = 0;
+    return NULL;
+}
+
+void swbreak_ui_auto_init(void)
+{
+    if (g_auto_init_running) return;
+
+    g_auto_init_running = 1;
+
+    pthread_t tid;
+    if (pthread_create(&tid, NULL, auto_init_thread, NULL) != 0) {
+        LOGE("Failed to create auto-init thread");
+        g_auto_init_running = 0;
+        return;
+    }
+
+    pthread_detach(tid);
 }
 
 #endif /* __ANDROID__ */
