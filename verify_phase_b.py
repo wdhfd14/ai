@@ -22,6 +22,18 @@ JS_FILES = [
     '/workspace/web-build/src/ai_modules/damage_system.js',
     '/workspace/web-build/src/ai_modules/bots.js',
     '/workspace/web-build/src/ai_modules/animals.js',
+    '/workspace/web-build/src/ai_modules/player/player_stats.js',
+    '/workspace/web-build/src/ai_modules/player/interaction.js',
+    '/workspace/web-build/src/ai_modules/player/experience.js',
+    '/workspace/web-build/src/ai_modules/player/animations.js',
+    '/workspace/web-build/src/ai_modules/world/map_generation.js',
+    '/workspace/web-build/src/ai_modules/world/spawn_parameters.js',
+    '/workspace/web-build/src/ai_modules/world/environment.js',
+    '/workspace/web-build/src/ai_modules/world/environment_effects.js',
+    '/workspace/web-build/src/ai_modules/world/buildings.js',
+    '/workspace/web-build/src/ai_modules/gui/hud.js',
+    '/workspace/web-build/src/ai_modules/vehicles/drivable_vehicles.js',
+    '/workspace/web-build/src/ai_modules/system/save_system.js',
 ]
 
 # ── 颜色 ──
@@ -137,6 +149,10 @@ for jsf in JS_FILES:
         'try_spawn_zombie','spawn_zombie_at','get_player_x','get_player_y',
         'get_player_health','angle_between','spawn_zombie_at',
         'update','init','atan2','getFirstPicked',
+        'hasOwnProperty','push','pow','splice','shift',
+        'now','filter','setItem','stringify','catch',
+        'assign','random','getItem','removeItem','parse',
+        'min','floor','cos','sin','sqrt',
     }
     for li, line in enumerate(lines):
         stripped = line.strip()
@@ -283,6 +299,18 @@ module_checks = {
     'bots.js': ['bot_init', 'bot_update', 'BOT_STATE'],
     'animals.js': ['animal_init', 'animal_update', 'ANIMAL_STATE'],
     'npc_controller.js': ['update_all_npcs', 'update_zombies', 'pick_zombie_type'],
+    'player_stats.js': ['update_player_stats', 'use_item', 'PLAYER_STATS', 'FOOD_EFFECTS'],
+    'interaction.js': ['pick_up_item', 'interact_with_object', 'loot_container'],
+    'experience.js': ['add_experience', 'xp_on_zombie_kill', 'XP_SYSTEM'],
+    'animations.js': ['update_animations', 'ANIMATION_MAP'],
+    'map_generation.js': ['generate_map', 'MAP_DATA', 'BUILDING_TYPE'],
+    'spawn_parameters.js': ['calculate_zombie_density', 'should_spawn_zombie', 'SPAWN_CONFIG'],
+    'environment.js': ['update_time_cycle', 'get_environment_temperature', 'TIME_STATE', 'WEATHER_TYPE'],
+    'environment_effects.js': ['update_campfires', 'check_radiation_exposure', 'ENV_EFFECT_TYPE'],
+    'buildings.js': ['damage_building', 'update_buildings', 'BUILDING_STATE'],
+    'hud.js': ['update_hud', 'show_notification', 'GUI_STATE'],
+    'drivable_vehicles.js': ['enter_vehicle', 'update_vehicle', 'VEHICLE_TYPE'],
+    'save_system.js': ['save_game', 'load_game', 'SAVE_CONFIG'],
 }
 
 for jsf in JS_FILES:
