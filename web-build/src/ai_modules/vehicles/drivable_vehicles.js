@@ -1,18 +1,14 @@
 /**
  * Drivable Vehicles - 车辆系统
- * 来源: data.js → Game_events → Drivable vehicles (67 sub-events)
+ * 来源: data.js → Game_events → Drivable vehicles (472) → 67 个子事件
  * 
- * 涵盖:
- *   车辆进入/退出
- *   驾驶控制
- *   燃料消耗
- *   车辆碰撞伤害
- *   车辆损坏/爆炸
- *   车辆生成位置
+ * 真实子组: Vehicle collisions (16), Vehicles UI (5), 4个车辆注册组 (op=808→op=1175)
+ * 
+ * Key: 4种车辆通过 op=808 init → op=1175 activate 注册
  */
 
 // ═══════════════════════════════════════
-// 车辆类型
+// 车辆类型 (从 op=808 提取的4种)
 // ═══════════════════════════════════════
 var VEHICLE_TYPE = {
     CAR: "car",
@@ -26,40 +22,40 @@ var VEHICLE_TYPE = {
 // ═══════════════════════════════════════
 var VEHICLE_CONFIG = {
     car: {
-        speed: 250,            // # 最大速度
-        acceleration: 3,       // # 加速度
-        handling: 0.8,         // # 操控性
-        fuel_capacity: 100,    // # 油箱容量
-        fuel_consumption: 0.02, // # 每帧耗油
+        speed: 250,
+        acceleration: 3,
+        handling: 0.8,
+        fuel_capacity: 100,
+        fuel_per_frame: 0.02,
         health: 300,
-        damage_to_zombie: 60,  // # 撞僵尸伤害
+        ram_damage: 60,
     },
     truck: {
         speed: 180,
         acceleration: 2,
         handling: 0.6,
         fuel_capacity: 200,
-        fuel_consumption: 0.03,
+        fuel_per_frame: 0.03,
         health: 500,
-        damage_to_zombie: 100,
+        ram_damage: 100,
     },
     jeep: {
         speed: 220,
         acceleration: 3.5,
         handling: 0.9,
         fuel_capacity: 120,
-        fuel_consumption: 0.025,
+        fuel_per_frame: 0.025,
         health: 350,
-        damage_to_zombie: 80,
+        ram_damage: 80,
     },
     bike: {
         speed: 200,
         acceleration: 4,
         handling: 1.0,
-        fuel_capacity: 0,      // # 自行车不需要燃料
-        fuel_consumption: 0,
+        fuel_capacity: 0,
+        fuel_per_frame: 0,
         health: 150,
-        damage_to_zombie: 20,
+        ram_damage: 20,
     },
 };
 
@@ -74,21 +70,21 @@ var VEHICLE_STATE = {
     WRECKED: "wrecked",
 };
 
-var VEHICLES = [];  // # 场景中所有车辆
+var VEHICLES = [];  // 所有场景中的车辆实例
 
 // ═══════════════════════════════════════
 // 进入车辆
-// # 来源: Drivable vehicles → Enter vehicle
+// # 来源: Vehicles UI → input handling
 // ═══════════════════════════════════════
 function enter_vehicle(vehicle) {
     if (vehicle.state === VEHICLE_STATE.WRECKED) return false;
-    if (vehicle.fuel <= 0 && vehicle.type !== "bike") return false; // # 没油
+    if (vehicle.type !== "bike" && vehicle.fuel <= 0) return false;
     
     vehicle.state = VEHICLE_STATE.ENTERING;
-    vehicle.enter_timer = 30;  // # 进入动画
-    
-    // # 玩家变为不可见 (在车内)
+    vehicle.enter_timer = 30;
     set_player_visible(false);
+    // # 将玩家坐标绑定到车辆
+    // player.x = vehicle.x; player.y = vehicle.y;
     
     return true;
 }
@@ -100,7 +96,7 @@ function exit_vehicle(vehicle) {
     var exit_x = vehicle.x + (Math.random() - 0.5) * 80;
     var exit_y = vehicle.y + (Math.random() - 0.5) * 80;
     
-    set_player_position(exit_x, exit_y);
+    // set_player_position(exit_x, exit_y);
     set_player_visible(true);
     
     vehicle.state = VEHICLE_STATE.PARKED;
@@ -113,30 +109,26 @@ function exit_vehicle(vehicle) {
 
 // ═══════════════════════════════════════
 // 车辆驾驶更新
-// # 来源: Drivable vehicles → Driving update
+// # 来源: Vehicle collisions → movement
 // ═══════════════════════════════════════
 function update_vehicle(vehicle, input, dt) {
     if (vehicle.state !== VEHICLE_STATE.DRIVING) return;
     
     var config = VEHICLE_CONFIG[vehicle.type];
+    if (!config) return;
     
-    // # 加速/减速
+    // # 加速
     if (input.accelerate) {
         vehicle.speed = Math.min(vehicle.speed + config.acceleration * dt, config.speed);
     } else if (input.brake) {
         vehicle.speed = Math.max(0, vehicle.speed - config.acceleration * 2 * dt);
     } else {
-        // # 自然减速
-        vehicle.speed *= 0.99;
+        vehicle.speed *= 0.99;  // # 自然减速
     }
     
     // # 转向
-    if (input.steer_left) {
-        vehicle.angle -= config.handling * 0.05 * dt;
-    }
-    if (input.steer_right) {
-        vehicle.angle += config.handling * 0.05 * dt;
-    }
+    if (input.steer_left) vehicle.angle -= config.handling * 0.05 * dt;
+    if (input.steer_right) vehicle.angle += config.handling * 0.05 * dt;
     
     // # 移动
     vehicle.vx = Math.cos(vehicle.angle) * vehicle.speed * dt;
@@ -145,49 +137,47 @@ function update_vehicle(vehicle, input, dt) {
     vehicle.y += vehicle.vy;
     
     // # 燃料消耗
-    vehicle.fuel -= config.fuel_consumption * dt * (vehicle.speed / config.speed);
-    if (vehicle.fuel <= 0) {
-        vehicle.fuel = 0;
-        vehicle.speed = 0;
-    }
+    vehicle.fuel -= config.fuel_per_frame * dt * (vehicle.speed / Math.max(config.speed, 1));
+    vehicle.fuel = Math.max(0, vehicle.fuel);
+    if (vehicle.fuel <= 0 && vehicle.type !== "bike") vehicle.speed = 0;
     
-    // # 碰撞检测
-    check_vehicle_collision(vehicle);
+    // # 碰撞
+    check_vehicle_collisions(vehicle);
 }
 
 // ═══════════════════════════════════════
 // 车辆碰撞
-// # 来源: Drivable vehicles → Collision
+// # 来源: Vehicle collisions (16 sub-events)
 // ═══════════════════════════════════════
-function check_vehicle_collision(vehicle) {
+function check_vehicle_collisions(vehicle) {
+    var config = VEHICLE_CONFIG[vehicle.type];
+    if (!config || vehicle.speed < 10) return;
+    
     // # 撞僵尸
     var zombies = get_all_objects_of_category("zombie");
     for (var z of zombies) {
         if (z.state === "dead") continue;
-        var dist = distance(vehicle.x, vehicle.y, z.x, z.y);
-        if (dist < 80) {  // # 碰撞半径
-            var damage = VEHICLE_CONFIG[vehicle.type].damage_to_zombie * (vehicle.speed / VEHICLE_CONFIG[vehicle.type].speed);
+        if (distance(vehicle.x, vehicle.y, z.x, z.y) < 80) {
+            var damage = config.ram_damage * (vehicle.speed / config.speed);
             z.health -= damage;
-            // # 减速
             vehicle.speed *= 0.7;
         }
     }
     
-    // # 撞建筑/障碍物 → 车辆受损
-    // for (var b of buildings) {
-    //     if (distance(vehicle.x, vehicle.y, b.x, b.y) < 100) {
-    //         vehicle.health -= vehicle.speed * 0.2;
-    //         vehicle.speed = -vehicle.speed * 0.3;  // 反弹
-    //     }
-    // }
+    // # 撞建筑 → 车辆受损
+    for (var b of MAP_DATA.buildings) {
+        if (Math.abs(vehicle.x - b.x) < 100 && Math.abs(vehicle.y - b.y) < 100) {
+            vehicle.health -= vehicle.speed * 0.2;
+            vehicle.speed = -vehicle.speed * 0.3;
+            damage_building(b, vehicle.speed * 0.1, "vehicle");
+        }
+    }
     
     // # 车辆损毁
     if (vehicle.health <= 0) {
         vehicle.state = VEHICLE_STATE.WRECKED;
-        // # 爆炸
         create_explosion_effect(vehicle.x, vehicle.y, 150, 40);
         exit_vehicle(vehicle);
-        // # 玩家受伤
         deal_damage_to_player(30, "vehicle_explosion");
     }
 }
@@ -195,24 +185,44 @@ function check_vehicle_collision(vehicle) {
 // ═══════════════════════════════════════
 // 加油
 // ═══════════════════════════════════════
-function refuel_vehicle(vehicle, fuel_item) {
-    if (vehicle.type === "bike") return false;  // # 自行车不用油
+function refuel_vehicle(vehicle, fuel_item_slot) {
+    if (vehicle.type === "bike") return false;
     
     var max_fuel = VEHICLE_CONFIG[vehicle.type].fuel_capacity;
     vehicle.fuel = Math.min(max_fuel, vehicle.fuel + 50);
-    remove_from_inventory(fuel_item.slot);
+    remove_from_inventory(fuel_item_slot);
     
     return true;
 }
 
 // ═══════════════════════════════════════
+// 车辆注册
+// # op=808 init → op=1175 activate
+// ═══════════════════════════════════════
+function register_vehicle(type, x, y) {
+    var config = VEHICLE_CONFIG[type];
+    var vehicle = {
+        type: type,
+        x: x, y: y,
+        angle: 0,
+        speed: 0,
+        vx: 0, vy: 0,
+        fuel: config.fuel_capacity,
+        health: config.health,
+        max_health: config.health,
+        state: VEHICLE_STATE.PARKED,
+    };
+    VEHICLES.push(vehicle);
+    return vehicle;
+}
+
+// ═══════════════════════════════════════
 // 辅助
 // ═══════════════════════════════════════
-function set_player_visible(visible) {}
-function set_player_position(x, y) {}
+function set_player_visible(v) {}
 function get_vehicle_input() {
     return { accelerate: false, brake: false, steer_left: false, steer_right: false };
 }
 
 export { enter_vehicle, exit_vehicle, update_vehicle, refuel_vehicle,
-         VEHICLE_TYPE, VEHICLE_CONFIG, VEHICLE_STATE, VEHICLES };
+         register_vehicle, VEHICLE_TYPE, VEHICLE_CONFIG, VEHICLE_STATE, VEHICLES };

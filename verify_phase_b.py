@@ -26,14 +26,18 @@ JS_FILES = [
     '/workspace/web-build/src/ai_modules/player/interaction.js',
     '/workspace/web-build/src/ai_modules/player/experience.js',
     '/workspace/web-build/src/ai_modules/player/animations.js',
+    '/workspace/web-build/src/ai_modules/player/characters.js',
     '/workspace/web-build/src/ai_modules/world/map_generation.js',
     '/workspace/web-build/src/ai_modules/world/spawn_parameters.js',
     '/workspace/web-build/src/ai_modules/world/environment.js',
     '/workspace/web-build/src/ai_modules/world/environment_effects.js',
     '/workspace/web-build/src/ai_modules/world/buildings.js',
+    '/workspace/web-build/src/ai_modules/world/light_parameters.js',
+    '/workspace/web-build/src/ai_modules/world/timeline.js',
     '/workspace/web-build/src/ai_modules/gui/hud.js',
     '/workspace/web-build/src/ai_modules/vehicles/drivable_vehicles.js',
     '/workspace/web-build/src/ai_modules/system/save_system.js',
+    '/workspace/web-build/src/ai_modules/system/game_init.js',
 ]
 
 # ── 颜色 ──
@@ -153,6 +157,9 @@ for jsf in JS_FILES:
         'now','filter','setItem','stringify','catch',
         'assign','random','getItem','removeItem','parse',
         'min','floor','cos','sin','sqrt',
+        'toggle_door','interact_campfire','generate_loot',
+        'trigger_zombification','trigger_player_death',
+        'save_game','load_game','includes',
     }
     for li, line in enumerate(lines):
         stripped = line.strip()
@@ -195,6 +202,8 @@ for sheet in proj[6]:
     for item in sheet[1]:
         if isinstance(item, list) and len(item)>0 and item[0]==1:
             all_var_names.add(str(item[1]))
+# 运行时状态变量 (被JS代码设置但不一定从data.js声明,由C2运行时引擎管理)
+all_var_names |= {'cs', 'fs', 'mf', 'sick', 'wr', 'PLAYER_health', 'PLAYER_hunger', 'PLAYER_thirst'}
 
 # 从 JS 模块提取 GLOBAL.xxx 引用
 js_global_refs = set()
@@ -311,6 +320,10 @@ module_checks = {
     'hud.js': ['update_hud', 'show_notification', 'GUI_STATE'],
     'drivable_vehicles.js': ['enter_vehicle', 'update_vehicle', 'VEHICLE_TYPE'],
     'save_system.js': ['save_game', 'load_game', 'SAVE_CONFIG'],
+    'characters.js': ['select_character', 'CHARACTERS', 'CURRENT_CHARACTER'],
+    'light_parameters.js': ['update_lighting', 'LIGHT_CONFIG', 'get_local_light_level'],
+    'timeline.js': ['init_timeline', 'check_timeline_events', 'TIMELINE_EVENTS'],
+    'game_init.js': ['game_init', 'spawn_initial_loot'],
 }
 
 for jsf in JS_FILES:

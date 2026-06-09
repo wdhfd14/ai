@@ -109,6 +109,12 @@ function spawn_random_loot(x, y) {
     // # 在位置(x,y)随机生成掉落物品
 }
 
+function trigger_zombification() {
+    // # 感染到100 → 玩家变成僵尸
+    PLAYER_STATS.is_alive = false;
+    // cr_goToLayout("Deadscreen") with zombie death variant
+}
+
 // ═══════════════════════════════════════
 // 僵尸类型注册表 (全局, 所有僵尸模块共用)
 // ═══════════════════════════════════════
