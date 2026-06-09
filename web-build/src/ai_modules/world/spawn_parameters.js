@@ -162,7 +162,3 @@ function generate_loot_from_table(container_type) {
 function get_active_zombie_count() { return 0; }
 function get_active_bot_count() { return 0; }
 
-export { calculate_zombie_density, should_spawn_zombie, should_spawn_bot,
-         check_special_events, check_loot_respawn, schedule_loot_respawn,
-         generate_loot_from_table, ITEM_SPAWN_TABLE, LOOT_COUNT_PROBABILITIES,
-         SPAWN_CONFIG };

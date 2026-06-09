@@ -141,4 +141,3 @@ function animal_move_toward(animal, tx, ty, speed_mult) {
     animal.y += (dy / len) * animal.speed * speed_mult;
 }
 
-export { animal_init, animal_update, ANIMAL_CONFIG, ANIMAL_STATE };

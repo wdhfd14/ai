@@ -115,5 +115,3 @@ function set_player_mode_visible(mode) {
     GAME_MODE.player_mode_visible = mode;
 }
 
-export { select_character, is_character_unlocked, set_player_mode_visible,
-         CHARACTERS, CURRENT_CHARACTER, GAME_MODE };

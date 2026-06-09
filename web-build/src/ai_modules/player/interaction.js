@@ -293,7 +293,3 @@ function show_stash_ui(stash) {}
 function get_loot_table_for_container(type) { return []; }
 function get_random_loot_count(type) { return {min: 1, max: 4}; }
 
-export { pick_up_item, drop_item, interact_with_object, open_container,
-         drink_from_pump, plant_seed, toggle_headtorch, toggle_nvg,
-         open_stash, update_interaction, drop_all_items,
-         INTERACTION_CONFIG, INTERACTION_STATE };

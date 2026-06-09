@@ -213,6 +213,3 @@ function reset_xp() {
     GLOBAL.SCORE = 0;
 }
 
-export { add_experience, xp_on_zombie_kill, xp_on_bot_kill, xp_on_animal_kill,
-         xp_on_item_collected, xp_on_day_survived, xp_on_distance, xp_on_building_destroy,
-         get_xp_progress, reset_xp, XP_CONFIG, XP_STATE };

@@ -184,5 +184,3 @@ function get_daylight_level() {
     }
 }
 
-export { update_time_cycle, on_new_day, get_environment_temperature,
-         get_daylight_level, TIME_STATE, TIME_CONFIG, WEATHER_TYPE };

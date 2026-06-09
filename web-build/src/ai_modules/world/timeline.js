@@ -74,5 +74,3 @@ function trigger_timeline_event(event) {
     return true;
 }
 
-export { init_timeline, check_timeline_events, trigger_timeline_event,
-         TIMELINE_EVENTS };

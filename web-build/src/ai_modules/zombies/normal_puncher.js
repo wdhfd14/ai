@@ -129,4 +129,3 @@ ZOMBIE_TYPES["normal_puncher"] = {
     config: NORMAL_PUNCHER_CONFIG
 };
 
-export { normal_puncher_init, normal_puncher_update, NORMAL_PUNCHER_CONFIG };

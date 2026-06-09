@@ -238,5 +238,3 @@ function is_water_at(x, y) {
     return false;
 }
 
-export { generate_map, pick_building_type, get_building_health,
-         MAP_DATA, MAP_CONFIG, BUILDING_TYPE };

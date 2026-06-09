@@ -218,8 +218,3 @@ function pick_zombie_type() {
 // ═══════════════════════════════════════
 // 导出
 // ═══════════════════════════════════════
-export {
-    update_all_npcs,
-    make_noise,
-    NPCs as npcState
-};

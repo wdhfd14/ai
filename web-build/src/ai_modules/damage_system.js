@@ -176,5 +176,3 @@ function get_entities_in_range(x, y, radius) {
 // ═══════════════════════════════════════
 // 导出
 // ═══════════════════════════════════════
-export { apply_damage, deal_damage_to_player, bullet_hit_damage,
-         melee_hit_damage, area_damage, DAMAGE_TYPE, DAMAGE_CONFIG };

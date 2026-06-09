@@ -53,4 +53,3 @@ function spawn_initial_zombies() {
     }
 }
 
-export { game_init, spawn_initial_loot, spawn_initial_zombies };

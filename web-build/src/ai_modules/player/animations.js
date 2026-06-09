@@ -145,9 +145,6 @@ function get_player_input_state() {
 }
 function get_equipped_weapon() { return null; }
 
-export { update_animations, update_player_animation,
-         set_zombie_animation, set_bot_animation, set_animal_animation,
-         trigger_player_hurt_animation, ANIMATION_NAME, ANIMATION_SPEED };
 
 // 别名 (向后兼容旧模块)
 var ANIMATION_MAP = ANIMATION_NAME;

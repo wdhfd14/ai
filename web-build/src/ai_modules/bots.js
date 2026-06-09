@@ -196,4 +196,3 @@ function find_nearest_zombie(bot) {
     return null; // placeholder
 }
 
-export { bot_init, bot_update, BOT_CONFIG, BOT_STATE };

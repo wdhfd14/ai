@@ -232,5 +232,3 @@ function is_save_valid(slot) {
     }
 }
 
-export { save_game, load_game, delete_save, list_saves, update_auto_save,
-         is_save_valid, SAVE_CONFIG, SAVE_STATE, SAVE_GLOBAL_KEYS };

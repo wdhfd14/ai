@@ -151,6 +151,3 @@ function add_environment_effect(type, x, y, params) {
     return effect;
 }
 
-export { update_environment_effects, check_radiation_exposure,
-         create_explosion_effect, create_blood_pool, add_environment_effect,
-         ENV_EFFECT_TYPE, ENV_EFFECTS };

@@ -243,6 +243,3 @@ function set_gui_position(elem, x, y) {}
 function get_hotbar_item(slot) { return null; }
 function get_full_inventory() { return []; }
 
-export { update_hud, show_notification, open_inventory_ui, close_inventory_ui,
-         open_perks_menu, close_perks_menu, open_sleep_menu, confirm_sleep,
-         show_death_screen, GUI_STATE };

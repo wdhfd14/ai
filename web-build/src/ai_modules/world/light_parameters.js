@@ -84,4 +84,3 @@ function apply_lighting_to_scene(level) {
     // set_layout_effect_param("Brightness", clamped);
 }
 
-export { update_lighting, get_local_light_level, LIGHT_CONFIG, LIGHT_STATE };

@@ -159,6 +159,3 @@ function point_in_rect(ax, ay, bx, by, cx, cy, w, h) {
            (bx >= r_left && bx <= r_right && by >= r_top && by <= r_bottom);
 }
 
-export { damage_building, break_door, break_window, damage_barricade,
-         check_building_transparency, is_npc_blinded, update_buildings,
-         BUILDING_STATE, BUILDING_DAMAGE_CONFIG, TRANSPARENCY_STATE };

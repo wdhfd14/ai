@@ -224,5 +224,3 @@ function get_vehicle_input() {
     return { accelerate: false, brake: false, steer_left: false, steer_right: false };
 }
 
-export { enter_vehicle, exit_vehicle, update_vehicle, refuel_vehicle,
-         register_vehicle, VEHICLE_TYPE, VEHICLE_CONFIG, VEHICLE_STATE, VEHICLES };

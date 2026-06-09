@@ -376,6 +376,3 @@ function get_current_stats() { return { ...PLAYER_STATS }; }
 // ═══════════════════════════════════════
 // 导出
 // ═══════════════════════════════════════
-export { update_player_stats, use_item, apply_player_damage, reset_player_on_spawn,
-         fire_flare, apply_stat_modifier, get_current_stats,
-         PLAYER_STATS, FOOD_EFFECTS, STAT_DECAY, TEMPERATURE_BONUSES };
