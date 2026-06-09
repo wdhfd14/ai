@@ -31,17 +31,23 @@ typedef void (*swbreak_sigsegv_handler_t)(int sig, siginfo_t *si, void *ctx);
 /* 信号驱动引擎提供的 SIGTRAP 处理函数 (单步完成) */
 typedef void (*swbreak_sigtrap_handler_t)(int sig, siginfo_t *si, void *ctx);
 
-/* 注册信号驱动引擎的处理器 */
+/* 注册信号驱动引擎的处理器 (延迟安装信号处理器) */
 void swbreak_dispatch_register_signal(swbreak_sigsegv_handler_t segv_handler,
                                       swbreak_sigtrap_handler_t trap_handler);
+
+/* 注销信号驱动引擎的处理器 (无断点时自动恢复原始信号处理器) */
+void swbreak_dispatch_unregister_signal(void);
 
 /* ── Inline Hook 引擎的回调接口 ── */
 
 /* Hook 引擎提供的 SIGTRAP 处理函数 */
 typedef void (*swbreak_hook_trap_handler_t)(int sig, siginfo_t *si, void *ctx);
 
-/* 注册 Hook 引擎的 SIGTRAP 处理器 */
+/* 注册 Hook 引擎的 SIGTRAP 处理器 (延迟安装信号处理器) */
 void swbreak_dispatch_register_hook(swbreak_hook_trap_handler_t trap_handler);
+
+/* 注销 Hook 引擎的 SIGTRAP 处理器 */
+void swbreak_dispatch_unregister_hook(void);
 
 /* ── 线程局部上下文 ── */
 

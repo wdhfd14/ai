@@ -250,8 +250,8 @@ int swbreak_hook_init(void)
 {
     if (g_hook_state.initialized) return 0;
 
-    /* 向分发器注册 SIGTRAP 处理函数 (不自己注册信号) */
-    swbreak_dispatch_register_hook(hook_handle_sigtrap);
+    /* 不在这里注册信号处理器! 延迟到 swbreak_hook_set 时按需注册,
+     * 避免 swbreak_init() 后立即覆盖 ART 的 SIGSEGV 处理器导致闪退 */
 
     g_hook_state.active_bp = NULL;
     g_hook_state.active_tid = 0;
@@ -272,8 +272,8 @@ void swbreak_hook_destroy(void)
         bp = bp->next;
     }
 
-    /* 注销处理函数 */
-    swbreak_dispatch_register_hook(NULL);
+    /* 注销处理函数 (会自动恢复原始信号处理器) */
+    swbreak_dispatch_unregister_hook();
 
     g_hook_state.initialized = 0;
 }
@@ -281,6 +281,9 @@ void swbreak_hook_destroy(void)
 int swbreak_hook_set(swbreak_bp_t *bp)
 {
     if (!bp) return -1;
+
+    /* 按需注册信号处理器 (第一次设断点时才注册, 避免与 ART 冲突) */
+    swbreak_dispatch_register_hook(hook_handle_sigtrap);
 
     /* 保存原始指令 */
     memcpy(&bp->orig_insn, (const void *)bp->addr, HOOK_INSN_SIZE);

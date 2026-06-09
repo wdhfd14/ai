@@ -1,11 +1,16 @@
 /*
- * signal_dispatch.c - 统一信号分发器实现
+ * signal_dispatch.c - 统一信号分发器实现 (v2)
  *
- * 全局只注册一次 SIGSEGV 和 SIGTRAP 处理器,
- * 根据信号来源分发给对应的子引擎。
+ * v2: 延迟注册信号处理器, 避免与 Android ART 冲突。
  *
- * SIGSEGV → 信号驱动引擎 (mprotect 触发)
- * SIGTRAP → 先检查是否为 BRK 断点 → 否则检查是否为单步完成
+ * 核心改动:
+ * - dispatch_init() 不再注册信号处理器, 只初始化状态
+ * - 第一次注册子引擎处理器时才 sigaction
+ * - 所有子引擎处理器都注销后, 自动恢复原始处理器
+ * - SIGSEGV 处理器中, 如果子引擎没处理, 必须链回 ART 原始处理器
+ *
+ * 这避免了 swbreak_init() 后立即覆盖 ART 的 SIGSEGV 处理器
+ * 导致 NullPointerException / GC Read Barrier 崩溃。
  */
 
 #include <stdlib.h>
@@ -21,9 +26,10 @@
 static struct {
     struct sigaction old_sigsegv;
     struct sigaction old_sigtrap;
+    int handlers_installed;   /* 信号处理器是否已安装到内核 */
     int initialized;
 
-    /* 子引擎注册的处理器 */
+    /* 子引擎注册的处理器 (非 NULL 表示有断点需要处理) */
     swbreak_sigsegv_handler_t  signal_segv_handler;   /* 信号驱动引擎的 SIGSEGV */
     swbreak_sigtrap_handler_t  signal_trap_handler;   /* 信号驱动引擎的 SIGTRAP (单步) */
     swbreak_hook_trap_handler_t hook_trap_handler;    /* Hook 引擎的 SIGTRAP */
@@ -62,119 +68,19 @@ void swbreak_dispatch_clear_context(void)
 }
 
 /* ══════════════════════════════════════
- *  统一信号处理器
+ *  前向声明
  * ══════════════════════════════════════ */
 
-/* ── 统一 SIGSEGV 处理器 ── */
-static void dispatch_sigsegv(int sig, siginfo_t *si, void *ctx)
-{
-    /* SIGSEGV 只由信号驱动引擎处理 */
-    if (g_dispatch.signal_segv_handler) {
-        g_dispatch.signal_segv_handler(sig, si, ctx);
-        return;
-    }
-
-    /* 没有注册处理器, 传递给原始处理器 */
-    if (g_dispatch.old_sigsegv.sa_flags & SA_SIGINFO) {
-        if (g_dispatch.old_sigsegv.sa_sigaction)
-            g_dispatch.old_sigsegv.sa_sigaction(sig, si, ctx);
-    } else if (g_dispatch.old_sigsegv.sa_handler != SIG_DFL &&
-               g_dispatch.old_sigsegv.sa_handler != SIG_IGN) {
-        g_dispatch.old_sigsegv.sa_handler(sig);
-    } else {
-        /* 默认行为: 终止 */
-        abort();
-    }
-}
-
-/* ── 统一 SIGTRAP 处理器 ── */
-static void dispatch_sigtrap(int sig, siginfo_t *si, void *ctx)
-{
-    /*
-     * SIGTRAP 有两个来源:
-     * 1. BRK/INT3 指令触发 → Hook 引擎处理
-     * 2. 单步执行完成 → 信号驱动引擎或 Hook 引擎处理
-     *
-     * 判断逻辑 (关键: 先检查单步状态, 再检查 BRK/INT3):
-     * - 如果正在单步且 step_bp 是 SIGNAL/HYBRID → 信号引擎单步完成
-     * - 如果正在单步且 step_bp 是 HOOK → Hook 引擎单步完成
-     * - 否则检查 PC 前一条指令是否为 BRK/INT3 → Hook 引擎
-     * - 都不匹配 → 传递给原始处理器
-     *
-     * 注意: 必须先检查单步状态, 因为 x86_64 单步执行后的指令
-     * 可能包含 0xCC 字节被误判为 INT3。
-     */
-
-    /* 优先检查单步状态 */
-    if (swbreak_engine_is_stepping()) {
-        swbreak_bp_t *step_bp = swbreak_engine_get_step_bp();
-        if (step_bp) {
-            if (step_bp->mode == SWBREAK_MODE_HOOK) {
-                /* Hook 引擎的单步完成 */
-                if (g_dispatch.hook_trap_handler) {
-                    g_dispatch.hook_trap_handler(sig, si, ctx);
-                    return;
-                }
-            } else {
-                /* 信号驱动引擎的单步完成 */
-                if (g_dispatch.signal_trap_handler) {
-                    g_dispatch.signal_trap_handler(sig, si, ctx);
-                    return;
-                }
-            }
-        }
-    }
-
-    /* 非单步: 检查是否为 BRK/INT3 触发 */
-    swbreak_regs_t regs;
-    swbreak_regs_from_ucontext(&regs, ctx);
-    uint64_t pc = regs.pc;
-
-#ifdef __aarch64__
-    /* ARM64: BRK 触发后 PC 指向 BRK 之后, 回退 4 字节 */
-    uint64_t brk_addr = pc - 4;
-    uint32_t insn = 0;
-    if (pc > 4) {
-        memcpy(&insn, (const void *)brk_addr, sizeof(insn));
-    }
-    int is_brk = (swbreak_brk_decode(insn) >= 0);
-#else
-    /* x86_64: INT3 触发后 PC 指向 INT3 之后, 回退 1 字节 */
-    uint64_t brk_addr = pc - 1;
-    uint8_t insn = 0;
-    if (pc > 1) {
-        memcpy(&insn, (const void *)brk_addr, sizeof(insn));
-    }
-    int is_brk = (insn == 0xCC);
-#endif
-
-    if (is_brk) {
-        /* BRK/INT3 触发 → 交给 Hook 引擎 */
-        if (g_dispatch.hook_trap_handler) {
-            g_dispatch.hook_trap_handler(sig, si, ctx);
-            return;
-        }
-    }
-
-    /* 没有匹配的处理器, 传递给原始处理器 */
-    if (g_dispatch.old_sigtrap.sa_flags & SA_SIGINFO) {
-        if (g_dispatch.old_sigtrap.sa_sigaction)
-            g_dispatch.old_sigtrap.sa_sigaction(sig, si, ctx);
-    } else if (g_dispatch.old_sigtrap.sa_handler != SIG_DFL &&
-               g_dispatch.old_sigtrap.sa_handler != SIG_IGN) {
-        g_dispatch.old_sigtrap.sa_handler(sig);
-    }
-}
+static void dispatch_sigsegv(int sig, siginfo_t *si, void *ctx);
+static void dispatch_sigtrap(int sig, siginfo_t *si, void *ctx);
 
 /* ══════════════════════════════════════
- *  公共 API
+ *  内部: 安装/卸载信号处理器
  * ══════════════════════════════════════ */
 
-int swbreak_dispatch_init(void)
+static int install_handlers(void)
 {
-    if (g_dispatch.initialized) return 0;
-
-    memset(&g_dispatch, 0, sizeof(g_dispatch));
+    if (g_dispatch.handlers_installed) return 0;
 
     /* 注册 SIGSEGV */
     struct sigaction sa_segv;
@@ -199,6 +105,148 @@ int swbreak_dispatch_init(void)
         return -1;
     }
 
+    g_dispatch.handlers_installed = 1;
+    return 0;
+}
+
+static void uninstall_handlers(void)
+{
+    if (!g_dispatch.handlers_installed) return;
+
+    /* 恢复原始处理器 (ART 的 SIGSEGV 处理器等) */
+    sigaction(SIGSEGV, &g_dispatch.old_sigsegv, NULL);
+    sigaction(SIGTRAP, &g_dispatch.old_sigtrap, NULL);
+
+    g_dispatch.handlers_installed = 0;
+}
+
+/* 检查是否有任何子引擎处理器注册 */
+static int has_any_handler(void)
+{
+    return g_dispatch.signal_segv_handler != NULL ||
+           g_dispatch.signal_trap_handler != NULL ||
+           g_dispatch.hook_trap_handler  != NULL;
+}
+
+/* ══════════════════════════════════════
+ *  统一信号处理器
+ * ══════════════════════════════════════ */
+
+/* ── 链回原始处理器 ── */
+static void chain_to_old_sigsegv(int sig, siginfo_t *si, void *ctx)
+{
+    if (g_dispatch.old_sigsegv.sa_flags & SA_SIGINFO) {
+        if (g_dispatch.old_sigsegv.sa_sigaction)
+            g_dispatch.old_sigsegv.sa_sigaction(sig, si, ctx);
+    } else if (g_dispatch.old_sigsegv.sa_handler != SIG_DFL &&
+               g_dispatch.old_sigsegv.sa_handler != SIG_IGN) {
+        g_dispatch.old_sigsegv.sa_handler(sig);
+    } else {
+        /* 没有原始处理器: 恢复默认行为并重新触发 */
+        signal(SIGSEGV, SIG_DFL);
+        raise(SIGSEGV);
+    }
+}
+
+static void chain_to_old_sigtrap(int sig, siginfo_t *si, void *ctx)
+{
+    if (g_dispatch.old_sigtrap.sa_flags & SA_SIGINFO) {
+        if (g_dispatch.old_sigtrap.sa_sigaction)
+            g_dispatch.old_sigtrap.sa_sigaction(sig, si, ctx);
+    } else if (g_dispatch.old_sigtrap.sa_handler != SIG_DFL &&
+               g_dispatch.old_sigtrap.sa_handler != SIG_IGN) {
+        g_dispatch.old_sigtrap.sa_handler(sig);
+    }
+    /* SIGTRAP 默认行为是终止+core, 不需要特殊处理 */
+}
+
+/* ── 统一 SIGSEGV 处理器 ── */
+static void dispatch_sigsegv(int sig, siginfo_t *si, void *ctx)
+{
+    /*
+     * 关键: 如果没有子引擎处理器, 立即链回 ART 原始处理器。
+     * 这确保 ART 的 NullPointerException 检测和 GC Read Barrier
+     * 不受影响。
+     */
+    if (!g_dispatch.signal_segv_handler) {
+        chain_to_old_sigsegv(sig, si, ctx);
+        return;
+    }
+
+    /* 有子引擎处理器: 让它处理 */
+    g_dispatch.signal_segv_handler(sig, si, ctx);
+}
+
+/* ── 统一 SIGTRAP 处理器 ── */
+static void dispatch_sigtrap(int sig, siginfo_t *si, void *ctx)
+{
+    /*
+     * SIGTRAP 有两个来源:
+     * 1. BRK/INT3 指令触发 → Hook 引擎处理
+     * 2. 单步执行完成 → 信号驱动引擎或 Hook 引擎处理
+     */
+
+    /* 优先检查单步状态 */
+    if (swbreak_engine_is_stepping()) {
+        swbreak_bp_t *step_bp = swbreak_engine_get_step_bp();
+        if (step_bp) {
+            if (step_bp->mode == SWBREAK_MODE_HOOK) {
+                if (g_dispatch.hook_trap_handler) {
+                    g_dispatch.hook_trap_handler(sig, si, ctx);
+                    return;
+                }
+            } else {
+                if (g_dispatch.signal_trap_handler) {
+                    g_dispatch.signal_trap_handler(sig, si, ctx);
+                    return;
+                }
+            }
+        }
+    }
+
+    /* 非单步: 检查是否为 BRK/INT3 触发 */
+    swbreak_regs_t regs;
+    swbreak_regs_from_ucontext(&regs, ctx);
+    uint64_t pc = regs.pc;
+
+#ifdef __aarch64__
+    uint64_t brk_addr = pc - 4;
+    uint32_t insn = 0;
+    if (pc > 4) {
+        memcpy(&insn, (const void *)brk_addr, sizeof(insn));
+    }
+    int is_brk = (swbreak_brk_decode(insn) >= 0);
+#else
+    uint64_t brk_addr = pc - 1;
+    uint8_t insn = 0;
+    if (pc > 1) {
+        memcpy(&insn, (const void *)brk_addr, sizeof(insn));
+    }
+    int is_brk = (insn == 0xCC);
+#endif
+
+    if (is_brk) {
+        if (g_dispatch.hook_trap_handler) {
+            g_dispatch.hook_trap_handler(sig, si, ctx);
+            return;
+        }
+    }
+
+    /* 没有匹配的处理器, 传递给原始处理器 */
+    chain_to_old_sigtrap(sig, si, ctx);
+}
+
+/* ══════════════════════════════════════
+ *  公共 API
+ * ══════════════════════════════════════ */
+
+int swbreak_dispatch_init(void)
+{
+    if (g_dispatch.initialized) return 0;
+
+    memset(&g_dispatch, 0, sizeof(g_dispatch));
+    /* 注意: 不在这里注册信号处理器! 延迟到第一次 register 时 */
+
     g_dispatch.initialized = 1;
     return 0;
 }
@@ -207,8 +255,8 @@ void swbreak_dispatch_destroy(void)
 {
     if (!g_dispatch.initialized) return;
 
-    sigaction(SIGSEGV, &g_dispatch.old_sigsegv, NULL);
-    sigaction(SIGTRAP, &g_dispatch.old_sigtrap, NULL);
+    /* 恢复原始信号处理器 */
+    uninstall_handlers();
 
     memset(&g_dispatch, 0, sizeof(g_dispatch));
 }
@@ -218,9 +266,43 @@ void swbreak_dispatch_register_signal(swbreak_sigsegv_handler_t segv_handler,
 {
     g_dispatch.signal_segv_handler = segv_handler;
     g_dispatch.signal_trap_handler = trap_handler;
+
+    /* 延迟安装: 第一次注册子引擎时才 sigaction */
+    if (has_any_handler()) {
+        install_handlers();
+    } else {
+        uninstall_handlers();
+    }
 }
 
 void swbreak_dispatch_register_hook(swbreak_hook_trap_handler_t trap_handler)
 {
     g_dispatch.hook_trap_handler = trap_handler;
+
+    /* 延迟安装 */
+    if (has_any_handler()) {
+        install_handlers();
+    } else {
+        uninstall_handlers();
+    }
+}
+
+void swbreak_dispatch_unregister_signal(void)
+{
+    g_dispatch.signal_segv_handler = NULL;
+    g_dispatch.signal_trap_handler = NULL;
+
+    /* 所有处理器都注销后, 恢复原始处理器 */
+    if (!has_any_handler()) {
+        uninstall_handlers();
+    }
+}
+
+void swbreak_dispatch_unregister_hook(void)
+{
+    g_dispatch.hook_trap_handler = NULL;
+
+    if (!has_any_handler()) {
+        uninstall_handlers();
+    }
 }

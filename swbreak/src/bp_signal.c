@@ -257,8 +257,8 @@ int swbreak_signal_init(void)
 {
     if (g_signal_state.initialized) return 0;
 
-    /* 向分发器注册处理函数 (不自己注册信号) */
-    swbreak_dispatch_register_signal(signal_handle_sigsegv, signal_handle_sigtrap);
+    /* 不在这里注册信号处理器! 延迟到 swbreak_signal_set 时按需注册,
+     * 避免 swbreak_init() 后立即覆盖 ART 的 SIGSEGV 处理器导致闪退 */
 
     g_signal_state.initialized = 1;
     return 0;
@@ -277,8 +277,8 @@ void swbreak_signal_destroy(void)
         bp = bp->next;
     }
 
-    /* 注销处理函数 */
-    swbreak_dispatch_register_signal(NULL, NULL);
+    /* 注销处理函数 (会自动恢复原始信号处理器) */
+    swbreak_dispatch_unregister_signal();
 
     g_signal_state.initialized = 0;
 }
@@ -286,6 +286,9 @@ void swbreak_signal_destroy(void)
 int swbreak_signal_set(swbreak_bp_t *bp)
 {
     if (!bp) return -1;
+
+    /* 按需注册信号处理器 (第一次设断点时才注册, 避免与 ART 冲突) */
+    swbreak_dispatch_register_signal(signal_handle_sigsegv, signal_handle_sigtrap);
 
     /* 获取页保护属性 */
     if (swbreak_mem_get_prot(bp->addr, &bp->orig_prot,
