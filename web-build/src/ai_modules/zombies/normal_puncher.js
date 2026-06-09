@@ -121,9 +121,8 @@ function normal_puncher_condition_check(zombie) {
 }
 
 // ═══════════════════════════════════════
-// 注册到僵尸类型表
+// 注册到僵尸类型表 (ZOMBIE_TYPES 在 ai_helpers.js 中初始化)
 // ═══════════════════════════════════════
-var ZOMBIE_TYPES = {};
 ZOMBIE_TYPES["normal_puncher"] = {
     init: normal_puncher_init,
     update: normal_puncher_update,

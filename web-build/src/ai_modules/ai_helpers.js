@@ -108,3 +108,8 @@ function spawn_dead_body(zombie) {
 function spawn_random_loot(x, y) {
     // # 在位置(x,y)随机生成掉落物品
 }
+
+// ═══════════════════════════════════════
+// 僵尸类型注册表 (全局, 所有僵尸模块共用)
+// ═══════════════════════════════════════
+var ZOMBIE_TYPES = {};  // 由各僵尸模块填充: ZOMBIE_TYPES["实际类型名"] = {init, update, config}

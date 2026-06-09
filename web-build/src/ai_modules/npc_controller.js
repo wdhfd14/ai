@@ -75,40 +75,40 @@ function update_zombies(zombies, dt) {
     for (var z of zombies) {
         if (z.state === "dead") continue;
         
-        // Step 1: 检测目标 (玩家 或 噪音源)
-        // Step 2: 移动
-        // Step 3: 攻击检查
-        // Step 4: 动画更新
-        
-        switch (z.state) {
-            case "idle":
-                zed_idle_wander(z);
-                zed_detect_player(z);
-                // # 噪音也可以吸引空闲僵尸
-                if (NPCs.noise_level > 20) {
-                    var dist = distance(z.x, z.y, NPCs.noise_position.x, NPCs.noise_position.y);
-                    if (dist < NPCs.noise_level * 5) {
-                        z.state = "chasing";
-                        z.target_x = NPCs.noise_position.x;
-                        z.target_y = NPCs.noise_position.y;
+        // 类型专用 update: 将控制权交给各僵尸类型的 update 函数
+        var type_handler = ZOMBIE_TYPES[z.type];
+        if (type_handler && type_handler.update) {
+            type_handler.update(z, dt);
+        }
+        // 通用 update 作为后备: 处理未注册类型的僵尸
+        else {
+            switch (z.state) {
+                case "idle":
+                    zed_idle_wander(z);
+                    zed_detect_player(z);
+                    if (NPCs.noise_level > 20) {
+                        var ndist = distance(z.x, z.y, NPCs.noise_position.x, NPCs.noise_position.y);
+                        if (ndist < NPCs.noise_level * 5) {
+                            z.state = "chasing";
+                            z.target_x = NPCs.noise_position.x;
+                            z.target_y = NPCs.noise_position.y;
+                        }
                     }
-                }
-                break;
-            case "chasing":
-                zed_chase_update(z);
-                zed_move_toward_target(z, dt);
-                break;
-            case "attacking":
-                zed_attack(z);
-                break;
-            case "dead":
-                break;
+                    break;
+                case "chasing":
+                    zed_chase_update(z);
+                    zed_move_toward_target(z, dt);
+                    break;
+                case "attacking":
+                    zed_attack(z);
+                    break;
+            }
         }
         
-        // 攻击冷却递减
+        // 通用处理: 攻击冷却递减 (所有僵尸共用)
         if (z.attack_cooldown > 0) z.attack_cooldown -= 1;
         
-        // 离屏检查: 太远了就休眠/删除
+        // 离屏检查: 休眠/删除远处僵尸
         var px = get_player_x(), py = get_player_y();
         if (distance(z.x, z.y, px, py) > (GLOBAL.Collisiondisabler_distance || 2000)) {
             z.active = false;
@@ -121,11 +121,10 @@ function update_zombies(zombies, dt) {
 // ═══════════════════════════════════════
 function update_bots(bots, dt) {
     for (var bot of bots) {
-        // TODO: 从 data.js 的 Bots 子组中提取具体逻辑
-        // bot 行为: 
-        //   - 巡逻/站岗
-        //   - 发现僵尸 → 战斗/逃跑
-        //   - 发现玩家 → 跟随/交易/敌对(视关系)
+        // 调用 bots.js 中的 bot_update
+        if (typeof bot_update === 'function') {
+            bot_update(bot, dt);
+        }
     }
 }
 
@@ -134,11 +133,10 @@ function update_bots(bots, dt) {
 // ═══════════════════════════════════════
 function update_animals(animals, dt) {
     for (var animal of animals) {
-        // TODO: 从 data.js 的 Animals 子组中提取
-        // 狼的行为:
-        //   - 随机游荡
-        //   - 发现玩家 → 追击/攻击
-        //   - 受伤 → 逃跑
+        // 调用 animals.js 中的 animal_update
+        if (typeof animal_update === 'function') {
+            animal_update(animal, dt);
+        }
     }
 }
 
@@ -164,8 +162,7 @@ function npc_lifecycle_manager(dt) {
 }
 
 function try_spawn_zombie() {
-    // # 生成逻辑具体细节在 Spawn parameters 模块
-    // 在玩家视野外的随机位置, 沿玩家朝向方向
+    // # 在屏幕外随机位置生成
     var px = get_player_x(), py = get_player_y();
     var angle = Math.random() * Math.PI * 2;
     var dist = 600 + Math.random() * 400;  // 屏幕外
@@ -174,6 +171,22 @@ function try_spawn_zombie() {
     
     // 选择僵尸类型 (根据天数/难度)
     spawn_zombie_at(sx, sy, pick_zombie_type());
+}
+
+function spawn_zombie_at(x, y, type) {
+    // # 调用 Construct 2 运行时创建僵尸对象
+    // 然后在僵尸上调用类型专用 init
+    var zombie = null; // TODO: 接入 c2runtime 对象创建
+    if (zombie) {
+        zombie.x = x;
+        zombie.y = y;
+        var type_handler = ZOMBIE_TYPES[type];
+        if (type_handler && type_handler.init) {
+            type_handler.init(zombie);
+        } else if (typeof zed_on_create === 'function') {
+            zed_on_create(zombie);  // 后备: 通用初始化
+        }
+    }
 }
 
 function pick_zombie_type() {

@@ -11,7 +11,17 @@ JS_FILES = [
     '/workspace/web-build/src/ai_modules/ai_helpers.js',
     '/workspace/web-build/src/ai_modules/zombies/zeds_common.js',
     '/workspace/web-build/src/ai_modules/zombies/normal_puncher.js',
+    '/workspace/web-build/src/ai_modules/zombies/buried_puncher.js',
+    '/workspace/web-build/src/ai_modules/zombies/army_puncher.js',
+    '/workspace/web-build/src/ai_modules/zombies/fast_puncher.js',
+    '/workspace/web-build/src/ai_modules/zombies/army_shooters.js',
+    '/workspace/web-build/src/ai_modules/zombies/screamer.js',
+    '/workspace/web-build/src/ai_modules/zombies/tank.js',
+    '/workspace/web-build/src/ai_modules/zombies/jumper.js',
     '/workspace/web-build/src/ai_modules/npc_controller.js',
+    '/workspace/web-build/src/ai_modules/damage_system.js',
+    '/workspace/web-build/src/ai_modules/bots.js',
+    '/workspace/web-build/src/ai_modules/animals.js',
 ]
 
 # ── 颜色 ──
@@ -126,6 +136,7 @@ for jsf in JS_FILES:
         'get_all_objects_of_category','schedule_destroy','count_active',
         'try_spawn_zombie','spawn_zombie_at','get_player_x','get_player_y',
         'get_player_health','angle_between','spawn_zombie_at',
+        'update','init','atan2','getFirstPicked',
     }
     for li, line in enumerate(lines):
         stripped = line.strip()
@@ -225,22 +236,20 @@ for sub in get_subs(npcs):
                 zombie_types_raw.append(zname)
         break
 
-# JS模块中定义的僵尸类型
-js_zombie_types = []
+# JS模块中定义的僵尸类型 (搜索所有文件)
+js_zombie_types = set()
 for jsf in JS_FILES:
     with open(jsf, 'r') as f:
         content = f.read()
-    for m in re.finditer(r'ZOMBIE_TYPES\["(\w+)"\]', content):
-        js_zombie_types.append(m.group(1))
-    for m in re.finditer(r'case\s+"(\w+)"', content):
-        if 'puncher' in m.group(1) or 'shooter' in m.group(1) or 'screamer' in m.group(1) or 'tank' in m.group(1) or 'jumper' in m.group(1):
-            if m.group(1) not in js_zombie_types:
-                js_zombie_types.append(m.group(1))
+    for m in re.finditer(r'ZOMBIE_TYPES\["([a-z_][a-z0-9_]*)"\]', content):
+        js_zombie_types.add(m.group(1))
 
+# zeds_common 是基础模块不注册，期望 8 个 spawnable 类型
 check(f"data.js 僵尸类型: {len(zombie_types_raw)}", len(zombie_types_raw) == 9)
 print(f"    原始类型: {zombie_types_raw}")
-check(f"JS 已翻译: {len(js_zombie_types)}", len(js_zombie_types) >= 1)
-print(f"    JS已翻译: {js_zombie_types}")
+print(f"    (zeds_common 为基础共享模块，不在 ZOMBIE_TYPES 注册)")
+check(f"JS 已注册僵尸类型: {len(js_zombie_types)}/8 spawnable", len(js_zombie_types) == 8)
+print(f"    JS已注册: {sorted(js_zombie_types)}")
 
 # ═══ 7. 对象类别交叉验证 ═══
 print(f"\n{B}─── 自检7: 对象分类准确性 ───{N}")
@@ -256,6 +265,74 @@ check(f"武器对象: {len(weapon_objects)} (期望>50)", len(weapon_objects) > 
 print(f"\n{B}─── 自检8: 项目规则文件 ───{N}")
 rule_path = '/workspace/.trae/rules/project_rules.md'
 check(f"规则文件存在: .trae/rules/project_rules.md", os.path.exists(rule_path), warn=True)
+
+# ═══ 9. 模块结构质量: CONFIG / 状态机 / init-update ═══
+print(f"\n{B}─── 自检9: 模块结构质量检查 ───{N}")
+
+module_checks = {
+    'zeds_common.js': ['zed_on_create', 'zed_chase_update', 'zed_attack', 'zed_idle_wander', 'zed_death'],
+    'normal_puncher.js': ['CONFIG', 'ZOMBIE_TYPES'],
+    'buried_puncher.js': ['CONFIG', 'ZOMBIE_TYPES'],
+    'army_puncher.js': ['CONFIG', 'ZOMBIE_TYPES'],
+    'fast_puncher.js': ['CONFIG', 'ZOMBIE_TYPES'],
+    'army_shooters.js': ['CONFIG', 'ZOMBIE_TYPES'],
+    'screamer.js': ['CONFIG', 'ZOMBIE_TYPES'],
+    'tank.js': ['CONFIG', 'ZOMBIE_TYPES'],
+    'jumper.js': ['CONFIG', 'ZOMBIE_TYPES'],
+    'damage_system.js': ['apply_damage', 'DAMAGE_TYPE', 'DAMAGE_CONFIG'],
+    'bots.js': ['bot_init', 'bot_update', 'BOT_STATE'],
+    'animals.js': ['animal_init', 'animal_update', 'ANIMAL_STATE'],
+    'npc_controller.js': ['update_all_npcs', 'update_zombies', 'pick_zombie_type'],
+}
+
+for jsf in JS_FILES:
+    bn = os.path.basename(jsf)
+    if bn not in module_checks:
+        continue
+    with open(jsf, 'r') as f:
+        content = f.read()
+    for required in module_checks[bn]:
+        check(f"  {bn}: 含 {required}()", required in content)
+    # 检查是否有 # 注释说明原始操作码
+    comment_count = len(re.findall(r'//\s*#', content))
+    check(f"  {bn}: 操作码注释 ({comment_count}个)", comment_count >= 3, warn=(comment_count > 0))
+
+# ═══ 10. npc_controller 调度完整性 ═══
+print(f"\n{B}─── 自检10: npc_controller 调度逻辑完整性 ───{N}")
+with open('/workspace/web-build/src/ai_modules/npc_controller.js', 'r') as f:
+    ctrl_content = f.read()
+
+# 检查是否调用了核心子系统
+subsystems = {
+    'update_zombies': '僵尸更新调度',
+    'make_noise': '噪音传播',
+}
+for func, desc in subsystems.items():
+    check(f"  调度 {desc} ({func})", func in ctrl_content)
+
+# 检查僵尸类型派发
+dispatch_types = ['normal_puncher', 'buried_puncher', 'army_puncher', 'fast_puncher',
+                  'army_shooters', 'screamer', 'tank', 'jumper']
+for zt in dispatch_types:
+    check(f"  僵尸类型派发: {zt}", zt in ctrl_content)
+
+# 新增: 检查关键调度修复
+check(f"  ZOMBIE_TYPES 分发搜索 (type_handler)", 'type_handler' in ctrl_content)
+check(f"  bot_update 分发", 'bot_update' in ctrl_content)
+check(f"  animal_update 分发", 'animal_update' in ctrl_content)
+check(f"  spawn_zombie_at 调用 type_handler.init", 'type_handler.init' in ctrl_content)
+check(f"  try_spawn_zombie 函数存在", 'try_spawn_zombie' in ctrl_content)
+
+# ═══ 11. ZOMBIE_TYPES 全局初始化检查 ═══
+print(f"\n{B}─── 自检11: ZOMBIE_TYPES 全局初始化 ───{N}")
+with open('/workspace/web-build/src/ai_modules/ai_helpers.js', 'r') as f:
+    helpers_content = f.read()
+check(f"  ai_helpers.js 中含 var ZOMBIE_TYPES = {{}}", 'var ZOMBIE_TYPES = {}' in helpers_content)
+
+# 检查 normal_puncher.js 不再重复创建 ZOMBIE_TYPES
+with open('/workspace/web-build/src/ai_modules/zombies/normal_puncher.js', 'r') as f:
+    np_content = f.read()
+check(f"  normal_puncher.js 无重复 var ZOMBIE_TYPES", 'var ZOMBIE_TYPES' not in np_content)
 
 # ═══ 总结 ═══
 print(f"\n{'='*55}")
