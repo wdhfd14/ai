@@ -238,8 +238,19 @@ static jclass load_dex_class(JNIEnv *env)
 
     /* 4. 使用 DexClassLoader 加载 SwbreakPanel 类 */
     jclass cl_class = (*env)->FindClass(env, "java/lang/ClassLoader");
+    if (!cl_class) {
+        LOGE("ClassLoader class not found");
+        (*env)->DeleteLocalRef(env, dex_cl);
+        return NULL;
+    }
     jmethodID load_class = (*env)->GetMethodID(env, cl_class, "loadClass",
         "(Ljava/lang/String;)Ljava/lang/Class;");
+    if (!load_class) {
+        LOGE("ClassLoader.loadClass not found");
+        (*env)->DeleteLocalRef(env, cl_class);
+        (*env)->DeleteLocalRef(env, dex_cl);
+        return NULL;
+    }
 
     jstring class_name = (*env)->NewStringUTF(env, "com.swbreak.SwbreakPanel");
     jclass panel_class = (jclass)(*env)->CallObjectMethod(env, dex_cl, load_class, class_name);
@@ -247,6 +258,11 @@ static jclass load_dex_class(JNIEnv *env)
     (*env)->DeleteLocalRef(env, cl_class);
     (*env)->DeleteLocalRef(env, dex_cl);
 
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("Exception loading SwbreakPanel class");
+        (*env)->ExceptionClear(env);
+        return NULL;
+    }
     if (!panel_class) {
         LOGE("Failed to load com.swbreak.SwbreakPanel");
         return NULL;
@@ -360,19 +376,22 @@ static jobject find_activity_via_thread(JNIEnv *env)
     jfieldID activity_field = (*env)->GetFieldID(env, ar_class, "activity",
         "Landroid/app/Activity;");
     (*env)->DeleteLocalRef(env, ar_class);
-    (*env)->DeleteLocalRef(env, activity_record);
 
     if ((*env)->ExceptionCheck(env)) {
         LOGE("Exception getting ActivityRecord.activity field");
         (*env)->ExceptionClear(env);
+        (*env)->DeleteLocalRef(env, activity_record);
         return NULL;
     }
     if (!activity_field) {
         LOGE("ActivityRecord.activity field not found");
+        (*env)->DeleteLocalRef(env, activity_record);
         return NULL;
     }
 
     jobject activity = (*env)->GetObjectField(env, activity_record, activity_field);
+    (*env)->DeleteLocalRef(env, activity_record);  /* 现在才释放 */
+
     if ((*env)->ExceptionCheck(env)) {
         LOGE("Exception accessing ActivityRecord.activity");
         (*env)->ExceptionClear(env);
@@ -578,6 +597,9 @@ void swbreak_ui_show(void)
     if (ret != JNI_OK || !env) return;
 
     (*env)->CallStaticVoidMethod(env, g_panel_class, g_show_method, g_activity);
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionClear(env);
+    }
 }
 
 void swbreak_ui_hide(void)
@@ -589,6 +611,9 @@ void swbreak_ui_hide(void)
     if (ret != JNI_OK || !env) return;
 
     (*env)->CallStaticVoidMethod(env, g_panel_class, g_hide_method);
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionClear(env);
+    }
 }
 
 void swbreak_ui_log(const char *msg)
@@ -603,6 +628,9 @@ void swbreak_ui_log(const char *msg)
     if (jmsg) {
         (*env)->CallStaticVoidMethod(env, g_panel_class, g_log_method, jmsg);
         (*env)->DeleteLocalRef(env, jmsg);
+        if ((*env)->ExceptionCheck(env)) {
+            (*env)->ExceptionClear(env);
+        }
     }
 }
 
