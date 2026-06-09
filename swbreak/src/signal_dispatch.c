@@ -15,6 +15,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include <signal.h>
 #include <unistd.h>
 #include "signal_dispatch.h"
@@ -36,10 +37,29 @@ static struct {
 } g_dispatch;
 
 /* ── 线程局部上下文 ── */
-static __thread struct {
-    swbreak_regs_t *regs;
-    void           *ucontext;
-} g_tl_context;
+static pthread_key_t g_tl_key;
+static pthread_once_t g_tl_key_once = PTHREAD_ONCE_INIT;
+
+static void make_tl_key(void)
+{
+    pthread_key_create(&g_tl_key, free);
+}
+
+typedef struct {
+    swbreak_regs_t regs;
+    void          *ucontext;
+} tl_ctx_t;
+
+static tl_ctx_t *tl_get_ctx(void)
+{
+    pthread_once(&g_tl_key_once, make_tl_key);
+    tl_ctx_t *ctx = pthread_getspecific(g_tl_key);
+    if (!ctx) {
+        ctx = calloc(1, sizeof(tl_ctx_t));
+        if (ctx) pthread_setspecific(g_tl_key, ctx);
+    }
+    return ctx;
+}
 
 /* ══════════════════════════════════════
  *  线程局部上下文 API
@@ -47,24 +67,32 @@ static __thread struct {
 
 void swbreak_dispatch_set_context(swbreak_regs_t *regs, void *ucontext)
 {
-    g_tl_context.regs = regs;
-    g_tl_context.ucontext = ucontext;
+    tl_ctx_t *ctx = tl_get_ctx();
+    if (ctx) {
+        if (regs) memcpy(&ctx->regs, regs, sizeof(*regs));
+        ctx->ucontext = ucontext;
+    }
 }
 
 swbreak_regs_t *swbreak_dispatch_get_regs(void)
 {
-    return g_tl_context.regs;
+    tl_ctx_t *ctx = tl_get_ctx();
+    return ctx ? &ctx->regs : NULL;
 }
 
 void *swbreak_dispatch_get_ucontext(void)
 {
-    return g_tl_context.ucontext;
+    tl_ctx_t *ctx = tl_get_ctx();
+    return ctx ? ctx->ucontext : NULL;
 }
 
 void swbreak_dispatch_clear_context(void)
 {
-    g_tl_context.regs = NULL;
-    g_tl_context.ucontext = NULL;
+    tl_ctx_t *ctx = tl_get_ctx();
+    if (ctx) {
+        memset(&ctx->regs, 0, sizeof(ctx->regs));
+        ctx->ucontext = NULL;
+    }
 }
 
 /* ══════════════════════════════════════

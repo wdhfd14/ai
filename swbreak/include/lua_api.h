@@ -43,6 +43,9 @@ int  swbreak_lua_load_script(const char *path);
 /* 加载并执行 Lua 脚本字符串 */
 int  swbreak_lua_load_string(const char *script);
 
+/* 注册 Lua 回调函数 (将脚本编译为函数并返回引用) */
+int  swbreak_lua_register_callback(const char *script);
+
 /* 调用 Lua 断点回调 (内部使用) */
 swbreak_bp_action_t swbreak_lua_call_callback(int lua_ref,
                                                swbreak_hit_info_t *info);
