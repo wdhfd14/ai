@@ -109,7 +109,8 @@ function update_zombies(zombies, dt) {
         if (z.attack_cooldown > 0) z.attack_cooldown -= 1;
         
         // 离屏检查: 太远了就休眠/删除
-        if (distance(z.x, z.y, GLOBAL.player_x, GLOBAL.player_y) > GLOBAL.culling_distance || 2000) {
+        var px = get_player_x(), py = get_player_y();
+        if (distance(z.x, z.y, px, py) > (GLOBAL.Collisiondisabler_distance || 2000)) {
             z.active = false;
         }
     }
@@ -165,10 +166,11 @@ function npc_lifecycle_manager(dt) {
 function try_spawn_zombie() {
     // # 生成逻辑具体细节在 Spawn parameters 模块
     // 在玩家视野外的随机位置, 沿玩家朝向方向
+    var px = get_player_x(), py = get_player_y();
     var angle = Math.random() * Math.PI * 2;
     var dist = 600 + Math.random() * 400;  // 屏幕外
-    var sx = GLOBAL.player_x + Math.cos(angle) * dist;
-    var sy = GLOBAL.player_y + Math.sin(angle) * dist;
+    var sx = px + Math.cos(angle) * dist;
+    var sy = py + Math.sin(angle) * dist;
     
     // 选择僵尸类型 (根据天数/难度)
     spawn_zombie_at(sx, sy, pick_zombie_type());
@@ -176,7 +178,7 @@ function try_spawn_zombie() {
 
 function pick_zombie_type() {
     // # 根据 GLOBAL.Final_Day 和难度选择
-    var day = GLOBAL.current_day || 1;
+    var day = GLOBAL.Day_survived || 1;
     var roll = Math.random();
     
     if (day < 3) {

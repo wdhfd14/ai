@@ -62,10 +62,10 @@
  *     set_collision_range(zombie, zombie_detection_range)
  */
 function zed_on_create(zombie) {
-    // TODO: 从 data.js 中验证具体数值参数
-    zombie.speed = GLOBAL.zombie_base_speed || 80;  // # 需要验证
+    // # 数值由各僵尸类型的 CONFIG 对象覆盖, 此处为默认后备
+    zombie.speed = zombie.speed || 80;
     zombie.animation = "idle";                       // # op=1035 推测
-    zombie.detection_range = GLOBAL.zombie_detect_range || 300;
+    zombie.detection_range = zombie.detection_range || 300;
     zombie.state = "idle";
     zombie.target = null;
     zombie.last_known_player_pos = null;
@@ -88,14 +88,15 @@ function zed_on_create(zombie) {
 function zed_detect_player(zombie) {
     // op=256 产生 Make PickAll (遍历所有该类对象)
     // op=256 二次 PickAll 可能是在子类型间筛选
-    var dist = distance(zombie.x, zombie.y, GLOBAL.player_x, GLOBAL.player_y);
+    var px = get_player_x(), py = get_player_y();
+    var dist = distance(zombie.x, zombie.y, px, py);
     
     if (dist < zombie.detection_range) {
         zombie.state = "chasing";
-        zombie.target_x = GLOBAL.player_x;
-        zombie.target_y = GLOBAL.player_y;
+        zombie.target_x = px;
+        zombie.target_y = py;
         // # 朝向: op=60(FLIP) 或 op=170/171(SET_X/Y)
-        if (GLOBAL.player_x > zombie.x) zombie.flip = false;
+        if (px > zombie.x) zombie.flip = false;
         else zombie.flip = true;
     } else {
         zombie.state = "idle";
@@ -167,17 +168,18 @@ function zed_chase_update(zombie) {
     // # op=256: 每帧对每个活动僵尸执行
     if (zombie.state !== "chasing") return;
     
-    var dist_to_player = distance(zombie.x, zombie.y, GLOBAL.player_x, GLOBAL.player_y);
-    var line_of_sight = has_line_of_sight(zombie, GLOBAL.player_x, GLOBAL.player_y);
+    var px = get_player_x(), py = get_player_y();
+    var dist_to_player = distance(zombie.x, zombie.y, px, py);
+    var line_of_sight = has_line_of_sight(zombie, px, py);
     
     if (line_of_sight && dist_to_player < zombie.detection_range) {
-        zombie.target_x = GLOBAL.player_x;
-        zombie.target_y = GLOBAL.player_y;
+        zombie.target_x = px;
+        zombie.target_y = py;
         zombie.lost_sight_timer = 0;
     } else {
         // # 短暂记忆: 僵尸会在失去视野后继续追几秒
         zombie.lost_sight_timer += 1;
-        if (zombie.lost_sight_timer > GLOBAL.zombie_chase_timeout || 180) {
+        if (zombie.lost_sight_timer > (zombie.chase_timeout || 180)) {
             zombie.state = "idle";
         }
     }
@@ -201,7 +203,8 @@ function zed_chase_update(zombie) {
 function zed_attack(zombie) {
     if (zombie.state !== "attacking") return;
     
-    var dist = distance(zombie.x, zombie.y, GLOBAL.player_x, GLOBAL.player_y);
+    var px = get_player_x(), py = get_player_y();
+    var dist = distance(zombie.x, zombie.y, px, py);
     // # attack_range 值需要从 data.js 中定位验证
     var attack_range = zombie.attack_range || 30;
     

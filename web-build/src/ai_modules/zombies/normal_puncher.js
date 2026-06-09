@@ -81,7 +81,8 @@ function normal_puncher_update(zombie, dt) {
             zed_chase_update(zombie);
             zed_move_toward_target(zombie, dt);
             // 距离够近 → 进入攻击
-            var dist = distance(zombie.x, zombie.y, GLOBAL.player_x, GLOBAL.player_y);
+            var px = get_player_x(), py = get_player_y();
+            var dist = distance(zombie.x, zombie.y, px, py);
             if (dist < zombie.attack_range) {
                 zombie.state = "attacking";
             }
@@ -89,11 +90,12 @@ function normal_puncher_update(zombie, dt) {
         case "attacking":
             zed_attack(zombie);
             // 玩家跑远 → 重新追击
-            var adist = distance(zombie.x, zombie.y, GLOBAL.player_x, GLOBAL.player_y);
+            var px2 = get_player_x(), py2 = get_player_y();
+            var adist = distance(zombie.x, zombie.y, px2, py2);
             if (adist > zombie.attack_range * 2) {
                 zombie.state = "chasing";
-                zombie.target_x = GLOBAL.player_x;
-                zombie.target_y = GLOBAL.player_y;
+                zombie.target_x = px2;
+                zombie.target_y = py2;
             }
             break;
         case "dead":
