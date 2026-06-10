@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Mini DAYZ - Web Edition</title>
+
+    <link rel="manifest" href="appmanifest.json" />
+    <link rel="icon" type="image/png" sizes="256x256" href="icon-256.png" />
+    <link rel="apple-touch-icon" sizes="256x256" href="icon-256.png" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="HandheldFriendly" content="true" />
+
+    <style>
+        * { padding: 0; margin: 0; box-sizing: border-box; }
+        html, body {
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            -ms-touch-action: none;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            touch-action-delay: none;
+            touch-action: none;
+            -ms-touch-action: none;
+            image-rendering: auto;
+            display: block;
+        }
+
+        /* ── 外层容器 ── */
+        #game-wrapper {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #000;
+        }
+        #canvas-area {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 竖屏模式：canvas 占上方 58%，底部留 D-pad */
+        #game-wrapper.portrait #canvas-area {
+            height: auto;
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            bottom: 42%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #game-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ── 虚拟触控区 ── */
+        #ctrl-area {
+            display: none;
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            height: 42%;
+            background: #0a0a0a;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px 20px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        #game-wrapper.portrait #ctrl-area { display: flex; }
+
+        /* D-pad */
+        #dpad {
+            position: relative;
+            width: 160px; height: 160px;
+            flex-shrink: 0;
+        }
+        .dpad-btn {
+            position: absolute;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 6px;
+            width: 50px; height: 50px;
+            cursor: pointer;
+            touch-action: none;
+            transition: background 0.08s;
+        }
+        .dpad-btn:active, .dpad-btn.pressed {
+            background: rgba(255,255,255,0.18);
+            border-color: rgba(255,255,255,0.35);
+        }
+        .dpad-up    { top: 0;   left: 55px; }
+        .dpad-down  { top: 110px; left: 55px; }
+        .dpad-left  { top: 55px; left: 0; }
+        .dpad-right { top: 55px; left: 110px; }
+        .dpad-center {
+            top: 55px; left: 55px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* 动作按钮 */
+        #action-btns {
+            display: flex;
+            flex-direction: row;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .act-btn {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.07);
+            border: 2px solid rgba(255,255,255,0.15);
+            color: #ccc;
+            font-size: 20px;
+            cursor: pointer;
+            touch-action: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.08s, border-color 0.08s;
+        }
+        .act-btn:active, .act-btn.pressed {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.45);
+            color: #fff;
+        }
+
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        #loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #loading-text {
+            color: #aaa;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        #loading-bar-bg {
+            width: 200px;
+            height: 3px;
+            background: #222;
+            border-radius: 2px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+        #loading-bar {
+            width: 0%;
+            height: 100%;
+            background: #4a4;
+            transition: width 0.4s ease;
+        }
+        #kb-hint {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            color: #555;
+            font-size: 10px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen">
+        <div id="loading-text">Mini DAYZ Loading</div>
+        <div id="loading-bar-bg"><div id="loading-bar"></div></div>
+    </div>
+
+    <div id="game-wrapper">
+        <div id="canvas-area">
+            <div id="game-container">
+                <canvas id="c2canvas" width="1024" height="768">
+                    <h1>Your browser does not support HTML5. Please upgrade.</h1>
+                </canvas>
+            </div>
+        </div>
+        <div id="ctrl-area">
+            <div id="dpad">
+                <div class="dpad-btn dpad-up"    data-dir="up"></div>
+                <div class="dpad-btn dpad-left"  data-dir="left"></div>
+                <div class="dpad-center"></div>
+                <div class="dpad-btn dpad-right" data-dir="right"></div>
+                <div class="dpad-btn dpad-down"  data-dir="down"></div>
+            </div>
+            <div id="action-btns">
+                <button class="act-btn" data-act="interact">&#x270B;</button>
+                <button class="act-btn" data-act="inventory">&#x1F392;</button>
+                <button class="act-btn" data-act="map">&#x1F5FA;</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="kb-hint">WASD move &bull; Mouse click interact</div>
+
+    <!-- Cordova API polyfill -->
+    <script src="cordova-polyfill.js"></script>
+
+    <!-- Core game engine -->
+    <script src="jquery-3.4.1.min.js"></script>
+    <script src="c2runtime.js"></script>
+
+    <!-- AI Modules -->
+    <script src="src/ai_modules/ai_helpers.js"></script>
+    <script src="src/ai_modules/damage_system.js"></script>
+    <script src="src/ai_modules/world/map_generation.js"></script>
+    <script src="src/ai_modules/world/spawn_parameters.js"></script>
+    <script src="src/ai_modules/world/environment.js"></script>
+    <script src="src/ai_modules/world/environment_effects.js"></script>
+    <script src="src/ai_modules/world/buildings.js"></script>
+    <script src="src/ai_modules/world/light_parameters.js"></script>
+    <script src="src/ai_modules/world/timeline.js"></script>
+    <script src="src/ai_modules/player/player_stats.js"></script>
+    <script src="src/ai_modules/player/interaction.js"></script>
+    <script src="src/ai_modules/player/experience.js"></script>
+    <script src="src/ai_modules/player/animations.js"></script>
+    <script src="src/ai_modules/player/characters.js"></script>
+    <script src="src/ai_modules/zombies/zeds_common.js"></script>
+    <script src="src/ai_modules/zombies/normal_puncher.js"></script>
+    <script src="src/ai_modules/zombies/fast_puncher.js"></script>
+    <script src="src/ai_modules/zombies/army_puncher.js"></script>
+    <script src="src/ai_modules/zombies/buried_puncher.js"></script>
+    <script src="src/ai_modules/zombies/army_shooters.js"></script>
+    <script src="src/ai_modules/zombies/screamer.js"></script>
+    <script src="src/ai_modules/zombies/tank.js"></script>
+    <script src="src/ai_modules/zombies/jumper.js"></script>
+    <script src="src/ai_modules/bots.js"></script>
+    <script src="src/ai_modules/animals.js"></script>
+    <script src="src/ai_modules/npc_controller.js"></script>
+    <script src="src/ai_modules/vehicles/drivable_vehicles.js"></script>
+    <script src="src/ai_modules/gui/hud.js"></script>
+    <script src="src/ai_modules/system/save_system.js"></script>
+    <script src="src/ai_modules/system/game_init.js"></script>
+    <script src="src/game-main.js"></script>
+
+    <script>
+    (function() {
+        var canvas = document.getElementById('c2canvas');
+        var GAME_W = 1024, GAME_H = 768;
+
+        // ── D-Pad 触控 ──
+        var dpadState = { up: false, down: false, left: false, right: false };
+        var dpadTouchActive = false;
+        var dpadTouchX = GAME_W / 2, dpadTouchY = GAME_H / 2;
+        var DPAD_SPEED = 7;
+
+        function screenToCanvas(clientX, clientY) {
+            var rect = canvas.getBoundingClientRect();
+            return {
+                x: ((clientX - rect.left) / rect.width)  * GAME_W,
+                y: ((clientY - rect.top)  / rect.height) * GAME_H
+            };
+        }
+        function canvasToScreen(cx, cy) {
+            var rect = canvas.getBoundingClientRect();
+            return {
+                x: rect.left + (cx / GAME_W) * rect.width,
+                y: rect.top  + (cy / GAME_H) * rect.height
+            };
+        }
+        function simulateTouch(type, clientX, clientY, id) {
+            id = id || 0;
+            var t = new Touch({
+                identifier: id, target: canvas,
+                clientX: clientX, clientY: clientY,
+                pageX: clientX, pageY: clientY,
+                radiusX: 5, radiusY: 5,
+                rotationAngle: 0, force: 1
+            });
+            var at = (type === 'end' || type === 'cancel') ? [] : [t];
+            try {
+                canvas.dispatchEvent(new TouchEvent('touch' + type, {
+                    bubbles: true, cancelable: true,
+                    touches: at, targetTouches: at, changedTouches: [t]
+                }));
+            } catch(e) {
+                var ev = document.createEvent('UIEvents');
+                ev.initUIEvent('touch' + type, true, true);
+                canvas.dispatchEvent(ev);
+            }
+        }
+
+        function bindDpadBtn(sel, dir) {
+            var el = document.querySelector(sel);
+            if (!el) return;
+            function on(e) { e.preventDefault(); dpadState[dir] = true; el.classList.add('pressed'); }
+            function off(e) { e.preventDefault(); dpadState[dir] = false; el.classList.remove('pressed'); }
+            el.addEventListener('mousedown', on);
+            el.addEventListener('touchstart', on, {passive: false});
+            el.addEventListener('mouseup', off);
+            el.addEventListener('mouseleave', off);
+            el.addEventListener('touchend', off);
+            el.addEventListener('touchcancel', off);
+        }
+        bindDpadBtn('.dpad-up',    'up');
+        bindDpadBtn('.dpad-down',  'down');
+        bindDpadBtn('.dpad-left',  'left');
+        bindDpadBtn('.dpad-right', 'right');
+
+        function resetDpadPos() { dpadTouchX = GAME_W / 2; dpadTouchY = GAME_H / 2; }
+
+        setInterval(function() {
+            if (!document.getElementById('game-wrapper').classList.contains('portrait')) return;
+            var dx = 0, dy = 0;
+            if (dpadState.up)    dy -= 1;
+            if (dpadState.down)  dy += 1;
+            if (dpadState.left)  dx -= 1;
+            if (dpadState.right) dx += 1;
+            var moving = (dx !== 0 || dy !== 0);
+            if (moving) {
+                dpadTouchX = Math.max(0, Math.min(GAME_W, dpadTouchX + dx * DPAD_SPEED));
+                dpadTouchY = Math.max(0, Math.min(GAME_H, dpadTouchY + dy * DPAD_SPEED));
+                var sc = canvasToScreen(dpadTouchX, dpadTouchY);
+                if (!dpadTouchActive) { dpadTouchActive = true; simulateTouch('start', sc.x, sc.y, 10); }
+                simulateTouch('move', sc.x, sc.y, 10);
+            } else if (dpadTouchActive) {
+                dpadTouchActive = false;
+                var sc = canvasToScreen(dpadTouchX, dpadTouchY);
+                simulateTouch('end', sc.x, sc.y, 10);
+            }
+        }, 16);
+
+        // 动作按钮绑定
+        function bindActBtn(sel, cx, cy) {
+            var el = document.querySelector(sel);
+            if (!el) return;
+            function press(e) {
+                e.preventDefault();
+                el.classList.add('pressed');
+                resetDpadPos();
+                var sc = canvasToScreen(cx, cy);
+                simulateTouch('start', sc.x, sc.y, 20);
+            }
+            function release(e) {
+                e.preventDefault();
+                el.classList.remove('pressed');
+                var sc = canvasToScreen(cx, cy);
+                simulateTouch('end', sc.x, sc.y, 20);
+            }
+            el.addEventListener('mousedown', press);
+            el.addEventListener('touchstart', press, {passive: false});
+            el.addEventListener('mouseup', release);
+            el.addEventListener('mouseleave', release);
+            el.addEventListener('touchend', release);
+            el.addEventListener('touchcancel', release);
+        }
+        bindActBtn('.act-btn[data-act="interact"]', GAME_W * 0.50, GAME_H * 0.55);
+        bindActBtn('.act-btn[data-act="inventory"]', GAME_W * 0.93, GAME_H * 0.50);
+        bindActBtn('.act-btn[data-act="map"]',        GAME_W * 0.07, GAME_H * 0.93);
+
+        // ── 桌面鼠标 / 键盘 ──
+        canvas.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            simulateTouch('start', e.clientX, e.clientY, 2);
+        });
+        canvas.addEventListener('mousemove', function(e) {
+            if (e.buttons & 1) simulateTouch('move', e.clientX, e.clientY, 2);
+        });
+        canvas.addEventListener('mouseup', function(e) {
+            simulateTouch('end', e.clientX, e.clientY, 2);
+        });
+        canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+        var kbState = {};
+        var kbTouchActive = false;
+        var kbTouchX = GAME_W / 2, kbTouchY = GAME_H / 2;
+        var KB_SPEED = 6;
+        function updateKbTouch() {
+            var dx = 0, dy = 0;
+            if (kbState['w'] || kbState['ArrowUp'])    dy -= 1;
+            if (kbState['s'] || kbState['ArrowDown'])  dy += 1;
+            if (kbState['a'] || kbState['ArrowLeft'])  dx -= 1;
+            if (kbState['d'] || kbState['ArrowRight']) dx += 1;
+            var moving = (dx !== 0 || dy !== 0);
+            if (moving) {
+                kbTouchX = Math.max(0, Math.min(GAME_W, kbTouchX + dx * KB_SPEED));
+                kbTouchY = Math.max(0, Math.min(GAME_H, kbTouchY + dy * KB_SPEED));
+                var sc = canvasToScreen(kbTouchX, kbTouchY);
+                if (!kbTouchActive) { kbTouchActive = true; simulateTouch('start', sc.x, sc.y, 3); }
+                simulateTouch('move', sc.x, sc.y, 3);
+            }
+            return moving;
+        }
+        setInterval(updateKbTouch, 16);
+
+        window.addEventListener('keydown', function(e) {
+            kbState[e.key] = true;
+            var key = e.key;
+            if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Escape'].indexOf(key) >= 0) e.preventDefault();
+            if (key === ' ' || key === 'e' || key === 'E' || key === 'Enter') {
+                e.preventDefault();
+                kbTouchX = GAME_W / 2; kbTouchY = GAME_H / 2;
+                var sc = canvasToScreen(GAME_W / 2, GAME_H / 2);
+                simulateTouch('start', sc.x, sc.y, 4);
+                setTimeout(function() { simulateTouch('end', sc.x, sc.y, 4); }, 40);
+            }
+            if (key === 'r' || key === 'R') {
+                var sc = canvasToScreen(GAME_W * 0.85, GAME_H * 0.9);
+                simulateTouch('start', sc.x, sc.y, 5);
+                setTimeout(function() { simulateTouch('end', sc.x, sc.y, 5); }, 40);
+            }
+            if (key === 'i' || key === 'I' || key === 'Tab') {
+                e.preventDefault();
+                var sc = canvasToScreen(GAME_W * 0.93, GAME_H * 0.5);
+                simulateTouch('start', sc.x, sc.y, 6);
+                setTimeout(function() { simulateTouch('end', sc.x, sc.y, 6); }, 40);
+            }
+            if (key === 'm' || key === 'M') {
+                var sc = canvasToScreen(GAME_W * 0.07, GAME_H * 0.93);
+                simulateTouch('start', sc.x, sc.y, 7);
+                setTimeout(function() { simulateTouch('end', sc.x, sc.y, 7); }, 40);
+            }
+        });
+        window.addEventListener('keyup', function(e) {
+            kbState[e.key] = false;
+            if (!kbTouchActive) return;
+            var any = kbState['w']||kbState['ArrowUp']||kbState['s']||kbState['ArrowDown']||
+                      kbState['a']||kbState['ArrowLeft']||kbState['d']||kbState['ArrowRight'];
+            if (!any) {
+                kbTouchActive = false;
+                var sc = canvasToScreen(kbTouchX, kbTouchY);
+                simulateTouch('end', sc.x, sc.y, 3);
+            }
+        });
+
+        // ── 启动 ──
+        jQuery(document).ready(function() {
+            cr_createRuntime("c2canvas");
+            setTimeout(function() {
+                document.getElementById('loading-screen').classList.add('hidden');
+            }, 2000);
+        });
+
+        function onVisibilityChanged() {
+            var h = document.hidden || document.mozHidden || document.webkitHidden || document.msHidden;
+            if (typeof cr_setSuspended === 'function') cr_setSuspended(h);
+        }
+        document.addEventListener("visibilitychange", onVisibilityChanged, false);
+    })();
+    </script>
+</body>
+</html>
