@@ -259,19 +259,26 @@ class GGLuaSandbox:
             items = []
             if lua_table is not None:
                 try:
-                    for i in range(1, len(lua_table) + 1):
-                        item = lua_table[i]
+                    table_len = len(lua_table)
+                    for i in range(1, max(table_len + 1, 2)):
+                        try:
+                            item = lua_table[i]
+                        except (IndexError, KeyError):
+                            continue
                         if item is not None:
                             d = {}
                             try:
                                 d['address'] = int(item.get('address', 0))
-                            except (TypeError, ValueError):
+                            except (TypeError, ValueError, AttributeError):
                                 d['address'] = 0
                             try:
                                 d['flags'] = int(item.get('flags', 4))
-                            except (TypeError, ValueError):
+                            except (TypeError, ValueError, AttributeError):
                                 d['flags'] = 4
-                            d['value'] = item.get('value', 0)
+                            try:
+                                d['value'] = item.get('value', 0)
+                            except (TypeError, ValueError, AttributeError):
+                                d['value'] = 0
                             items.append(d)
                 except (TypeError, AttributeError):
                     pass
@@ -283,23 +290,33 @@ class GGLuaSandbox:
             items = []
             if lua_table is not None:
                 try:
-                    for i in range(1, len(lua_table) + 1):
-                        item = lua_table[i]
+                    table_len = len(lua_table)
+                    for i in range(1, max(table_len + 1, 2)):
+                        try:
+                            item = lua_table[i]
+                        except (IndexError, KeyError):
+                            continue
                         if item is not None:
                             d = {}
                             try:
                                 d['address'] = int(item.get('address', 0))
-                            except (TypeError, ValueError):
+                            except (TypeError, ValueError, AttributeError):
                                 d['address'] = 0
                             try:
                                 d['flags'] = int(item.get('flags', 4))
-                            except (TypeError, ValueError):
+                            except (TypeError, ValueError, AttributeError):
                                 d['flags'] = 4
-                            d['value'] = item.get('value', 0)
-                            d['freeze'] = bool(item.get('freeze', False))
+                            try:
+                                d['value'] = item.get('value', 0)
+                            except (TypeError, ValueError, AttributeError):
+                                d['value'] = 0
+                            try:
+                                d['freeze'] = bool(item.get('freeze', False))
+                            except (TypeError, ValueError, AttributeError):
+                                d['freeze'] = False
                             try:
                                 d['freezeType'] = int(item.get('freezeType', 0))
-                            except (TypeError, ValueError):
+                            except (TypeError, ValueError, AttributeError):
                                 d['freezeType'] = 0
                             items.append(d)
                 except (TypeError, AttributeError):
@@ -311,8 +328,12 @@ class GGLuaSandbox:
             items = []
             if lua_table is not None:
                 try:
-                    for i in range(1, len(lua_table) + 1):
-                        item = lua_table[i]
+                    table_len = len(lua_table)
+                    for i in range(1, max(table_len + 1, 2)):
+                        try:
+                            item = lua_table[i]
+                        except (IndexError, KeyError):
+                            continue
                         if item is not None:
                             items.append(dict(item))
                 except (TypeError, AttributeError):
