@@ -41,6 +41,9 @@ Examples:
   %(prog)s script.luac --info             Show bytecode info only
   %(prog)s script.luac --cfg              Generate control flow graph (DOT)
   %(prog)s script.luac --stats            Show deobfuscation statistics
+  %(prog)s script.luac --run              Decompile and run in gglua sandbox
+  %(prog)s script.lua --run-source        Run a .lua source in gglua sandbox
+  %(prog)s script.luac --verify           Verify decompilation by running
         """
     )
 
@@ -62,6 +65,12 @@ Examples:
                         help='Indentation size (default: 2)')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Verbose output')
+    parser.add_argument('--run', action='store_true',
+                        help='Decompile and run in gglua sandbox')
+    parser.add_argument('--run-source', action='store_true',
+                        help='Run a .lua source file in gglua sandbox')
+    parser.add_argument('--verify', action='store_true',
+                        help='Verify decompilation by running decompiled code')
 
     args = parser.parse_args()
 
@@ -172,6 +181,81 @@ Examples:
             print(f"Decompiled output written to {args.output}")
     else:
         print(formatted)
+
+    # Run in gglua sandbox
+    if args.run or args.verify:
+        try:
+            from gglua_runtime import GGLuaRuntime
+            runtime = GGLuaRuntime(verbose=args.verbose)
+            runtime.run_code(formatted)
+            output = runtime.get_output()
+            if output:
+                print("\n--- gglua Runtime Output ---", file=sys.stderr)
+                for line in output:
+                    print(line, file=sys.stderr)
+            gg_log = runtime.get_gg_log()
+            if gg_log.get('toast') or gg_log.get('print'):
+                print("\n--- GG API Log ---", file=sys.stderr)
+                for t in gg_log.get('toast', []):
+                    print(f"  [toast] {t}", file=sys.stderr)
+                for p in gg_log.get('print', []):
+                    print(f"  [print] {p}", file=sys.stderr)
+            errors = runtime.get_errors()
+            if errors:
+                print("\n--- Runtime Errors ---", file=sys.stderr)
+                for e in errors:
+                    print(f"  {e}", file=sys.stderr)
+        except ImportError:
+            print("Error: lupa not installed. Install with: pip install lupa",
+                  file=sys.stderr)
+        except Exception as e:
+            print(f"Runtime error: {e}", file=sys.stderr)
+            if args.verbose:
+                import traceback
+                traceback.print_exc()
+
+    # Verify decompilation
+    if args.verify:
+        try:
+            from gglua_runtime import GGLuaRuntime
+            runtime = GGLuaRuntime(verbose=args.verbose)
+            result = runtime.verify_decompilation(args.input)
+            print("\n--- Verification Result ---", file=sys.stderr)
+            print(f"  Decompilation: {'OK' if result['decompilation_success'] else 'FAILED'}",
+                  file=sys.stderr)
+            print(f"  Execution: {'OK' if result['execution_success'] else 'FAILED'}",
+                  file=sys.stderr)
+        except ImportError:
+            pass
+        except Exception as e:
+            print(f"Verification error: {e}", file=sys.stderr)
+
+    # Run source file in gglua sandbox
+    if args.run_source:
+        try:
+            from gglua_runtime import GGLuaRuntime
+            runtime = GGLuaRuntime(verbose=args.verbose)
+            runtime.run_script(args.input)
+            output = runtime.get_output()
+            if output:
+                print("\n--- gglua Runtime Output ---")
+                for line in output:
+                    print(line)
+            gg_log = runtime.get_gg_log()
+            if gg_log.get('toast') or gg_log.get('print'):
+                print("\n--- GG API Log ---", file=sys.stderr)
+                for t in gg_log.get('toast', []):
+                    print(f"  [toast] {t}", file=sys.stderr)
+                for p in gg_log.get('print', []):
+                    print(f"  [print] {p}", file=sys.stderr)
+        except ImportError:
+            print("Error: lupa not installed. Install with: pip install lupa",
+                  file=sys.stderr)
+        except Exception as e:
+            print(f"Runtime error: {e}", file=sys.stderr)
+            if args.verbose:
+                import traceback
+                traceback.print_exc()
 
 
 if __name__ == '__main__':
