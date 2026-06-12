@@ -129,7 +129,6 @@ class Lua53Opcode(IntEnum):
     SHL = 24
     SHR = 25
     UNM = 26
-    BNOT_ALIAS = 27  # Actually NOT in 5.3
     NOT = 27
     LEN = 28
     CONCAT = 29
@@ -288,7 +287,6 @@ class LuaJITOpcode(IntEnum):
     GGET = 42
     GSET = 43
     ISNEXT = 44
-    ITERNEXT = 44  # Alias
     ITERC = 45
     ITERL = 46
     VARG = 47
@@ -308,8 +306,7 @@ class LuaJITOpcode(IntEnum):
     ISF = 61
     ISTYPE = 62
     ISNUM = 63
-    MOV = 1  # Duplicate for clarity
-    NOT = 2
+    # 64-72: PRIM opcodes (reserved)
     JMP = 73
     CALL = 74
     CALLM = 75

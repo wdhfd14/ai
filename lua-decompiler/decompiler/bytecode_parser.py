@@ -197,7 +197,7 @@ class BytecodeParser:
     def _parse_instruction(self, pc: int) -> Instruction:
         """Parse a single instruction based on the Lua version."""
         raw = self._read_uint32()
-        instr = Instruction(raw=raw, pc=pc)
+        instr = Instruction(opcode=0, raw=raw, pc=pc)
 
         if self.version == 0x54:
             self._decode_instruction_54(instr, raw)
@@ -408,7 +408,7 @@ class BytecodeParser:
     def _parse_luajit_instruction(self, pc: int) -> Instruction:
         """Parse a single LuaJIT instruction."""
         raw = self._read_uint32()
-        instr = Instruction(raw=raw, pc=pc)
+        instr = Instruction(opcode=0, raw=raw, pc=pc)
 
         opcode = raw & 0x7F  # 7 bits for opcode
         instr.opcode = opcode
