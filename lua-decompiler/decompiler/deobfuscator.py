@@ -451,10 +451,10 @@ class Deobfuscator:
                     # Same register compared to itself
                     # This is always EQ (true) or never LT (false)
                     # Replace with unconditional jump or remove
-                    if instr.opcode in (23, 31, 56, 52, 54):  # EQ variants
+                    if instr.opcode in (23, 31, 52, 54, 56, 57):  # EQ variants (5.5: 57)
                         # Always equal -> unconditional jump
                         new_instr = Instruction(
-                            opcode=22 if self.version != 0x54 else 55,
+                            opcode=22 if self.version not in (0x54, 0x55) else (55 if self.version == 0x54 else 56),
                             A=0, sBx=instr.sBx, pc=instr.pc
                         )
                         if self.version == 0x80:
@@ -462,7 +462,7 @@ class Deobfuscator:
                         new_instrs.append(new_instr)
                         removed += 1
                         continue
-                    elif instr.opcode in (24, 32, 57, 51):  # LT variants
+                    elif instr.opcode in (24, 32, 51, 57, 58):  # LT variants (5.5: 58)
                         # Never less than itself -> remove branch
                         removed += 1
                         continue
@@ -588,6 +588,8 @@ class Deobfuscator:
         op = instr.opcode
         if self.version == 0x80:
             return op in (48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61)
+        elif self.version == 0x55:
+            return op in (57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67)
         elif self.version == 0x54:
             return op in (56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66)
         else:

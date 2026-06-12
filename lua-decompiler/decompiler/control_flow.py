@@ -254,6 +254,8 @@ class ControlFlowAnalyzer:
         op = instr.opcode
         if self.version == 0x80:  # LuaJIT
             return op == 73  # JMP
+        elif self.version == 0x55:
+            return op == 56  # JMP
         elif self.version == 0x54:
             return op == 55  # JMP
         else:
@@ -264,6 +266,8 @@ class ControlFlowAnalyzer:
         op = instr.opcode
         if self.version == 0x80:  # LuaJIT
             return op in (48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63)
+        elif self.version == 0x55:
+            return op in (57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67)
         elif self.version == 0x54:
             return op in (56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66)
         elif self.version == 0x53:
@@ -278,6 +282,8 @@ class ControlFlowAnalyzer:
         op = instr.opcode
         if self.version == 0x80:
             return op in (78, 79, 80, 81, 82)
+        elif self.version == 0x55:
+            return op in (70, 71, 72)
         elif self.version == 0x54:
             return op in (69, 70, 71)
         else:
@@ -290,6 +296,10 @@ class ControlFlowAnalyzer:
                 return pc + 1 + instr.sBx
             # Conditional branches in LuaJIT: jump if condition NOT met (skip next)
             if instr.opcode in (48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61):
+                return pc + 1 + instr.sBx
+            return None
+        elif self.version == 0x55:
+            if instr.opcode == 56:  # JMP
                 return pc + 1 + instr.sBx
             return None
         elif self.version == 0x54:

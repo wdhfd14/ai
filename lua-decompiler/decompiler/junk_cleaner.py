@@ -156,7 +156,7 @@ class JunkCleaner:
     def _is_redundant_jump(self, instr: Instruction, idx: int,
                            instrs: List[Instruction]) -> bool:
         """Check if JMP targets the next instruction."""
-        jmp_opcodes = {22, 23, 30, 55, 73}  # JMP opcodes across versions
+        jmp_opcodes = {22, 23, 30, 55, 56, 73}  # JMP opcodes across versions (56=5.5)
         if instr.opcode not in jmp_opcodes:
             return False
         # JMP to PC = current_pc + 1 means jump to next instruction
@@ -212,6 +212,8 @@ class JunkCleaner:
         op = instr.opcode
         if self.version == 0x80:
             return op in (78, 79, 80, 81, 82)
+        elif self.version == 0x55:
+            return op in (70, 71, 72)
         elif self.version == 0x54:
             return op in (69, 70, 71)
         else:
@@ -219,7 +221,7 @@ class JunkCleaner:
 
     def _is_unconditional_jump(self, instr: Instruction) -> bool:
         """Check if instruction is an unconditional jump."""
-        jmp_opcodes = {22, 55, 73}
+        jmp_opcodes = {22, 55, 56, 73}  # 56=JMP in 5.5
         return instr.opcode in jmp_opcodes
 
     def _is_any_branch(self, instr: Instruction) -> bool:
@@ -227,6 +229,8 @@ class JunkCleaner:
         op = instr.opcode
         if self.version == 0x80:
             return op in (48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 73)
+        elif self.version == 0x55:
+            return op in (56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67)
         elif self.version == 0x54:
             return op in (55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66)
         else:
@@ -255,7 +259,8 @@ class JunkCleaner:
         op = instr.opcode
 
         # ADD with 0 constant
-        if op in (12, 13, 20, 21, 33) and instr.C < len(proto.constants):  # ADD variants
+        # 5.1/5.2/5.3: ADD=12/13, 5.4: ADDK=21, ADD=33, 5.5: ADDK=22, ADD=34
+        if op in (12, 13, 20, 21, 22, 33, 34) and instr.C < len(proto.constants):
             try:
                 const = proto.constants[instr.C]
                 if const.ctype in (2, 3) and const.value == 0:  # integer or float 0
@@ -264,7 +269,8 @@ class JunkCleaner:
                 pass
 
         # MUL with 1 constant
-        if op in (14, 15, 23, 35) and instr.C < len(proto.constants):  # MUL variants
+        # 5.1/5.2/5.3: MUL=14/15, 5.4: MULK=23, MUL=35, 5.5: MULK=24, MUL=36
+        if op in (14, 15, 23, 24, 35, 36) and instr.C < len(proto.constants):
             try:
                 const = proto.constants[instr.C]
                 if const.ctype in (2, 3) and const.value == 1:
@@ -297,11 +303,16 @@ class JunkCleaner:
         op = instr.opcode
 
         # EQ with same operands
-        if op in (23, 24, 31, 56, 52, 54) and instr.B == instr.C:
+        # 5.1: EQ=23, 5.2: EQ=24, 5.3: EQ=31, 5.4: EQ=56, 5.5: EQ=57
+        # LuaJIT: ISEQV=52, ISEQS=53, ISEQN=54
+        if op in (23, 24, 31, 52, 54, 56, 57) and instr.B == instr.C:
             return True
 
         # LT/LE with same operands (always false for LT, always true for LE)
-        if op in (24, 25, 32, 33, 57, 58, 50, 51) and instr.B == instr.C:
+        # 5.1: LT=24, LE=25, 5.2: LT=25, LE=26, 5.3: LT=32, LE=33
+        # 5.4: LT=57, LE=58, 5.5: LT=58, LE=59
+        # LuaJIT: ISLT=51, ISLE=50, ISGE=48, ISGT=49
+        if op in (24, 25, 32, 33, 48, 50, 51, 57, 58, 58, 59) and instr.B == instr.C:
             return True
 
         return False

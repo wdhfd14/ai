@@ -353,6 +353,9 @@ class Instruction:
     # LuaJIT specific fields
     D: int = 0  # LuaJIT D operand
 
+    # Lua 5.5 specific fields
+    k: int = 0  # k bit for RK references (bit 15 in 5.5 instructions)
+
     # Metadata
     is_junk: bool = False  # Marked as junk by cleaner
     junk_reason: str = ""
@@ -364,7 +367,7 @@ class Instruction:
 
     def is_jump(self) -> bool:
         """Check if this is a jump instruction."""
-        return self.opcode in (22, 23, 30, 55, 73)  # JMP opcodes across versions
+        return self.opcode in (22, 23, 30, 55, 56, 73)  # JMP opcodes across versions (56=5.5)
 
     def is_conditional(self) -> bool:
         """Check if this is a conditional branch."""
@@ -373,6 +376,7 @@ class Instruction:
             24, 25, 26,      # EQ, LT, LE (5.2)
             31, 32, 33,      # EQ, LT, LE (5.3)
             56, 57, 58,      # EQ, LT, LE (5.4)
+            57, 58, 59,      # EQ, LT, LE (5.5)
             48, 49, 50, 51, 52, 53, 54, 55, 56, 57,  # LuaJIT comparisons
         )
 
@@ -382,7 +386,7 @@ class Instruction:
 
     def is_return(self) -> bool:
         """Check if this is a return instruction."""
-        return self.opcode in (30, 31, 38, 69, 70, 71, 78, 79, 80, 81, 82)
+        return self.opcode in (30, 31, 38, 69, 70, 71, 72, 78, 79, 80, 81, 82)  # 70-72=5.5 RETURN variants
 
     def is_load(self) -> bool:
         """Check if this is a load instruction."""
@@ -466,6 +470,31 @@ LUA54_OPNAMES = {
     80: "VARARGPREP", 81: "EXTRAARG",
 }
 
+LUA55_OPNAMES = {
+    0: "MOVE", 1: "LOADI", 2: "LOADF", 3: "LOADK",
+    4: "LOADKX", 5: "LOADFALSE", 6: "LFALSESKIP", 7: "LOADTRUE",
+    8: "LOADNIL", 9: "GETUPVAL", 10: "SETUPVAL", 11: "GETTABUP",
+    12: "GETTABLE", 13: "GETI", 14: "GETFIELD", 15: "SETTABUP",
+    16: "SETTABLE", 17: "SETI", 18: "SETFIELD", 19: "NEWTABLE",
+    20: "SELF", 21: "ADDI", 22: "ADDK", 23: "SUBK",
+    24: "MULK", 25: "MODK", 26: "POWK", 27: "DIVK",
+    28: "IDIVK", 29: "BANDK", 30: "BORK", 31: "BXORK",
+    32: "SHLI", 33: "SHRI", 34: "ADD", 35: "SUB",
+    36: "MUL", 37: "MOD", 38: "POW", 39: "DIV",
+    40: "IDIV", 41: "BAND", 42: "BOR", 43: "BXOR",
+    44: "SHL", 45: "SHR", 46: "MMBIN", 47: "MMBINI",
+    48: "MMBINK", 49: "UNM", 50: "BNOT", 51: "NOT",
+    52: "LEN", 53: "CONCAT", 54: "CLOSE", 55: "TBC",
+    56: "JMP", 57: "EQ", 58: "LT", 59: "LE",
+    60: "EQK", 61: "EQI", 62: "LTI", 63: "LEI",
+    64: "GTI", 65: "GEI", 66: "TEST", 67: "TESTSET",
+    68: "CALL", 69: "TAILCALL", 70: "RETURN", 71: "RETURN0",
+    72: "RETURN1", 73: "FORLOOP", 74: "FORPREP", 75: "TFORPREP",
+    76: "TFORCALL", 77: "TFORLOOP", 78: "SETLIST", 79: "CLOSURE",
+    80: "VARARG", 81: "GETVARG", 82: "ERRNNIL", 83: "VARARGPREP",
+    84: "EXTRAARG",
+}
+
 LUAJIT_OPNAMES = {
     0: "NOP", 1: "MOV", 2: "NOT", 3: "UNM", 4: "LEN",
     5: "ADDVN", 6: "SUBVN", 7: "MULVN", 8: "DIVVN", 9: "MODVN",
@@ -498,6 +527,7 @@ def get_opname(opcode: int, version: int) -> str:
         0x52: LUA52_OPNAMES,
         0x53: LUA53_OPNAMES,
         0x54: LUA54_OPNAMES,
+        0x55: LUA55_OPNAMES,
         0x80: LUAJIT_OPNAMES,
     }
     names = mapping.get(version, {})
@@ -568,4 +598,99 @@ LUA54_INSTR_FORMATS = {
     72: 'iABC', 73: 'iABC', 74: 'iABC', 75: 'iABC',
     76: 'iABC', 77: 'iABC', 78: 'iABx', 79: 'iABC',
     80: 'iABC', 81: 'iAx',
+}
+
+# Lua 5.5 instruction formats
+# Based on lopcodes.h from Lua 5.5:
+# iABC:  C(8) | B(8) | k(1) | A(8) | Op(7)
+# ivABC: vC(10) | vB(6) | k(1) | A(8) | Op(7) - variant with different B/C widths
+# iABx:  Bx(17) | k(1) | A(8) | Op(7)
+# isJ:   sJ(25) | Op(7)  (was isJ in 5.4 too, but 5.5 has k bit at bit 7)
+# iAx:   Ax(25) | Op(7)
+LUA55_INSTR_FORMATS = {
+    0: 'iABC',    # MOVE
+    1: 'iABx',    # LOADI
+    2: 'iABx',    # LOADF
+    3: 'iABx',    # LOADK
+    4: 'iABx',    # LOADKX
+    5: 'iABC',    # LOADFALSE
+    6: 'iABC',    # LFALSESKIP
+    7: 'iABC',    # LOADTRUE
+    8: 'iABC',    # LOADNIL
+    9: 'iABC',    # GETUPVAL
+    10: 'iABC',   # SETUPVAL
+    11: 'ivABC',  # GETTABUP
+    12: 'ivABC',  # GETTABLE
+    13: 'ivABC',  # GETI
+    14: 'ivABC',  # GETFIELD
+    15: 'ivABC',  # SETTABUP
+    16: 'ivABC',  # SETTABLE
+    17: 'ivABC',  # SETI
+    18: 'ivABC',  # SETFIELD
+    19: 'iABx',   # NEWTABLE (iABx in 5.5, was iABC in 5.4)
+    20: 'ivABC',  # SELF
+    21: 'iABx',   # ADDI
+    22: 'iABx',   # ADDK
+    23: 'iABx',   # SUBK
+    24: 'iABx',   # MULK
+    25: 'iABx',   # MODK
+    26: 'iABx',   # POWK
+    27: 'iABx',   # DIVK
+    28: 'iABx',   # IDIVK
+    29: 'iABx',   # BANDK
+    30: 'iABx',   # BORK
+    31: 'iABx',   # BXORK
+    32: 'iABx',   # SHLI
+    33: 'iABx',   # SHRI
+    34: 'ivABC',  # ADD
+    35: 'ivABC',  # SUB
+    36: 'ivABC',  # MUL
+    37: 'ivABC',  # MOD
+    38: 'ivABC',  # POW
+    39: 'ivABC',  # DIV
+    40: 'ivABC',  # IDIV
+    41: 'ivABC',  # BAND
+    42: 'ivABC',  # BOR
+    43: 'ivABC',  # BXOR
+    44: 'ivABC',  # SHL
+    45: 'ivABC',  # SHR
+    46: 'iABC',   # MMBIN
+    47: 'iABC',   # MMBINI
+    48: 'iABC',   # MMBINK
+    49: 'iABC',   # UNM
+    50: 'iABC',   # BNOT
+    51: 'iABC',   # NOT
+    52: 'iABC',   # LEN
+    53: 'ivABC',  # CONCAT
+    54: 'iABC',   # CLOSE
+    55: 'iABC',   # TBC
+    56: 'isJ',    # JMP
+    57: 'ivABC',  # EQ
+    58: 'ivABC',  # LT
+    59: 'ivABC',  # LE
+    60: 'ivABC',  # EQK
+    61: 'ivABC',  # EQI
+    62: 'ivABC',  # LTI
+    63: 'ivABC',  # LEI
+    64: 'ivABC',  # GTI
+    65: 'ivABC',  # GEI
+    66: 'iABC',   # TEST
+    67: 'iABC',   # TESTSET
+    68: 'iABC',   # CALL
+    69: 'iABC',   # TAILCALL
+    70: 'iABC',   # RETURN
+    71: 'iABC',   # RETURN0
+    72: 'iABC',   # RETURN1
+    73: 'iABx',   # FORLOOP
+    74: 'iABx',   # FORPREP
+    75: 'iABC',   # TFORPREP
+    76: 'iABC',   # TFORCALL
+    77: 'iABC',   # TFORLOOP
+    78: 'iABC',   # SETLIST
+    79: 'iABx',   # CLOSURE
+    80: 'iABC',   # VARARG
+    81: 'iABC',   # GETVARG
+    82: 'iABC',   # ERRNNIL
+    83: 'iABC',   # VARARGPREP
+    84: 'iAx',    # EXTRAARG
 }

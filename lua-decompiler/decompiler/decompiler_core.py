@@ -319,6 +319,13 @@ class Decompiler:
                 self._emit(f"{reg_name(instr.A)} = {float(instr.sBx)}")
             elif op == 2:  # LOADK
                 self._emit(f"{reg_name(instr.A)} = {const_ref(instr.Bx)}")
+            elif op == 3:  # LOADKX
+                if idx + 1 < len(instrs) and instrs[idx + 1].opcode == 81:  # EXTRAARG
+                    k_idx = instrs[idx + 1].Bx  # EXTRAARG stores index in Bx
+                    self._emit(f"{reg_name(instr.A)} = {const_ref(k_idx)}")
+                    consumed = 2
+                else:
+                    self._emit(f"{reg_name(instr.A)} = {const_ref(instr.Bx)}")
             elif op == 4:  # LOADFALSE
                 self._emit(f"{reg_name(instr.A)} = false")
             elif op == 5:  # LFALSESKIP
@@ -328,40 +335,154 @@ class Decompiler:
                 self._emit(f"{reg_name(instr.A)} = true")
             elif op == 7:  # LOADNIL
                 self._emit(f"{reg_name(instr.A)} = nil")
+            elif op == 8:  # GETUPVAL
+                self._emit(f"{reg_name(instr.A)} = {self._upval_name(proto, instr.B)}")
+            elif op == 9:  # SETUPVAL
+                self._emit(f"{self._upval_name(proto, instr.B)} = {reg_name(instr.A)}")
             elif op == 10:  # GETTABUP
                 self._emit(f"{reg_name(instr.A)} = {self._upval_name(proto, instr.B)}[{rk_ref(instr.C)}]")
-            elif op == 11:  # GETTABLE
-                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)}[{rk_ref(instr.C)}]")
+            elif op == 11:  # GETTABLE - R(A) = R(B)[R(C)]
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)}[{reg_name(instr.C)}]")
+            elif op == 12:  # GETI
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)}[{instr.C}]")
+            elif op == 13:  # GETFIELD
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)}[{const_ref(instr.C)}]")
             elif op == 14:  # SETTABUP
                 self._emit(f"{self._upval_name(proto, instr.A)}[{rk_ref(instr.B)}] = {rk_ref(instr.C)}")
             elif op == 15:  # SETTABLE
                 self._emit(f"{reg_name(instr.A)}[{rk_ref(instr.B)}] = {rk_ref(instr.C)}")
+            elif op == 16:  # SETI
+                self._emit(f"{reg_name(instr.A)}[{instr.B}] = {const_ref(instr.C)}")
+            elif op == 17:  # SETFIELD
+                self._emit(f"{reg_name(instr.A)}[{const_ref(instr.B)}] = {const_ref(instr.C)}")
             elif op == 18:  # NEWTABLE
                 self._emit(f"{reg_name(instr.A)} = {{}}")
             elif op == 19:  # SELF
                 self._emit(f"{reg_name(instr.A + 1)} = {reg_name(instr.B)}")
                 self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)}[{rk_ref(instr.C)}]")
-            elif op in range(33, 45):  # Binary ops
+            elif op == 20:  # ADDI - R(A) = R(B) + C (C is signed integer)
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} + {instr.C}")
+            elif op == 21:  # ADDK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} + {const_ref(instr.C)}")
+            elif op == 22:  # SUBK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} - {const_ref(instr.C)}")
+            elif op == 23:  # MULK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} * {const_ref(instr.C)}")
+            elif op == 24:  # MODK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} % {const_ref(instr.C)}")
+            elif op == 25:  # POWK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} ^ {const_ref(instr.C)}")
+            elif op == 26:  # DIVK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} / {const_ref(instr.C)}")
+            elif op == 27:  # IDIVK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} // {const_ref(instr.C)}")
+            elif op == 28:  # BANDK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} & {const_ref(instr.C)}")
+            elif op == 29:  # BORK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} | {const_ref(instr.C)}")
+            elif op == 30:  # BXORK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} ~ {const_ref(instr.C)}")
+            elif op == 31:  # SHRI - R(A) = R(B) >> C
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} >> {instr.C}")
+            elif op == 32:  # SHLI - R(A) = C << R(B)
+                self._emit(f"{reg_name(instr.A)} = {instr.C} << {reg_name(instr.B)}")
+            elif op in range(33, 45):  # Binary register-register ops (ADD..SHR)
                 ops = {33: '+', 34: '-', 35: '*', 36: '%', 37: '^', 38: '/',
                        39: '//', 40: '&', 41: '|', 42: '~', 43: '<<', 44: '>>'}
                 if op in ops:
-                    self._emit(f"{reg_name(instr.A)} = {rk_ref(instr.B)} {ops[op]} {rk_ref(instr.C)}")
+                    self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} {ops[op]} {reg_name(instr.C)}")
+            elif op in (45, 46, 47):  # MMBIN, MMBINI, MMBINK - metamethod hints, skip silently
+                pass
             elif op == 48:  # UNM
-                self._emit(f"{reg_name(instr.A)} = -{rk_ref(instr.B)}")
+                self._emit(f"{reg_name(instr.A)} = -{reg_name(instr.B)}")
             elif op == 49:  # BNOT
-                self._emit(f"{reg_name(instr.A)} = ~{rk_ref(instr.B)}")
+                self._emit(f"{reg_name(instr.A)} = ~{reg_name(instr.B)}")
             elif op == 50:  # NOT
-                self._emit(f"{reg_name(instr.A)} = not {rk_ref(instr.B)}")
+                self._emit(f"{reg_name(instr.A)} = not {reg_name(instr.B)}")
             elif op == 51:  # LEN
-                self._emit(f"{reg_name(instr.A)} = #{rk_ref(instr.B)}")
+                self._emit(f"{reg_name(instr.A)} = #{reg_name(instr.B)}")
             elif op == 52:  # CONCAT
-                self._emit(f"{reg_name(instr.A)} = {rk_ref(instr.B)} .. {rk_ref(instr.C)}")
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} .. {reg_name(instr.C)}")
+            elif op == 53:  # CLOSE
+                self._emit(f"-- close upvalues >= {reg_name(instr.A)}")
+            elif op == 54:  # TBC - to-be-closed
+                self._emit(f"-- to-be-closed {reg_name(instr.A)}")
+            elif op == 55:  # JMP
+                self._emit(f"-- jmp {instr.sBx:+d}")
+            elif op == 56:  # EQ - if (R(B)==R(C)) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {reg_name(instr.B)} == {reg_name(instr.C)} then")
+                else:
+                    self._emit(f"-- if {reg_name(instr.B)} ~= {reg_name(instr.C)} then")
+            elif op == 57:  # LT
+                if instr.A == 0:
+                    self._emit(f"-- if {reg_name(instr.B)} < {reg_name(instr.C)} then")
+                else:
+                    self._emit(f"-- if {reg_name(instr.B)} >= {reg_name(instr.C)} then")
+            elif op == 58:  # LE
+                if instr.A == 0:
+                    self._emit(f"-- if {reg_name(instr.B)} <= {reg_name(instr.C)} then")
+                else:
+                    self._emit(f"-- if {reg_name(instr.B)} > {reg_name(instr.C)} then")
+            elif op == 59:  # EQK - if (K(B)==R(C)) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {const_ref(instr.B)} == {reg_name(instr.C)} then")
+                else:
+                    self._emit(f"-- if {const_ref(instr.B)} ~= {reg_name(instr.C)} then")
+            elif op == 60:  # EQI - if (B==R(C)) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {instr.B} == {reg_name(instr.C)} then")
+                else:
+                    self._emit(f"-- if {instr.B} ~= {reg_name(instr.C)} then")
+            elif op == 61:  # LTI - if (B<R(C)) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {instr.B} < {reg_name(instr.C)} then")
+                else:
+                    self._emit(f"-- if {instr.B} >= {reg_name(instr.C)} then")
+            elif op == 62:  # LEI - if (B<=R(C)) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {instr.B} <= {reg_name(instr.C)} then")
+                else:
+                    self._emit(f"-- if {instr.B} > {reg_name(instr.C)} then")
+            elif op == 63:  # GTI - if (R(C)>B) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {reg_name(instr.C)} > {instr.B} then")
+                else:
+                    self._emit(f"-- if {reg_name(instr.C)} <= {instr.B} then")
+            elif op == 64:  # GEI - if (R(C)>=B) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {reg_name(instr.C)} >= {instr.B} then")
+                else:
+                    self._emit(f"-- if {reg_name(instr.C)} < {instr.B} then")
+            elif op == 65:  # TEST - if (not R(A) == B) then pc++
+                if instr.B == 0:
+                    self._emit(f"-- if not {reg_name(instr.A)} then")
+                else:
+                    self._emit(f"-- if {reg_name(instr.A)} then")
+            elif op == 66:  # TESTSET - if (not R(B) == C) then pc++; else R(A)=R(B)
+                if instr.C == 0:
+                    self._emit(f"-- if not {reg_name(instr.B)} then skip; else {reg_name(instr.A)} = {reg_name(instr.B)}")
+                else:
+                    self._emit(f"-- if {reg_name(instr.B)} then skip; else {reg_name(instr.A)} = {reg_name(instr.B)}")
             elif op == 67:  # CALL
                 consumed = self._handle_call(instr, idx, instrs, proto, reg_names)
             elif op == 68:  # TAILCALL
                 self._emit(f"return {reg_name(instr.A)}({self._call_args(instr, proto, reg_names)})")
             elif op in (69, 70, 71):  # RETURN variants
                 self._handle_return_54(instr, proto, reg_names)
+            elif op == 72:  # FORLOOP
+                pass  # Handled by control flow; FORPREP/FORLOOP pair
+            elif op == 73:  # FORPREP
+                self._emit(f"for {reg_name(instr.A)} = {reg_name(instr.A)}, {reg_name(instr.A + 1)}, {reg_name(instr.A + 2)} do")
+                self.indent_level += 1
+            elif op == 74:  # TFORPREP
+                self._emit(f"-- tforprep R{instr.A}")
+            elif op == 75:  # TFORLOOP
+                pass  # Handled by control flow
+            elif op == 76:  # TFORCALL
+                pass  # Handled by control flow
+            elif op == 77:  # SETLIST
+                pass  # Table initialization, handled implicitly
             elif op == 78:  # CLOSURE
                 child_idx = instr.Bx
                 if child_idx < len(proto.children):
@@ -370,6 +491,236 @@ class Decompiler:
                     self.indent_level += 1
                     self.indent_level -= 1
                     self._emit("end")
+            elif op == 79:  # VARARG
+                if instr.B == 0:
+                    self._emit("...")
+                elif instr.B == 1:
+                    self._emit(f"{reg_name(instr.A)} = ...")
+                elif instr.B > 1:
+                    for r in range(instr.B - 1):
+                        self._emit(f"{reg_name(instr.A + r)} = select({r + 1}, ...)")
+            elif op == 80:  # VARARGPREP - skip silently
+                pass
+            elif op == 81:  # EXTRAARG - consumed by LOADKX, skip if standalone
+                pass
+
+        # =====================================================================
+        # Lua 5.5 instruction handling
+        # =====================================================================
+        elif self.version == 0x55:
+            # In Lua 5.5, the k bit (bit 15) is used for RK references.
+            # For ivABC instructions: when k=1, C refers to K(C); when k=0, C refers to R(C).
+            # B is always a register in ivABC (6 bits).
+            # For iABx instructions: k bit is present but not used for RK.
+
+            def rk_ref_55(c_val: int, k_bit: int) -> str:
+                """RK reference using Lua 5.5 k bit."""
+                if k_bit:
+                    return const_ref(c_val)
+                return reg_name(c_val)
+
+            if op == 0:  # MOVE - R(A) = R(B)
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)}")
+            elif op == 1:  # LOADI
+                self._emit(f"{reg_name(instr.A)} = {instr.sBx}")
+            elif op == 2:  # LOADF
+                self._emit(f"{reg_name(instr.A)} = {float(instr.sBx)}")
+            elif op == 3:  # LOADK
+                self._emit(f"{reg_name(instr.A)} = {const_ref(instr.Bx)}")
+            elif op == 4:  # LOADKX - iABx format in 5.5, constant index in Bx
+                self._emit(f"{reg_name(instr.A)} = {const_ref(instr.Bx)}")
+            elif op == 5:  # LOADFALSE
+                self._emit(f"{reg_name(instr.A)} = false")
+            elif op == 6:  # LFALSESKIP
+                self._emit(f"{reg_name(instr.A)} = false")
+                consumed = 2
+            elif op == 7:  # LOADTRUE
+                self._emit(f"{reg_name(instr.A)} = true")
+            elif op == 8:  # LOADNIL
+                self._emit(f"{reg_name(instr.A)} = nil")
+            elif op == 9:  # GETUPVAL
+                self._emit(f"{reg_name(instr.A)} = {self._upval_name(proto, instr.B)}")
+            elif op == 10:  # SETUPVAL
+                self._emit(f"{self._upval_name(proto, instr.B)} = {reg_name(instr.A)}")
+            elif op == 11:  # GETTABUP - R(A) = UpValue[B][K(C):shortstring]
+                # In Lua 5.5, C is always a constant reference (shortstring)
+                self._emit(f"{reg_name(instr.A)} = {self._upval_name(proto, instr.B)}[{const_ref(instr.C)}]")
+            elif op == 12:  # GETTABLE - R(A) = R(B)[R(C)]
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)}[{reg_name(instr.C)}]")
+            elif op == 13:  # GETI - R(A) = R(B)[C]
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)}[{instr.C}]")
+            elif op == 14:  # GETFIELD - R(A) = R(B)[K(C):shortstring]
+                # In Lua 5.5, C is always a constant reference (shortstring)
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)}[{const_ref(instr.C)}]")
+            elif op == 15:  # SETTABUP - UpValue[A][K(B):shortstring] = RK(C)
+                # In Lua 5.5, B is always a constant reference, C uses k bit
+                self._emit(f"{self._upval_name(proto, instr.A)}[{const_ref(instr.B)}] = {rk_ref_55(instr.C, instr.k)}")
+            elif op == 16:  # SETTABLE - R(A)[R(B)] = RK(C)
+                self._emit(f"{reg_name(instr.A)}[{reg_name(instr.B)}] = {rk_ref_55(instr.C, instr.k)}")
+            elif op == 17:  # SETI - R(A)[B] = RK(C)
+                self._emit(f"{reg_name(instr.A)}[{instr.B}] = {rk_ref_55(instr.C, instr.k)}")
+            elif op == 18:  # SETFIELD - R(A)[K(B):shortstring] = RK(C)
+                # In Lua 5.5, B is always a constant reference, C uses k bit
+                self._emit(f"{reg_name(instr.A)}[{const_ref(instr.B)}] = {rk_ref_55(instr.C, instr.k)}")
+            elif op == 19:  # NEWTABLE - iABx in 5.5
+                self._emit(f"{reg_name(instr.A)} = {{}}")
+            elif op == 20:  # SELF - R(A+1)=R(B), R(A)=R(B)[K(C):shortstring]
+                # In Lua 5.5, C is always a constant reference (shortstring)
+                self._emit(f"{reg_name(instr.A + 1)} = {reg_name(instr.B)}")
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)}[{const_ref(instr.C)}]")
+            elif op == 21:  # ADDI - iABx: R(A) = R(B) + C (C is signed integer)
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} + {instr.C}")
+            elif op == 22:  # ADDK - iABx: R(A) = R(B) + K(C)
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} + {const_ref(instr.C)}")
+            elif op == 23:  # SUBK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} - {const_ref(instr.C)}")
+            elif op == 24:  # MULK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} * {const_ref(instr.C)}")
+            elif op == 25:  # MODK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} % {const_ref(instr.C)}")
+            elif op == 26:  # POWK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} ^ {const_ref(instr.C)}")
+            elif op == 27:  # DIVK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} / {const_ref(instr.C)}")
+            elif op == 28:  # IDIVK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} // {const_ref(instr.C)}")
+            elif op == 29:  # BANDK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} & {const_ref(instr.C)}")
+            elif op == 30:  # BORK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} | {const_ref(instr.C)}")
+            elif op == 31:  # BXORK
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} ~ {const_ref(instr.C)}")
+            elif op == 32:  # SHLI - iABx: R(A) = C << R(B)
+                self._emit(f"{reg_name(instr.A)} = {instr.C} << {reg_name(instr.B)}")
+            elif op == 33:  # SHRI - iABx: R(A) = R(B) >> C
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} >> {instr.C}")
+            elif op in range(34, 46):  # Binary register-register ops (ADD..SHR) - ivABC
+                ops = {34: '+', 35: '-', 36: '*', 37: '%', 38: '^', 39: '/',
+                       40: '//', 41: '&', 42: '|', 43: '~', 44: '<<', 45: '>>'}
+                if op in ops:
+                    self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} {ops[op]} {reg_name(instr.C)}")
+            elif op in (46, 47, 48):  # MMBIN, MMBINI, MMBINK - metamethod hints, skip silently
+                pass
+            elif op == 49:  # UNM
+                self._emit(f"{reg_name(instr.A)} = -{reg_name(instr.B)}")
+            elif op == 50:  # BNOT
+                self._emit(f"{reg_name(instr.A)} = ~{reg_name(instr.B)}")
+            elif op == 51:  # NOT
+                self._emit(f"{reg_name(instr.A)} = not {reg_name(instr.B)}")
+            elif op == 52:  # LEN
+                self._emit(f"{reg_name(instr.A)} = #{reg_name(instr.B)}")
+            elif op == 53:  # CONCAT - ivABC
+                self._emit(f"{reg_name(instr.A)} = {reg_name(instr.B)} .. {reg_name(instr.C)}")
+            elif op == 54:  # CLOSE
+                self._emit(f"-- close upvalues >= {reg_name(instr.A)}")
+            elif op == 55:  # TBC - to-be-closed
+                self._emit(f"-- to-be-closed {reg_name(instr.A)}")
+            elif op == 56:  # JMP
+                self._emit(f"-- jmp {instr.sBx:+d}")
+            elif op == 57:  # EQ - ivABC: if (R(B)==RK(C)) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {reg_name(instr.B)} == {rk_ref_55(instr.C, instr.k)} then")
+                else:
+                    self._emit(f"-- if {reg_name(instr.B)} ~= {rk_ref_55(instr.C, instr.k)} then")
+            elif op == 58:  # LT - ivABC
+                if instr.A == 0:
+                    self._emit(f"-- if {reg_name(instr.B)} < {rk_ref_55(instr.C, instr.k)} then")
+                else:
+                    self._emit(f"-- if {reg_name(instr.B)} >= {rk_ref_55(instr.C, instr.k)} then")
+            elif op == 59:  # LE - ivABC
+                if instr.A == 0:
+                    self._emit(f"-- if {reg_name(instr.B)} <= {rk_ref_55(instr.C, instr.k)} then")
+                else:
+                    self._emit(f"-- if {reg_name(instr.B)} > {rk_ref_55(instr.C, instr.k)} then")
+            elif op == 60:  # EQK - ivABC: if (K(B)==R(C)) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {const_ref(instr.B)} == {reg_name(instr.C)} then")
+                else:
+                    self._emit(f"-- if {const_ref(instr.B)} ~= {reg_name(instr.C)} then")
+            elif op == 61:  # EQI - ivABC: if (B==R(C)) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {instr.B} == {reg_name(instr.C)} then")
+                else:
+                    self._emit(f"-- if {instr.B} ~= {reg_name(instr.C)} then")
+            elif op == 62:  # LTI - ivABC: if (B<R(C)) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {instr.B} < {reg_name(instr.C)} then")
+                else:
+                    self._emit(f"-- if {instr.B} >= {reg_name(instr.C)} then")
+            elif op == 63:  # LEI - ivABC: if (B<=R(C)) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {instr.B} <= {reg_name(instr.C)} then")
+                else:
+                    self._emit(f"-- if {instr.B} > {reg_name(instr.C)} then")
+            elif op == 64:  # GTI - ivABC: if (R(C)>B) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {reg_name(instr.C)} > {instr.B} then")
+                else:
+                    self._emit(f"-- if {reg_name(instr.C)} <= {instr.B} then")
+            elif op == 65:  # GEI - ivABC: if (R(C)>=B) ~= A then pc++
+                if instr.A == 0:
+                    self._emit(f"-- if {reg_name(instr.C)} >= {instr.B} then")
+                else:
+                    self._emit(f"-- if {reg_name(instr.C)} < {instr.B} then")
+            elif op == 66:  # TEST - if (not R(A) == B) then pc++
+                if instr.B == 0:
+                    self._emit(f"-- if not {reg_name(instr.A)} then")
+                else:
+                    self._emit(f"-- if {reg_name(instr.A)} then")
+            elif op == 67:  # TESTSET - if (not R(B) == C) then pc++; else R(A)=R(B)
+                if instr.C == 0:
+                    self._emit(f"-- if not {reg_name(instr.B)} then skip; else {reg_name(instr.A)} = {reg_name(instr.B)}")
+                else:
+                    self._emit(f"-- if {reg_name(instr.B)} then skip; else {reg_name(instr.A)} = {reg_name(instr.B)}")
+            elif op == 68:  # CALL
+                consumed = self._handle_call(instr, idx, instrs, proto, reg_names)
+            elif op == 69:  # TAILCALL
+                self._emit(f"return {reg_name(instr.A)}({self._call_args(instr, proto, reg_names)})")
+            elif op in (70, 71, 72):  # RETURN, RETURN0, RETURN1
+                self._handle_return_55(instr, proto, reg_names)
+            elif op == 73:  # FORLOOP
+                pass  # Handled by control flow; FORPREP/FORLOOP pair
+            elif op == 74:  # FORPREP
+                self._emit(f"for {reg_name(instr.A)} = {reg_name(instr.A)}, {reg_name(instr.A + 1)}, {reg_name(instr.A + 2)} do")
+                self.indent_level += 1
+            elif op == 75:  # TFORPREP
+                self._emit(f"-- tforprep R{instr.A}")
+            elif op == 76:  # TFORCALL
+                pass  # Handled by control flow
+            elif op == 77:  # TFORLOOP
+                pass  # Handled by control flow
+            elif op == 78:  # SETLIST
+                pass  # Table initialization, handled implicitly
+            elif op == 79:  # CLOSURE
+                child_idx = instr.Bx
+                if child_idx < len(proto.children):
+                    child = proto.children[child_idx]
+                    self._emit(f"local {reg_name(instr.A)} = function({self._param_list(child)})")
+                    self.indent_level += 1
+                    self.indent_level -= 1
+                    self._emit("end")
+            elif op == 80:  # VARARG
+                if instr.B == 0:
+                    self._emit("...")
+                elif instr.B == 1:
+                    self._emit(f"{reg_name(instr.A)} = ...")
+                elif instr.B > 1:
+                    for r in range(instr.B - 1):
+                        self._emit(f"{reg_name(instr.A + r)} = select({r + 1}, ...)")
+            elif op == 81:  # GETVARG - new in 5.5: gets vararg parameters
+                if instr.B == 0:
+                    self._emit(f"{reg_name(instr.A)} = ...")
+                elif instr.B == 1:
+                    self._emit(f"{reg_name(instr.A)} = ...")
+                elif instr.B > 1:
+                    for r in range(instr.B - 1):
+                        self._emit(f"{reg_name(instr.A + r)} = select({r + 1}, ...)")
+            elif op == 82:  # ERRNNIL - new in 5.5: error on nil comparison
+                self._emit(f"-- errnnil: error if {reg_name(instr.B)} is nil")
+            elif op == 83:  # VARARGPREP - skip silently
+                pass
+            elif op == 84:  # EXTRAARG - consumed by LOADKX, skip if standalone
+                pass
 
         # =====================================================================
         # LuaJIT instruction handling
@@ -550,6 +901,25 @@ class Decompiler:
         elif op == 71:  # RETURN1
             self._emit(f"return {reg_name(instr.A)}")
         else:  # RETURN
+            n_rets = instr.B - 1
+            if n_rets <= 0:
+                self._emit("return")
+            else:
+                rets = [reg_name(instr.A + i) for i in range(n_rets)]
+                self._emit(f"return {', '.join(rets)}")
+
+    def _handle_return_55(self, instr: Instruction, proto: Prototype,
+                          reg_names: Dict[int, str]):
+        """Handle RETURN/RETURN0/RETURN1 for Lua 5.5."""
+        def reg_name(r):
+            return reg_names.get(r, f"R{r}")
+
+        op = instr.opcode
+        if op == 71:  # RETURN0
+            self._emit("return")
+        elif op == 72:  # RETURN1
+            self._emit(f"return {reg_name(instr.A)}")
+        else:  # RETURN (op == 70)
             n_rets = instr.B - 1
             if n_rets <= 0:
                 self._emit("return")

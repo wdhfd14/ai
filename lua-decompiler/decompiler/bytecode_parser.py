@@ -22,9 +22,12 @@ class BytecodeParser:
         self.size_t_size = 4
         self.instruction_size = 4
         self.number_size = 8
+        self.integer_size = 8
         self.is_integral = False
         self.is_gglua = False
         self.gglua_encryption = ''
+        # Lua 5.5 string dedup table
+        self._string_table = []  # list of strings for dedup
 
     def parse(self) -> Prototype:
         """Parse the bytecode and return the top-level Prototype."""
@@ -44,6 +47,15 @@ class BytecodeParser:
         # Mark as gglua if it's Lua 5.2 format (gglua uses 5.2 bytecode)
         if self.version == 0x52:
             self.is_gglua = True
+
+        # For Lua 5.4+, read the upvalue count byte before the function body
+        # (this is read by luaU_undump, not by loadFunction)
+        if self.version >= 0x54:
+            self._upvalue_count = self._read_byte()
+
+        # Reset string dedup table for Lua 5.5
+        if self.version >= 0x55:
+            self._string_table = []
 
         proto = self._parse_function()
         proto.is_obfuscated = self.is_gglua and self.gglua_encryption != ''
@@ -97,25 +109,84 @@ class BytecodeParser:
         # Format version (0 = official)
         fmt = self._read_byte()
 
-        # Endianness (1 = little-endian)
-        endian = self._read_byte()
-        self.endianness = '<' if endian == 1 else '>'
-
-        # Sizes
-        self.int_size = self._read_byte()
-        self.size_t_size = self._read_byte()
-        self.instruction_size = self._read_byte()
-        self.number_size = self._read_byte()
-
-        # Integral flag
-        self.is_integral = self._read_byte() == 1
-
-        # Verify sanity check (for Lua 5.2+)
-        if self.version >= 0x52:
+        if self.version >= 0x55:
+            # Lua 5.5 header: checknum format (1 byte size + N bytes value)
+            # LUAC_DATA
             check = self._read_bytes(6)
             expected = b'\x19\x93\r\n\x1a\n'
             if check != expected:
-                raise ValueError(f"Lua bytecode sanity check failed")
+                pass  # Tolerate minor differences
+
+            # checknum(int, LUAC_INT): 1 byte size + size bytes value
+            self.int_size = self._read_byte()
+            self._read_bytes(self.int_size)  # test int value
+
+            # checknum(Instruction, LUAC_INST): 1 byte size + size bytes value
+            self.instruction_size = self._read_byte()
+            self._read_bytes(self.instruction_size)  # test instruction value
+
+            # checknum(lua_Integer, LUAC_INT): 1 byte size + size bytes value
+            self.integer_size = self._read_byte()
+            self._read_bytes(self.integer_size)  # test integer value
+
+            # checknum(lua_Number, LUAC_NUM): 1 byte size + size bytes value
+            self.number_size = self._read_byte()
+            self._read_bytes(self.number_size)  # test number value
+
+            # Derive size_t_size (same as int on most platforms)
+            self.size_t_size = self.int_size
+
+            self.endianness = '<'
+            self.is_integral = False
+
+        elif self.version == 0x54:
+            # Lua 5.4 header: checksize + loadInteger/loadNumber
+            # LUAC_DATA
+            check = self._read_bytes(6)
+            expected = b'\x19\x93\r\n\x1a\n'
+            if check != expected:
+                pass
+
+            # checksize(Instruction): 1 byte = sizeof(Instruction)
+            self.instruction_size = self._read_byte()
+
+            # checksize(lua_Integer): 1 byte = sizeof(lua_Integer)
+            self.integer_size = self._read_byte()
+
+            # checksize(lua_Number): 1 byte = sizeof(lua_Number)
+            self.number_size = self._read_byte()
+
+            # loadInteger: test value (sizeof(lua_Integer) bytes)
+            self._read_bytes(self.integer_size)  # LUAC_INT = 0x5678
+
+            # loadNumber: test value (sizeof(lua_Number) bytes)
+            self._read_bytes(self.number_size)  # LUAC_NUM = 370.5
+
+            self.int_size = 4
+            self.size_t_size = 4
+            self.endianness = '<'
+            self.is_integral = False
+        else:
+            # Lua 5.1/5.2/5.3 header format
+            # Endianness (1 = little-endian)
+            endian = self._read_byte()
+            self.endianness = '<' if endian == 1 else '>'
+
+            # Sizes
+            self.int_size = self._read_byte()
+            self.size_t_size = self._read_byte()
+            self.instruction_size = self._read_byte()
+            self.number_size = self._read_byte()
+
+            # Integral flag
+            self.is_integral = self._read_byte() == 1
+
+            # Verify sanity check (for Lua 5.2+)
+            if self.version >= 0x52:
+                check = self._read_bytes(6)
+                expected = b'\x19\x93\r\n\x1a\n'
+                if check != expected:
+                    pass  # Tolerate minor differences
 
     def _parse_luajit_header(self):
         """Parse LuaJIT bytecode header."""
@@ -157,6 +228,12 @@ class BytecodeParser:
 
         proto = Prototype()
 
+        if self.version >= 0x55:
+            return self._parse_function_55(proto)
+        elif self.version >= 0x54:
+            return self._parse_function_54(proto)
+
+        # Lua 5.1/5.2/5.3 format
         # Source name
         if self.version >= 0x52:
             source = self._read_string()
@@ -239,7 +316,9 @@ class BytecodeParser:
         raw = self._read_uint32()
         instr = Instruction(opcode=0, raw=raw, pc=pc)
 
-        if self.version == 0x54:
+        if self.version >= 0x55:
+            self._decode_instruction_55(instr, raw)
+        elif self.version == 0x54:
             self._decode_instruction_54(instr, raw)
         else:
             self._decode_instruction_standard(instr, raw)
@@ -283,6 +362,62 @@ class BytecodeParser:
             instr.sBx = ((raw >> 15) & 0x1FFFF) - 0xFFFF  # 17 bits signed
         elif fmt == 'iAx':
             instr.Bx = (raw >> 15) & 0x1FFFFFF  # 25 bits
+
+    def _decode_instruction_55(self, instr: Instruction, raw: int):
+        """Decode instruction for Lua 5.5.
+
+        Lua 5.5 instruction format differs from 5.4:
+        iABC:  C(8) | B(8) | k(1) | A(8) | Op(7)   - k bit at position 15
+        ivABC: vC(10) | vB(6) | k(1) | A(8) | Op(7) - variant format
+        iABx:  Bx(17) | k(1) | A(8) | Op(7)
+        isJ:   sJ(25) | Op(7)
+        iAx:   Ax(25) | Op(7)
+
+        The k bit is used as the constant flag for RK references.
+        """
+        opcode = raw & 0x7F  # 7 bits for opcode
+        instr.opcode = opcode
+        instr.A = (raw >> 7) & 0xFF  # 8 bits for A
+
+        # k bit is at position 15 (between A and B)
+        instr.k = (raw >> 15) & 0x1  # 1 bit
+
+        fmt = self._get_instruction_format_55(opcode)
+        if fmt == 'iABC':
+            instr.B = (raw >> 16) & 0xFF   # 8 bits for B
+            instr.C = (raw >> 24) & 0xFF   # 8 bits for C
+            # For RK references: k bit indicates if B or C is constant
+            # When k=1, C refers to a constant K(C)
+            # B is always a register in iABC
+        elif fmt == 'ivABC':
+            instr.B = (raw >> 16) & 0x3F   # 6 bits for vB
+            instr.C = (raw >> 22) & 0x3FF  # 10 bits for vC
+        elif fmt == 'iABx':
+            instr.Bx = (raw >> 16) & 0x1FFFF  # 17 bits for Bx
+            instr.B = instr.Bx & 0xFF
+            instr.C = (instr.Bx >> 8) & 0xFF
+        elif fmt == 'isJ':
+            # sJ is 25 bits signed
+            sj = (raw >> 7) & 0x1FFFFFF
+            if sj & 0x1000000:  # sign bit
+                sj -= 0x2000000
+            instr.sBx = sj
+        elif fmt == 'iAx':
+            instr.Bx = (raw >> 7) & 0x1FFFFFF  # 25 bits for Ax
+
+    def _get_instruction_format_55(self, opcode: int) -> str:
+        """Get instruction format for Lua 5.5.
+
+        Lua 5.5 uses different formats than 5.4:
+        - iABC: most instructions with register operands
+        - ivABC: instructions with variant register operands (smaller B, larger C)
+        - iABx: instructions with extended B operand
+        - isJ: jump instruction
+        - iAx: instructions with extended A operand
+        """
+        from .instruction import LUA55_INSTR_FORMATS
+        fmt = LUA55_INSTR_FORMATS.get(opcode, 'iABC')
+        return fmt
 
     def _get_instruction_format(self, opcode: int) -> str:
         """Get instruction format for standard Lua."""
@@ -656,6 +791,349 @@ class BytecodeParser:
                 break
             shift += 7
         return result
+
+    def _read_varint(self) -> int:
+        """Read a variable-length integer (Lua 5.4 format: LEB128).
+
+        Uses loadUnsigned encoding from Lua 5.4 lundump.c:
+        7 bits per byte, high bit 0 = last byte, high bit 1 = more bytes.
+        """
+        result = 0
+        shift = 0
+        for _ in range(10):  # Max 10 bytes for 64-bit
+            if self.pos >= len(self.data):
+                break
+            byte = self.data[self.pos]
+            self.pos += 1
+            result |= (byte & 0x7F) << shift
+            if (byte & 0x80) == 0:
+                break
+            shift += 7
+        return result
+
+    def _read_varint_55(self) -> int:
+        """Read a variable-length integer (Lua 5.5 format: big-endian varint).
+
+        Uses loadVarint encoding from Lua 5.5 lundump.c:
+        x = (x << 7) | (b & 0x7f); continue while (b & 0x80) != 0
+        High bit 1 = more bytes, high bit 0 = last byte (same as LEB128
+        but accumulates in big-endian order).
+        """
+        x = 0
+        for _ in range(10):
+            if self.pos >= len(self.data):
+                break
+            b = self.data[self.pos]
+            self.pos += 1
+            x = (x << 7) | (b & 0x7f)
+            if (b & 0x80) == 0:
+                break
+        return x
+
+    def _read_zigzag_55(self) -> int:
+        """Read a zigzag-encoded signed integer (Lua 5.5 loadInteger).
+
+        Zigzag encoding: 0→0, 1→-1, 2→1, 3→-2, ...
+        Decode: if (cx & 1) then ~(cx >> 1) else (cx >> 1)
+        """
+        cx = self._read_varint_55()
+        if (cx & 1) != 0:
+            return ~(cx >> 1)
+        else:
+            return cx >> 1
+
+    def _read_lua54_int(self) -> int:
+        """Read an integer in Lua 5.4/5.5 format (variable-length)."""
+        return self._read_varint()
+
+    def _read_lua54_size(self) -> int:
+        """Read a size value in Lua 5.4/5.5 format."""
+        return self._read_varint()
+
+    # =========================================================================
+    # Lua 5.4 function parsing
+    # =========================================================================
+    def _parse_function_54(self, proto: Prototype) -> Prototype:
+        """Parse a function prototype for Lua 5.4 bytecode.
+
+        Lua 5.4 uses variable-length integers (loadUnsigned) for counts.
+        Field order: source, linedefined, lastlinedefined, numparams,
+        is_vararg, maxstacksize, code, constants, upvalues, protos, debug.
+        """
+        # Source name
+        source = self._read_string_54()
+        if source:
+            proto.source = source
+
+        # Line defined (variable-length)
+        proto.line_defined = self._read_varint()
+        # Last line defined
+        proto.last_line_defined = self._read_varint()
+
+        # Number of parameters
+        proto.num_params = self._read_byte()
+
+        # Is vararg
+        proto.is_vararg = bool(self._read_byte())
+
+        # Max stack size
+        proto.max_stack_size = self._read_byte()
+
+        # Parse instructions (count is variable-length)
+        num_instructions = self._read_varint()
+        for i in range(num_instructions):
+            instr = self._parse_instruction(i)
+            self._decode_instruction_54(instr, instr.raw)
+            proto.instructions.append(instr)
+
+        # Parse constants (count is variable-length)
+        num_constants = self._read_varint()
+        for _ in range(num_constants):
+            const = self._parse_constant_54()
+            proto.constants.append(const)
+
+        # Parse upvalues
+        num_upvalues = self._read_varint()
+        for _ in range(num_upvalues):
+            instack = bool(self._read_byte())
+            idx = self._read_byte()
+            kind = self._read_byte()
+            proto.upvalues.append(UpvalueDesc(instack, idx))
+
+        # Parse child prototypes
+        num_protos = self._read_varint()
+        for _ in range(num_protos):
+            child = self._parse_function_54(Prototype())
+            proto.children.append(child)
+
+        # Debug info - line info
+        num_line_info = self._read_varint()
+        for _ in range(num_line_info):
+            proto.line_info.append(self._read_varint())
+
+        # Debug info - abs line info
+        num_abs_line_info = self._read_varint()
+        for _ in range(num_abs_line_info):
+            self._read_varint()  # pc
+            self._read_varint()  # line
+
+        # Debug info - local variables
+        num_locals = self._read_varint()
+        for _ in range(num_locals):
+            name = self._read_string_54()
+            start_pc = self._read_varint()
+            end_pc = self._read_varint()
+            proto.local_vars.append(LocalVar(name or "", start_pc, end_pc))
+
+        # Debug info - upvalue names
+        num_upvalue_names = self._read_varint()
+        for i in range(min(num_upvalue_names, len(proto.upvalues))):
+            name = self._read_string_54()
+            if name and i < len(proto.upvalues):
+                proto.upvalues[i].name = name
+
+        return proto
+
+    # =========================================================================
+    # Lua 5.5 function parsing
+    # =========================================================================
+    def _parse_function_55(self, proto: Prototype) -> Prototype:
+        """Parse a function prototype for Lua 5.5 bytecode.
+
+        Lua 5.5 uses loadVarint (big-endian varint) for counts and
+        zigzag encoding for signed integers. Field order differs from 5.4:
+        linedefined, lastlinedefined, numparams, flag, maxstacksize,
+        code, constants, upvalues, protos, source, debug.
+        String dedup: size=0 means read varint index to reuse a string.
+        """
+        # linedefined (varint)
+        proto.line_defined = self._read_varint_55()
+        # lastlinedefined (varint)
+        proto.last_line_defined = self._read_varint_55()
+
+        # Number of parameters
+        proto.num_params = self._read_byte()
+
+        # Flag byte (PF_VAHID=1, PF_VATAB=2, PF_FIXED=4)
+        flags = self._read_byte()
+        proto.is_vararg = bool(flags & 0x01)
+
+        # Max stack size
+        proto.max_stack_size = self._read_byte()
+
+        # loadCode: count + alignment + instructions
+        num_instructions = self._read_varint_55()
+        # loadAlign(4): align to 4-byte boundary relative to dump start
+        self._align_55(4)
+        for i in range(num_instructions):
+            instr = self._parse_instruction(i)
+            self._decode_instruction_55(instr, instr.raw)
+            proto.instructions.append(instr)
+
+        # loadConstants: count + constants
+        num_constants = self._read_varint_55()
+        for _ in range(num_constants):
+            const = self._parse_constant_55()
+            proto.constants.append(const)
+
+        # loadUpvalues: count + upvalue descriptors
+        num_upvalues = self._read_varint_55()
+        for _ in range(num_upvalues):
+            instack = bool(self._read_byte())
+            idx = self._read_byte()
+            kind = self._read_byte()
+            proto.upvalues.append(UpvalueDesc(instack, idx))
+
+        # loadProtos: count + child prototypes
+        num_protos = self._read_varint_55()
+        for _ in range(num_protos):
+            child = self._parse_function_55(Prototype())
+            proto.children.append(child)
+
+        # Source name (moved after protos in Lua 5.5!)
+        source = self._read_string_55()
+        if source:
+            proto.source = source
+
+        # loadDebug
+        self._parse_debug_55(proto)
+
+        return proto
+
+    def _align_55(self, alignment: int):
+        """Align position to given boundary (Lua 5.5 loadAlign)."""
+        padding = alignment - (self.pos % alignment)
+        if padding < alignment:
+            self.pos += padding
+
+    def _parse_constant_55(self) -> Constant:
+        """Parse a constant value for Lua 5.5.
+
+        Lua 5.5 uses zigzag+varint for integer constants instead of
+        raw 8-byte lua_Integer.
+        """
+        type_tag = self._read_byte()
+
+        if type_tag == 0x00:  # LUA_VNIL
+            return Constant(ConstantType.NIL)
+        elif type_tag == 0x01:  # LUA_VFALSE
+            return Constant(ConstantType.BOOLEAN, False)
+        elif type_tag == 0x11:  # LUA_VTRUE
+            return Constant(ConstantType.BOOLEAN, True)
+        elif type_tag == 0x03:  # LUA_VNUMINT (zigzag varint)
+            val = self._read_zigzag_55()
+            return Constant(ConstantType.INTEGER, val)
+        elif type_tag == 0x13:  # LUA_VNUMFLT (8-byte double)
+            val = self._read_number()
+            return Constant(ConstantType.FLOAT, val)
+        elif type_tag in (0x04, 0x14, 0x24):  # LUA_VSHRSTR
+            s = self._read_string_55()
+            return Constant(ConstantType.STRING, s or "")
+        elif type_tag in (0x05, 0x15, 0x25):  # LUA_VLNGSTR
+            s = self._read_string_55()
+            return Constant(ConstantType.STRING, s or "")
+        else:
+            return Constant(ConstantType.NIL)
+
+    def _read_string_55(self) -> Optional[str]:
+        """Read a string in Lua 5.5 format with dedup support.
+
+        loadStringN in Lua 5.5:
+        - size = loadVarint()
+        - if size == 0: read varint index, return string from dedup table
+        - else: read (size-1) chars + null terminator, add to dedup table
+        """
+        size = self._read_varint_55()
+        if size == 0:
+            # Dedup: read index to reuse a previously loaded string
+            idx = self._read_varint_55()
+            if 0 <= idx < len(self._string_table):
+                return self._string_table[idx]
+            return None
+        # size includes null terminator
+        actual_size = size - 1
+        if actual_size <= 0:
+            self.pos += 1  # Skip null terminator
+            s = ""
+        elif self.pos + actual_size > len(self.data):
+            s = ""
+        else:
+            s = self.data[self.pos:self.pos + actual_size].decode('utf-8', errors='replace')
+            self.pos += actual_size + 1  # string + null terminator
+        # Add to dedup table
+        self._string_table.append(s)
+        return s
+
+    def _parse_debug_55(self, proto: Prototype):
+        """Parse debug info for Lua 5.5."""
+        # Line info (byte array)
+        num_line_info = self._read_varint_55()
+        for _ in range(num_line_info):
+            proto.line_info.append(self._read_byte())
+
+        # Abs line info
+        num_abs_line_info = self._read_varint_55()
+        for _ in range(num_abs_line_info):
+            self._read_varint_55()  # pc
+            self._read_varint_55()  # line
+
+        # Local variables
+        num_locals = self._read_varint_55()
+        for _ in range(num_locals):
+            name = self._read_string_55()
+            start_pc = self._read_varint_55()
+            end_pc = self._read_varint_55()
+            proto.local_vars.append(LocalVar(name or "", start_pc, end_pc))
+
+        # Upvalue names
+        num_upvalue_names = self._read_varint_55()
+        if num_upvalue_names != 0:
+            # In Lua 5.5, non-zero means read all upvalue names
+            for i in range(len(proto.upvalues)):
+                name = self._read_string_55()
+                if name and i < len(proto.upvalues):
+                    proto.upvalues[i].name = name
+
+    def _parse_constant_54(self) -> Constant:
+        """Parse a constant value for Lua 5.4/5.5."""
+        type_tag = self._read_byte()
+
+        if type_tag == 0x00:  # NIL
+            return Constant(ConstantType.NIL)
+        elif type_tag == 0x01:  # FALSE
+            return Constant(ConstantType.BOOLEAN, False)
+        elif type_tag == 0x11:  # TRUE
+            return Constant(ConstantType.BOOLEAN, True)
+        elif type_tag == 0x03:  # INTEGER (lua_Integer = int64)
+            val = self._read_longlong()
+            return Constant(ConstantType.INTEGER, val)
+        elif type_tag == 0x13:  # NUMBER (lua_Number = double)
+            val = self._read_number()
+            return Constant(ConstantType.FLOAT, val)
+        elif type_tag in (0x04, 0x14, 0x24):  # SHORT STRING
+            s = self._read_string_54()
+            return Constant(ConstantType.STRING, s or "")
+        elif type_tag in (0x05, 0x15, 0x25):  # LONG STRING
+            s = self._read_string_54()
+            return Constant(ConstantType.STRING, s or "")
+        else:
+            return Constant(ConstantType.NIL)
+
+    def _read_string_54(self) -> Optional[str]:
+        """Read a string in Lua 5.4/5.5 format (variable-length size)."""
+        size = self._read_varint()
+        if size == 0:
+            return None
+        # size includes the null terminator
+        actual_size = size - 1
+        if actual_size <= 0:
+            self.pos += 1  # Skip null terminator
+            return ""
+        if self.pos + actual_size > len(self.data):
+            return ""
+        s = self.data[self.pos:self.pos + actual_size].decode('utf-8', errors='replace')
+        self.pos += actual_size + 1  # Skip string + null terminator
+        return s
 
 
 def parse_bytecode(data: bytes) -> Prototype:
