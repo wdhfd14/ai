@@ -191,7 +191,7 @@ class JunkCleaner:
                 skip_until_branch_target = True
 
             # After unconditional JMP, subsequent instructions are dead unless branch targets
-            if self._is_unconditional_jump(instr):
+            if self._is_unconditional_jump(instr, len(instrs)):
                 skip_until_branch_target = True
 
         if removed:
@@ -201,10 +201,13 @@ class JunkCleaner:
     def _collect_branch_targets(self, instrs: List[Instruction]) -> Set[int]:
         """Collect all branch target PCs."""
         targets = set()
+        n_instrs = len(instrs) if hasattr(instrs, '__len__') else 0
         for instr in instrs:
             if self._is_any_branch(instr):
                 target = instr.pc + 1 + instr.sBx
-                targets.add(target)
+                # Only include targets within valid PC range
+                if 0 <= target < n_instrs:
+                    targets.add(target)
         return targets
 
     def _is_return(self, instr: Instruction) -> bool:
@@ -219,10 +222,20 @@ class JunkCleaner:
         else:
             return op in (30, 31, 38)
 
-    def _is_unconditional_jump(self, instr: Instruction) -> bool:
+    def _is_unconditional_jump(self, instr: Instruction,
+                                n_instrs: int = 0) -> bool:
         """Check if instruction is an unconditional jump."""
         jmp_opcodes = {22, 55, 56, 73}  # 56=JMP in 5.5
-        return instr.opcode in jmp_opcodes
+        if instr.opcode not in jmp_opcodes:
+            return False
+        # Check that the jump target is valid (obfuscators may set garbage offsets)
+        target = instr.pc + 1 + instr.sBx
+        if target < 0:
+            return False
+        # If we know the instruction count, check upper bound too
+        if n_instrs > 0 and target >= n_instrs:
+            return False
+        return True
 
     def _is_any_branch(self, instr: Instruction) -> bool:
         """Check if instruction is any kind of branch."""
@@ -351,9 +364,31 @@ class JunkCleaner:
                     used.add(instr.B)
                 if instr.C < proto.max_stack_size:
                     used.add(instr.C)
-            # CALL/TAILCALL reads function register
+            # CALL/TAILCALL reads function register and argument registers
             if op in (28, 29, 36, 37, 67, 68, 74, 75, 76, 77):
                 used.add(instr.A)
+                # CALL also reads argument registers R(A+1)..R(A+B-1)
+                if op in (28, 29, 36, 37, 68, 69):
+                    n_args = instr.B - 1  # B=0 means vararg
+                    if n_args > 0:
+                        for j in range(1, n_args + 1):
+                            r = instr.A + j
+                            if r < proto.max_stack_size:
+                                used.add(r)
+            # RETURN reads return value registers
+            if op in (30, 31, 38, 70, 71, 72):
+                n_rets = instr.B - 1  # B=0 means vararg
+                if n_rets > 0:
+                    for j in range(n_rets):
+                        r = instr.A + j
+                        if r < proto.max_stack_size:
+                            used.add(r)
+            # CONCAT reads range R(B)..R(C)
+            if op == 53:  # CONCAT in Lua 5.5
+                end = max(instr.B, instr.C)
+                for r in range(instr.B, end + 1):
+                    if r < proto.max_stack_size:
+                        used.add(r)
         return used
 
     def _is_unused_write(self, instr: Instruction, used_regs: Set[int],

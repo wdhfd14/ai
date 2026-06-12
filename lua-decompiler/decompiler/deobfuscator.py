@@ -26,6 +26,13 @@ class Deobfuscator:
         self.version = version
         self.junk_cleaner = JunkCleaner(version)
         self.detected_techniques: List[str] = []
+        # JMP opcodes differ between Lua versions:
+        # Lua 5.4: 22 (JMP), 55 (JMP variant), 73 (FORLOOP with JMP)
+        # Lua 5.5: 56 (JMP)
+        if version == 0x55:
+            self._jmp_opcodes = (56,)
+        else:
+            self._jmp_opcodes = (22, 55, 73)
         self.stats = {
             'jmb_decrypted': False,
             'strings_decrypted': 0,
@@ -114,7 +121,7 @@ class Deobfuscator:
         # Count JMP instructions
         jmp_count = 0
         for instr in proto.instructions:
-            if instr.opcode in (22, 55, 73):  # JMP opcodes
+            if instr.opcode in self._jmp_opcodes:
                 jmp_count += 1
 
         # High ratio of JMPs indicates possible JMB
@@ -245,7 +252,7 @@ class Deobfuscator:
                 # If target is far away and there's a JMP right after
                 if i + 1 < len(proto.instructions):
                     next_instr = proto.instructions[i + 1]
-                    if next_instr.opcode in (22, 55, 73):  # JMP
+                    if next_instr.opcode in self._jmp_opcodes:  # JMP
                         always_fallthrough += 1
 
         if total_cond > 3 and always_fallthrough > total_cond * 0.5:
@@ -390,11 +397,19 @@ class Deobfuscator:
         return proto
 
     def _try_decrypt_string(self, s: str) -> Optional[str]:
-        """Try various decryption methods on a string."""
+        """Try various decryption methods on a string.
+
+        Only attempt decryption if the string appears to be encrypted
+        (contains non-printable or unusual characters).
+        """
+        # Skip strings that are already readable (mostly printable ASCII/UTF-8)
+        if self._is_likely_plaintext(s):
+            return None
+
         # Try XOR with common keys
         for key in [0x42, 0x55, 0xAA, 0xFF, 0x13, 0x37]:
             result = self._xor_decrypt(s, key)
-            if result and self._is_printable(result):
+            if result and self._is_printable(result) and self._is_likely_plaintext(result):
                 return result
 
         # Try base64 decode
@@ -403,6 +418,27 @@ class Deobfuscator:
             return result
 
         return None
+
+    def _is_likely_plaintext(self, s: str) -> bool:
+        """Check if a string is likely already plaintext (not encrypted).
+
+        A string is considered plaintext if most of its characters are
+        printable ASCII or valid UTF-8 (letters, digits, punctuation, CJK, etc.).
+        """
+        if not s:
+            return True
+        printable_count = 0
+        for ch in s:
+            # Check for common plaintext characters
+            if ch.isalpha() or ch.isdigit() or ch.isspace():
+                printable_count += 1
+            elif ch in '._-:/@#$%^&*()[]{}<>=+|\\~`!?,;:\'"':
+                printable_count += 1
+            elif ord(ch) > 127:
+                # Non-ASCII but could be valid UTF-8 (CJK, etc.)
+                printable_count += 1
+        # If more than 70% of characters are printable, consider it plaintext
+        return printable_count / len(s) > 0.7
 
     def _xor_decrypt(self, s: str, key: int) -> Optional[str]:
         """XOR decrypt a string with a single byte key."""
@@ -562,7 +598,7 @@ class Deobfuscator:
             # Pattern: conditional branch + JMP to skip = always-taken branch
             if (self._is_conditional(instr) and
                 i + 1 < len(instrs) and
-                instrs[i + 1].opcode in (22, 55, 73)):  # Next is JMP
+                instrs[i + 1].opcode in self._jmp_opcodes):  # Next is JMP
 
                 cond_target = instr.pc + 1 + instr.sBx
                 jmp_target = instrs[i + 1].pc + 1 + instrs[i + 1].sBx

@@ -609,9 +609,9 @@ LUA54_INSTR_FORMATS = {
 # iAx:   Ax(25) | Op(7)
 LUA55_INSTR_FORMATS = {
     0: 'iABC',    # MOVE
-    1: 'iABx',    # LOADI
-    2: 'iABx',    # LOADF
-    3: 'iABx',    # LOADK
+    1: 'iAsBx',   # LOADI - R(A) = sBx (signed)
+    2: 'iAsBx',   # LOADF - R(A) = sBx (signed, as float)
+    3: 'iABx',    # LOADK - R(A) = K[Bx] (unsigned constant index)
     4: 'iABx',    # LOADKX
     5: 'iABC',    # LOADFALSE
     6: 'iABC',    # LFALSESKIP
@@ -619,17 +619,17 @@ LUA55_INSTR_FORMATS = {
     8: 'iABC',    # LOADNIL
     9: 'iABC',    # GETUPVAL
     10: 'iABC',   # SETUPVAL
-    11: 'ivABC',  # GETTABUP
-    12: 'ivABC',  # GETTABLE
-    13: 'ivABC',  # GETI
-    14: 'ivABC',  # GETFIELD
-    15: 'ivABC',  # SETTABUP
-    16: 'ivABC',  # SETTABLE
-    17: 'ivABC',  # SETI
-    18: 'ivABC',  # SETFIELD
-    19: 'iABx',   # NEWTABLE (iABx in 5.5, was iABC in 5.4)
-    20: 'ivABC',  # SELF
-    21: 'iABx',   # ADDI
+    11: 'iABC',   # GETTABUP - C is always K[C]:shortstring
+    12: 'iABC',   # GETTABLE - C is R[C]
+    13: 'iABC',   # GETI - C is integer index
+    14: 'iABC',   # GETFIELD - C is always K[C]:shortstring
+    15: 'iABC',   # SETTABUP - B is always K[B]:shortstring, C uses k bit
+    16: 'iABC',   # SETTABLE - B is R[B], C uses k bit
+    17: 'iABC',   # SETI - B is integer index, C uses k bit
+    18: 'iABC',   # SETFIELD - B is always K[B]:shortstring, C uses k bit
+    19: 'ivABC',  # NEWTABLE - uses vB/vC for array/hash sizes
+    20: 'iABC',   # SELF - C is always K[C]:shortstring
+    21: 'iAsBx',  # ADDI - R(A) = R(B) + sBx (signed immediate)
     22: 'iABx',   # ADDK
     23: 'iABx',   # SUBK
     24: 'iABx',   # MULK
@@ -640,20 +640,20 @@ LUA55_INSTR_FORMATS = {
     29: 'iABx',   # BANDK
     30: 'iABx',   # BORK
     31: 'iABx',   # BXORK
-    32: 'iABx',   # SHLI
-    33: 'iABx',   # SHRI
-    34: 'ivABC',  # ADD
-    35: 'ivABC',  # SUB
-    36: 'ivABC',  # MUL
-    37: 'ivABC',  # MOD
-    38: 'ivABC',  # POW
-    39: 'ivABC',  # DIV
-    40: 'ivABC',  # IDIV
-    41: 'ivABC',  # BAND
-    42: 'ivABC',  # BOR
-    43: 'ivABC',  # BXOR
-    44: 'ivABC',  # SHL
-    45: 'ivABC',  # SHR
+    32: 'iAsBx',  # SHLI - R(A) = sBx << R(B) (signed shift amount)
+    33: 'iAsBx',  # SHRI - R(A) = R(B) >> sBx (signed shift amount)
+    34: 'iABC',   # ADD - B/C are registers, k bit for RK(C)
+    35: 'iABC',   # SUB
+    36: 'iABC',   # MUL
+    37: 'iABC',   # MOD
+    38: 'iABC',   # POW
+    39: 'iABC',   # DIV
+    40: 'iABC',   # IDIV
+    41: 'iABC',   # BAND
+    42: 'iABC',   # BOR
+    43: 'iABC',   # BXOR
+    44: 'iABC',   # SHL
+    45: 'iABC',   # SHR
     46: 'iABC',   # MMBIN
     47: 'iABC',   # MMBINI
     48: 'iABC',   # MMBINK
@@ -661,19 +661,19 @@ LUA55_INSTR_FORMATS = {
     50: 'iABC',   # BNOT
     51: 'iABC',   # NOT
     52: 'iABC',   # LEN
-    53: 'ivABC',  # CONCAT
+    53: 'iABC',   # CONCAT
     54: 'iABC',   # CLOSE
     55: 'iABC',   # TBC
     56: 'isJ',    # JMP
-    57: 'ivABC',  # EQ
-    58: 'ivABC',  # LT
-    59: 'ivABC',  # LE
-    60: 'ivABC',  # EQK
-    61: 'ivABC',  # EQI
-    62: 'ivABC',  # LTI
-    63: 'ivABC',  # LEI
-    64: 'ivABC',  # GTI
-    65: 'ivABC',  # GEI
+    57: 'iABC',   # EQ
+    58: 'iABC',   # LT
+    59: 'iABC',   # LE
+    60: 'iABC',   # EQK
+    61: 'iABC',   # EQI
+    62: 'iABC',   # LTI
+    63: 'iABC',   # LEI
+    64: 'iABC',   # GTI
+    65: 'iABC',   # GEI
     66: 'iABC',   # TEST
     67: 'iABC',   # TESTSET
     68: 'iABC',   # CALL
@@ -681,8 +681,8 @@ LUA55_INSTR_FORMATS = {
     70: 'iABC',   # RETURN
     71: 'iABC',   # RETURN0
     72: 'iABC',   # RETURN1
-    73: 'iABx',   # FORLOOP
-    74: 'iABx',   # FORPREP
+    73: 'iAsBx',  # FORLOOP
+    74: 'iAsBx',  # FORPREP
     75: 'iABC',   # TFORPREP
     76: 'iABC',   # TFORCALL
     77: 'iABC',   # TFORLOOP

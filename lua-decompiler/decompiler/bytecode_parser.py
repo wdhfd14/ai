@@ -396,6 +396,13 @@ class BytecodeParser:
             instr.Bx = (raw >> 16) & 0x1FFFF  # 17 bits for Bx
             instr.B = instr.Bx & 0xFF
             instr.C = (instr.Bx >> 8) & 0xFF
+        elif fmt == 'iAsBx':
+            # iAsBx: signed 17-bit Bx
+            # sBx = Bx - OFFSET_sBx, where OFFSET_sBx = 0x8000
+            instr.Bx = (raw >> 16) & 0x1FFFF  # 17 bits for Bx (unsigned)
+            instr.sBx = instr.Bx - 0x8000     # signed offset (same as Lua 5.4)
+            instr.B = instr.Bx & 0xFF
+            instr.C = (instr.Bx >> 8) & 0xFF
         elif fmt == 'isJ':
             # sJ is 25 bits signed
             sj = (raw >> 7) & 0x1FFFFFF
