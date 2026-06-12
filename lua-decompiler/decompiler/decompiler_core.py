@@ -8,6 +8,7 @@ Standard reverse engineering for software security analysis.
 from typing import List, Dict, Set, Optional, Tuple
 from .prototype import Prototype, Constant, ConstantType, UpvalueDesc
 from .instruction import Instruction, get_opname
+from .gglua_support import is_gglua_extra_opcode, get_gglua_opname
 from .control_flow import ControlFlowAnalyzer, BasicBlock
 from .junk_cleaner import JunkCleaner
 from .deobfuscator import Deobfuscator
@@ -285,6 +286,28 @@ class Decompiler:
                 elif instr.B > 1:
                     for r in range(instr.B - 1):
                         self._emit(f"{reg_name(instr.A + r)} = select({r + 1}, ...)")
+
+            # =================================================================
+            # gglua extra opcodes (Lua 5.3 bitwise ops in Lua 5.2 format)
+            # =================================================================
+            elif is_gglua_extra_opcode(op):
+                if op == 39:  # IDIV
+                    self._emit(f"{reg_name(instr.A)} = {rk_ref(instr.B)} // {rk_ref(instr.C)}")
+                elif op == 40:  # BAND
+                    self._emit(f"{reg_name(instr.A)} = {rk_ref(instr.B)} & {rk_ref(instr.C)}")
+                elif op == 41:  # BOR
+                    self._emit(f"{reg_name(instr.A)} = {rk_ref(instr.B)} | {rk_ref(instr.C)}")
+                elif op == 42:  # BXOR
+                    self._emit(f"{reg_name(instr.A)} = {rk_ref(instr.B)} ~ {rk_ref(instr.C)}")
+                elif op == 43:  # BNOT
+                    self._emit(f"{reg_name(instr.A)} = ~{rk_ref(instr.B)}")
+                elif op == 44:  # SHL
+                    self._emit(f"{reg_name(instr.A)} = {rk_ref(instr.B)} << {rk_ref(instr.C)}")
+                elif op == 45:  # SHR
+                    self._emit(f"{reg_name(instr.A)} = {rk_ref(instr.B)} >> {rk_ref(instr.C)}")
+                else:
+                    opname = get_gglua_opname(op) or f"GG_OP{op}"
+                    self._emit(f"-- gglua: {opname} A={instr.A} B={instr.B} C={instr.C}")
 
         # =====================================================================
         # Lua 5.4 instruction handling

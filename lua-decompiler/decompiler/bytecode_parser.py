@@ -1,12 +1,13 @@
 """Universal Lua bytecode parser.
 
-Supports Lua 5.1, 5.2, 5.3, 5.4 and LuaJIT bytecode formats.
+Supports Lua 5.1, 5.2, 5.3, 5.4, LuaJIT and gglua (GameGuardian Lua) bytecode formats.
 """
 
 import struct
 from typing import Optional, List, Tuple
 from .prototype import Prototype, Constant, ConstantType, UpvalueDesc, LocalVar, LuaVersion
 from .instruction import Instruction, get_opname
+from .gglua_support import detect_gglua, decrypt_gglua, GGLUA_EXTRA_OPCODES
 
 
 class BytecodeParser:
@@ -22,16 +23,39 @@ class BytecodeParser:
         self.instruction_size = 4
         self.number_size = 8
         self.is_integral = False
+        self.is_gglua = False
+        self.gglua_encryption = ''
 
     def parse(self) -> Prototype:
         """Parse the bytecode and return the top-level Prototype."""
         self.pos = 0
+
+        # Check for gglua encrypted/custom format first
+        is_gg, enc_type = detect_gglua(self.data)
+        if is_gg and enc_type not in ('gglua_52_format', 'gglua_luajit', 'standard_lua'):
+            # Need to decrypt first
+            self.is_gglua = True
+            self.gglua_encryption = enc_type
+            self.data = decrypt_gglua(self.data, enc_type)
+            self.pos = 0
+
         self._detect_and_parse_header()
+
+        # Mark as gglua if it's Lua 5.2 format (gglua uses 5.2 bytecode)
+        if self.version == 0x52:
+            self.is_gglua = True
+
         proto = self._parse_function()
+        proto.is_obfuscated = self.is_gglua and self.gglua_encryption != ''
+        if self.gglua_encryption:
+            proto.obfuscation_types.append(f'gglua:{self.gglua_encryption}')
         return proto
 
     def _detect_and_parse_header(self):
         """Detect bytecode version and parse header accordingly."""
+        if len(self.data) < 4:
+            raise ValueError("Data too short to detect bytecode format")
+
         magic = self.data[0:4]
         if magic[:3] == b'\x1bLJ':
             # LuaJIT bytecode
@@ -40,7 +64,23 @@ class BytecodeParser:
             # Standard Lua bytecode
             self._parse_standard_header()
         else:
-            raise ValueError(f"Invalid Lua bytecode magic: {magic.hex()}")
+            # Try gglua decryption as last resort
+            is_gg, enc_type = detect_gglua(self.data)
+            if is_gg:
+                self.is_gglua = True
+                self.gglua_encryption = enc_type
+                self.data = decrypt_gglua(self.data, enc_type)
+                self.pos = 0
+                # Re-detect after decryption
+                magic = self.data[0:4]
+                if magic[:3] == b'\x1bLJ':
+                    self._parse_luajit_header()
+                elif magic == b'\x1bLua':
+                    self._parse_standard_header()
+                else:
+                    raise ValueError(f"Failed to decrypt gglua bytecode (type: {enc_type})")
+            else:
+                raise ValueError(f"Invalid Lua bytecode magic: {magic.hex()}")
 
     def _parse_standard_header(self):
         """Parse standard Lua 5.x bytecode header."""
