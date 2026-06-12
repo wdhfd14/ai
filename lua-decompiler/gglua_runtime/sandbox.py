@@ -26,7 +26,7 @@ class GGLuaSandbox:
     """Sandboxed execution environment for gglua scripts.
 
     Creates a Lua runtime with:
-    - Complete gg.* API
+    - Complete gg.* API (every function callable)
     - bit32 library
     - math extensions (Lua 5.3 style)
     - Blocked dangerous operations
@@ -49,7 +49,7 @@ class GGLuaSandbox:
         """Create and configure the Lua runtime environment."""
         self.lua = LuaRuntime(unpack_returned_tuples=True)
 
-        # Inject gg.* API
+        # Inject gg.* API (complete - every function)
         self._inject_gg_api()
 
         # Inject bit32 library
@@ -64,17 +64,9 @@ class GGLuaSandbox:
         return self
 
     def execute(self, code: str) -> Any:
-        """Execute Lua code in the sandbox.
-
-        Args:
-            code: Lua source code to execute
-
-        Returns:
-            Result of the Lua execution
-        """
+        """Execute Lua code in the sandbox."""
         if self.lua is None:
             self.create_runtime()
-
         try:
             result = self.lua.execute(code)
             return result
@@ -115,15 +107,24 @@ class GGLuaSandbox:
         self.create_runtime()
 
     # ========================================================================
-    # API Injection
+    # Complete gg.* API injection
     # ========================================================================
     def _inject_gg_api(self):
-        """Inject the complete gg.* API into the Lua environment."""
-        lua = self.lua
+        """Inject the COMPLETE gg.* API into the Lua environment.
 
-        # Create gg table
+        Every function is implemented as a Lua wrapper that calls
+        Python through lupa's Python bridge. This ensures all
+        functions are actually callable from Lua code.
+        """
+        lua = self.lua
+        api = self.gg_api
+        g = lua.globals()
+
+        # ---- Step 1: Create gg table with all constants ----
         lua.execute("""
         gg = {}
+
+        -- Region constants
         gg.REGION_ANONYMOUS = 0
         gg.REGION_C_ALLOC = 1
         gg.REGION_JAVA = 2
@@ -136,6 +137,7 @@ class GGLuaSandbox:
         gg.REGION_ASHMEM = 256
         gg.REGION_OTHER = -1
 
+        -- Type constants
         gg.TYPE_AUTO = 0
         gg.TYPE_BYTE = 1
         gg.TYPE_WORD = 2
@@ -144,132 +146,298 @@ class GGLuaSandbox:
         gg.TYPE_FLOAT = 16
         gg.TYPE_DOUBLE = 32
         gg.TYPE_XOR = 64
+        gg.TYPE_BYTE_SIGN = 128
+        gg.TYPE_WORD_SIGN = 256
+        gg.TYPE_DWORD_SIGN = 512
+        gg.TYPE_QWORD_SIGN = 1024
 
+        -- Sign constants
         gg.SIGN_EQUAL = 0
         gg.SIGN_NOT_EQUAL = 1
         gg.SIGN_GREATER = 2
         gg.SIGN_LESS = 3
+        gg.SIGN_GREATER_EQUAL = 4
+        gg.SIGN_LESS_EQUAL = 5
 
+        -- Freeze type constants
         gg.FREEZE_NORMAL = 0
         gg.FREEZE_INCREASE = 1
         gg.FREEZE_DECREASE = 2
 
+        -- Visibility
         gg.VISIBLE = true
         gg.INVISIBLE = false
+
+        -- Print modes
+        gg.PRINT_NORMAL = 0
+        gg.PRINT_JSON = 1
+        gg.PRINT_TABLE = 2
+
+        -- Alert modes
+        gg.ALERT_OK = 0
+        gg.ALERT_YES_NO = 1
+        gg.ALERT_CANCEL = 2
         """)
 
-        # Inject Python-backed gg functions
-        api = self.gg_api
+        # ---- Step 2: Inject Python callables as _py_gg_* globals ----
+        # We use a naming convention _py_gg_FUNCNAME to avoid collisions
 
         # Search functions
-        lua.globals().gg_searchNumber = api.searchNumber
-        lua.globals().gg_refineNumber = api.refineNumber
-        lua.globals().gg_getResults = api.getResults
-        lua.globals().gg_getResultsCount = api.getResultsCount
-        lua.globals().gg_clearResults = api.clearResults
-        lua.globals().gg_setValues = api.setValues
-        lua.globals().gg_editAll = api.editAll
-        lua.globals().gg_addListItems = api.addListItems
-        lua.globals().gg_getListItems = api.getListItems
-        lua.globals().gg_clearList = api.clearList
+        g._py_gg_searchNumber = api.searchNumber
+        g._py_gg_refineNumber = api.refineNumber
+        g._py_gg_refineAddress = api.refineAddress
+        g._py_gg_getResults = api.getResults
+        g._py_gg_getResultsCount = api.getResultsCount
+        g._py_gg_clearResults = api.clearResults
+        g._py_gg_editAll = api.editAll
+        g._py_gg_clearList = api.clearList
+        g._py_gg_getListItems = api.getListItems
 
-        # Memory functions
-        lua.globals().gg_setRanges = api.setRanges
-        lua.globals().gg_getRanges = api.getRanges
+        # Memory region functions
+        g._py_gg_setRanges = api.setRanges
+        g._py_gg_getRanges = api.getRanges
+        g._py_gg_getRangesList = api.getRangesList
 
         # Process functions
-        lua.globals().gg_getProcessName = api.getProcessName
-        lua.globals().gg_getPackage = api.getPackage
+        g._py_gg_getProcessName = api.getProcessName
+        g._py_gg_getPackage = api.getPackage
+        g._py_gg_setPackage = api.setPackage
+        g._py_gg_isPackageInstalled = api.isPackageInstalled
+        g._py_gg_getTargetPackage = api.getTargetPackage
 
         # UI functions
-        lua.globals().gg_toast = api.toast
-        lua.globals().gg_alert = api.alert
-        lua.globals().gg_choice = api.choice
-        lua.globals().gg_input = api.input
+        g._py_gg_setVisible = api.setVisible
+        g._py_gg_isVisible = api.isVisible
+        g._py_gg_toast = api.toast
+        g._py_gg_alert = api.alert
+        g._py_gg_choice = api.choice
+        g._py_gg_input = api.input
+        g._py_gg_prompt = api.prompt
+
+        # Speed/time functions
+        g._py_gg_getSpeed = api.getSpeed
+        g._py_gg_setSpeed = api.setSpeed
+        g._py_gg_sleep = api.sleep
+
+        # File functions
+        g._py_gg_getFile = api.getFile
+        g._py_gg_makeDir = api.makeDir
+        g._py_gg_copyFile = api.copyFile
+        g._py_gg_renameFile = api.renameFile
+        g._py_gg_removeFile = api.removeFile
+
+        # Network functions
+        g._py_gg_makeRequest = api.makeRequest
 
         # Misc functions
-        lua.globals().gg_sleep = api.sleep
-        lua.globals().gg_getSpeed = api.getSpeed
-        lua.globals().gg_setSpeed = api.setSpeed
-        lua.globals().gg_getLocale = api.getLocale
-        lua.globals().gg_getVersion = api.getVersion
-        lua.globals().gg_isRooted = api.isRooted
-        lua.globals().gg_abort = api.abort
-        lua.globals().gg_freeMemory = api.freeMemory
+        g._py_gg_getLocale = api.getLocale
+        g._py_gg_getVersion = api.getVersion
+        g._py_gg_getVersionInt = api.getVersionInt
+        g._py_gg_buildNumber = api.buildNumber
+        g._py_gg_getDevice = api.getDevice
+        g._py_gg_isXposed = api.isXposed
+        g._py_gg_isRooted = api.isRooted
+        g._py_gg_getScreenDensity = api.getScreenDensity
+        g._py_gg_getScreenWidth = api.getScreenWidth
+        g._py_gg_getScreenHeight = api.getScreenHeight
+        g._py_gg_abort = api.abort
+        g._py_gg_skipFastForward = api.skipFastForward
+        g._py_gg_clearMemoryCache = api.clearMemoryCache
+        g._py_gg_freeMemory = api.freeMemory
 
-        # Wire up the gg.* namespace to Python functions
+        # Pointer/offset functions
+        g._py_gg_getPointer = api.getPointer
+        g._py_gg_readBytes = api.readBytes
+        g._py_gg_writeBytes = api.writeBytes
+
+        # ---- Step 3: Functions that need Lua table -> Python conversion ----
+        # setValues, addListItems, removeListItems, loadList, saveList
+        # These take Lua tables that need to be converted to Python lists
+
+        def py_setValues(lua_table):
+            """Convert Lua table to Python list of dicts for setValues."""
+            items = []
+            if lua_table is not None:
+                try:
+                    for i in range(1, len(lua_table) + 1):
+                        item = lua_table[i]
+                        if item is not None:
+                            d = {}
+                            try:
+                                d['address'] = int(item.get('address', 0))
+                            except (TypeError, ValueError):
+                                d['address'] = 0
+                            try:
+                                d['flags'] = int(item.get('flags', 4))
+                            except (TypeError, ValueError):
+                                d['flags'] = 4
+                            d['value'] = item.get('value', 0)
+                            items.append(d)
+                except (TypeError, AttributeError):
+                    pass
+            api.setValues(items)
+            return None
+
+        def py_addListItems(lua_table):
+            """Convert Lua table to Python list of dicts for addListItems."""
+            items = []
+            if lua_table is not None:
+                try:
+                    for i in range(1, len(lua_table) + 1):
+                        item = lua_table[i]
+                        if item is not None:
+                            d = {}
+                            try:
+                                d['address'] = int(item.get('address', 0))
+                            except (TypeError, ValueError):
+                                d['address'] = 0
+                            try:
+                                d['flags'] = int(item.get('flags', 4))
+                            except (TypeError, ValueError):
+                                d['flags'] = 4
+                            d['value'] = item.get('value', 0)
+                            d['freeze'] = bool(item.get('freeze', False))
+                            try:
+                                d['freezeType'] = int(item.get('freezeType', 0))
+                            except (TypeError, ValueError):
+                                d['freezeType'] = 0
+                            items.append(d)
+                except (TypeError, AttributeError):
+                    pass
+            return api.addListItems(items)
+
+        def py_removeListItems(lua_table):
+            """Convert Lua table for removeListItems."""
+            items = []
+            if lua_table is not None:
+                try:
+                    for i in range(1, len(lua_table) + 1):
+                        item = lua_table[i]
+                        if item is not None:
+                            items.append(dict(item))
+                except (TypeError, AttributeError):
+                    pass
+            api.removeListItems(items)
+            return None
+
+        def py_loadList(filename):
+            return api.loadList(str(filename))
+
+        def py_saveList(filename, items=None):
+            return api.saveList(str(filename), items)
+
+        g._py_gg_setValues = py_setValues
+        g._py_gg_addListItems = py_addListItems
+        g._py_gg_removeListItems = py_removeListItems
+        g._py_gg_loadList = py_loadList
+        g._py_gg_saveList = py_saveList
+
+        # ---- Step 4: Wire up gg.* namespace in Lua ----
+        # This is done entirely in Lua so all functions are properly callable
         lua.execute("""
-        gg.searchNumber = gg_searchNumber
-        gg.refineNumber = gg_refineNumber
-        gg.getResults = gg_getResults
-        gg.getResultsCount = gg_getResultsCount
-        gg.clearResults = gg_clearResults
-        gg.setValues = gg_setValues
-        gg.editAll = gg_editAll
-        gg.addListItems = gg_addListItems
-        gg.getListItems = gg_getListItems
-        gg.clearList = gg_clearList
-        gg.setRanges = gg_setRanges
-        gg.getRanges = gg_getRanges
-        gg.getProcessName = gg_getProcessName
-        gg.getPackage = gg_getPackage
-        gg.toast = gg_toast
-        gg.alert = gg_alert
-        gg.choice = gg_choice
-        gg.input = gg_input
-        gg.sleep = gg_sleep
-        gg.getSpeed = gg_getSpeed
-        gg.setSpeed = gg_setSpeed
-        gg.getLocale = gg_getLocale
-        gg.getVersion = gg_getVersion
-        gg.isRooted = gg_isRooted
-        gg.abort = gg_abort
-        gg.freeMemory = gg_freeMemory
+        -- Search functions
+        gg.searchNumber = function(search, flags) _py_gg_searchNumber(tostring(search), tonumber(flags) or 0) end
+        gg.refineNumber = function(search, flags, sign) _py_gg_refineNumber(tostring(search), tonumber(flags) or 0, tonumber(sign) or 0) end
+        gg.refineAddress = function(address, offset, size) _py_gg_refineAddress(tonumber(address) or 0, tonumber(offset) or 0, tonumber(size) or 4) end
+        gg.getResults = function(count) return _py_gg_getResults(tonumber(count) or 0) end
+        gg.getResultsCount = function() return _py_gg_getResultsCount() end
+        gg.clearResults = function() _py_gg_clearResults() end
+        gg.setValues = function(values) _py_gg_setValues(values) end
+        gg.editAll = function(value, flags) return _py_gg_editAll(tostring(value), tonumber(flags) or 0) end
+        gg.addListItems = function(items) return _py_gg_addListItems(items) end
+        gg.getListItems = function() return _py_gg_getListItems() end
+        gg.clearList = function() _py_gg_clearList() end
+        gg.removeListItems = function(items) _py_gg_removeListItems(items) end
+        gg.loadList = function(file) return _py_gg_loadList(tostring(file)) end
+        gg.saveList = function(file, items) return _py_gg_saveList(tostring(file), items) end
 
-        -- Clean up global aliases
-        gg_searchNumber = nil
-        gg_refineNumber = nil
-        gg_getResults = nil
-        gg_getResultsCount = nil
-        gg_clearResults = nil
-        gg_setValues = nil
-        gg_editAll = nil
-        gg_addListItems = nil
-        gg_getListItems = nil
-        gg_clearList = nil
-        gg_setRanges = nil
-        gg_getRanges = nil
-        gg_getProcessName = nil
-        gg_getPackage = nil
-        gg_toast = nil
-        gg_alert = nil
-        gg_choice = nil
-        gg_input = nil
-        gg_sleep = nil
-        gg_getSpeed = nil
-        gg_setSpeed = nil
-        gg_getLocale = nil
-        gg_getVersion = nil
-        gg_isRooted = nil
-        gg_abort = nil
-        gg_freeMemory = nil
+        -- Memory region functions
+        gg.setRanges = function(ranges) _py_gg_setRanges(tonumber(ranges) or 0) end
+        gg.getRanges = function() return _py_gg_getRanges() end
+        gg.getRangesList = function(region) return _py_gg_getRangesList(region) end
+
+        -- Process functions
+        gg.getProcessName = function() return _py_gg_getProcessName() end
+        gg.getPackage = function() return _py_gg_getPackage() end
+        gg.setPackage = function(pkg) return _py_gg_setPackage(tostring(pkg)) end
+        gg.isPackageInstalled = function(pkg) return _py_gg_isPackageInstalled(tostring(pkg)) end
+        gg.getTargetPackage = function() return _py_gg_getTargetPackage() end
+
+        -- UI functions
+        gg.setVisible = function(visible) _py_gg_setVisible(visible ~= false and true or false) end
+        gg.isVisible = function() return _py_gg_isVisible() end
+        gg.toast = function(message) _py_gg_toast(tostring(message)) end
+        gg.alert = function(title, message, positive, negative, neutral)
+            return _py_gg_alert(tostring(title or ''), tostring(message or ''),
+                tostring(positive or 'ok'), negative and tostring(negative) or nil,
+                neutral and tostring(neutral) or nil)
+        end
+        gg.choice = function(message, items, selected)
+            return _py_gg_choice(tostring(message), items, selected)
+        end
+        gg.input = function(title, message, default)
+            return _py_gg_input(tostring(title or ''), tostring(message or ''), tostring(default or ''))
+        end
+        gg.prompt = function(title, message, items, default)
+            return _py_gg_prompt(tostring(title or ''), tostring(message or ''), items, default)
+        end
+
+        -- Speed/time functions
+        gg.getSpeed = function() return _py_gg_getSpeed() end
+        gg.setSpeed = function(speed) _py_gg_setSpeed(tonumber(speed) or 1.0) end
+        gg.sleep = function(seconds) _py_gg_sleep(tonumber(seconds) or 0) end
+
+        -- File functions
+        gg.getFile = function() return _py_gg_getFile() end
+        gg.makeDir = function(path) return _py_gg_makeDir(tostring(path)) end
+        gg.copyFile = function(src, dst) return _py_gg_copyFile(tostring(src), tostring(dst)) end
+        gg.renameFile = function(src, dst) return _py_gg_renameFile(tostring(src), tostring(dst)) end
+        gg.removeFile = function(path) return _py_gg_removeFile(tostring(path)) end
+
+        -- Network functions
+        gg.makeRequest = function(url, method, headers, data)
+            return _py_gg_makeRequest(tostring(url or ''))
+        end
+
+        -- Misc functions
+        gg.getLocale = function() return _py_gg_getLocale() end
+        gg.getVersion = function() return _py_gg_getVersion() end
+        gg.getVersionInt = function() return _py_gg_getVersionInt() end
+        gg.buildNumber = function() return _py_gg_buildNumber() end
+        gg.getDevice = function() return _py_gg_getDevice() end
+        gg.isXposed = function() return _py_gg_isXposed() end
+        gg.isRooted = function() return _py_gg_isRooted() end
+        gg.getScreenDensity = function() return _py_gg_getScreenDensity() end
+        gg.getScreenWidth = function() return _py_gg_getScreenWidth() end
+        gg.getScreenHeight = function() return _py_gg_getScreenHeight() end
+        gg.abort = function(message) _py_gg_abort(tostring(message or '')) end
+        gg.skipFastForward = function(skip) _py_gg_skipFastForward(skip ~= false) end
+        gg.clearMemoryCache = function() _py_gg_clearMemoryCache() end
+        gg.freeMemory = function() return _py_gg_freeMemory() end
+
+        -- Pointer/offset functions
+        gg.getPointer = function(address, offset) return _py_gg_getPointer(tonumber(address) or 0, tonumber(offset) or 0) end
+        gg.readBytes = function(address, size) return _py_gg_readBytes(tonumber(address) or 0, tonumber(size) or 4) end
+        gg.writeBytes = function(address, hex) _py_gg_writeBytes(tonumber(address) or 0, tostring(hex)) end
         """)
 
-        # Redirect gg.print to capture output
+        # ---- Step 5: gg.print with output capture ----
         def capture_print(text=''):
             self._output.append(str(text))
             return None
 
-        lua.globals().gg_print = capture_print
-        lua.execute("gg.print = gg_print; gg_print = nil")
+        g._py_gg_print = capture_print
+        lua.execute("""
+        gg.print = function(text) _py_gg_print(tostring(text or '')) end
+        """)
 
-        # Also redirect print
+        # ---- Step 6: Redirect Lua's print too ----
         def lua_print(*args):
             self._output.append(' '.join(str(a) for a in args))
             return None
 
-        lua.globals()._sandbox_print = lua_print
-        lua.execute("print = _sandbox_print; _sandbox_print = nil")
+        g._py_print = lua_print
+        lua.execute("print = function(...) _py_print(...) end")
 
     def _inject_bit32(self):
         """Inject the bit32 library (Lua 5.2 compatibility)."""
@@ -334,33 +502,17 @@ class GGLuaSandbox:
     def _inject_math_extensions(self):
         """Inject math library extensions for gglua compatibility."""
         self.lua.execute("""
-        -- Lua 5.3 style integer division
-        if not math.idiv then
-            function math.idiv(a, b)
-                return a // b
-            end
-        end
-
-        -- math.pow for Lua 5.3+ compatibility
         if not math.pow then
-            function math.pow(a, b)
-                return a ^ b
-            end
+            function math.pow(a, b) return a ^ b end
         end
-
-        -- Additional math functions
         if not math.round then
             function math.round(x)
                 return x >= 0 and math.floor(x + 0.5) or math.ceil(x - 0.5)
             end
         end
-
-        -- Integer type check
         if not math.tointeger then
             function math.tointeger(x)
-                if type(x) == "number" and x == math.floor(x) then
-                    return x
-                end
+                if type(x) == "number" and x == math.floor(x) then return x end
                 return nil
             end
         end
@@ -369,21 +521,16 @@ class GGLuaSandbox:
     def _setup_sandbox(self):
         """Set up sandbox restrictions."""
         self.lua.execute("""
-        -- Block dangerous os functions
         if os then
             os.execute = function(...) error("os.execute blocked in sandbox") end
             os.remove = function(...) error("os.remove blocked in sandbox") end
             os.rename = function(...) error("os.rename blocked in sandbox") end
             os.exit = function(...) error("os.exit blocked in sandbox") end
         end
-
-        -- Block dangerous io functions
         if io then
             io.popen = function(...) error("io.popen blocked in sandbox") end
             io.open = function(...) error("io.open blocked in sandbox") end
         end
-
-        -- Block loadfile/dofile with real files
         loadfile = function(...) error("loadfile blocked in sandbox") end
         dofile = function(...) error("dofile blocked in sandbox") end
         """)

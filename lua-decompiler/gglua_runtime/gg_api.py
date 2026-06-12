@@ -381,12 +381,18 @@ class GGAPI:
         """Show an input dialog."""
         return default
 
-    def prompt(self, title: str, message: str, items: List[Dict],
+    def prompt(self, title: str, message: str, items=None,
                default: Optional[List] = None) -> Optional[List]:
         """Show a prompt dialog."""
         if default:
             return default
-        return [item.get('value', '') for item in items]
+        if not items:
+            return []
+        try:
+            return [item.get('value', '') if isinstance(item, dict) else ''
+                    for item in items]
+        except (TypeError, AttributeError):
+            return []
 
     def print(self, text: str) -> None:
         """Print to GG log."""
